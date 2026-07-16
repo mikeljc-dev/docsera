@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Docsera Docs — self-hosted AI chat for your documentation</title>
+  <meta name="description" content="Install, configure and run Docsera: the open-source, self-hosted AI chat widget for your documentation. RAG with citations, LLM-agnostic, Docker Compose." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <a class="logo" href="/">Doc<span>sera</span> Docs</a>
+      <span class="badge">v0.1.0</span>
+    </div>
+    <nav>
+      <a href="https://docsera.dev">Home</a>
+      <a href="https://github.com/mikeljc-dev/docsera">GitHub ↗</a>
+    </nav>
+  </div>
+
+  <div class="layout">
+    <aside>
+      <div class="group">Getting started</div>
+      <a href="#what-is-docsera">What is Docsera?</a>
+      <a href="#installation">Installation</a>
+      <a href="#configuration">Configuration</a>
+      <div class="group">Guides</div>
+      <a href="#ingestion">Ingest your docs</a>
+      <a href="#widget">Add the widget</a>
+      <a href="#dashboard">The dashboard</a>
+      <div class="group">Reference</div>
+      <a href="#http-api">HTTP API</a>
+      <a href="#local-development">Local development</a>
+    </aside>
+
+    <main>
+      <h1>Docsera documentation</h1>
+      <p class="lead">Everything you need to install, configure and run Docsera on your own server.</p>
+
+      <div class="tip">💬 This site runs Docsera itself — try the assistant in the corner. It answers from this page and cites its sources.</div>
+
+      <section id="what-is-docsera">
+        <h2>What is Docsera?</h2>
+        <p>Docsera is an embeddable widget that answers questions about your documentation using AI, <strong>with citations to the sources</strong>. Think of Intercom's support chat — but open source (AGPL-3.0) and hosted by you.</p>
+        <ul>
+          <li><strong>Installed in under 10 minutes</strong> with Docker Compose.</li>
+          <li><strong>Privacy-first</strong>: self-hosted, your data never leaves your server (except the calls to the LLM provider you choose — or none at all with Ollama).</li>
+          <li><strong>LLM-agnostic</strong>: Anthropic, OpenAI, or local models via Ollama — for chat and embeddings, configured independently.</li>
+          <li><strong>Answers with sources</strong>: every answer deep-links to the doc section it came from. Before hallucinating, it says "I don't know."</li>
+        </ul>
+        <p>Under the hood it's classic RAG: your docs are split into sections and stored as embeddings in Postgres with pgvector. Each question is matched by cosine similarity; if nothing relevant passes the threshold, Docsera answers "I don't know" without even calling the LLM.</p>
+      </section>
+
+      <section id="installation">
+        <h2>Installation</h2>
+        <h3>Requirements</h3>
+        <p>Docker and Docker Compose (bundled with Docker Desktop). That's it — Postgres with pgvector ships in the compose file.</p>
+        <h3>Quick start</h3>
+        <pre><code>git clone https://github.com/mikeljc-dev/docsera.git
+cd docsera
+cp .env.example .env
+# edit .env: LLM keys + ADMIN_TOKEN (openssl rand -hex 32)
+docker compose up -d --build</code></pre>
+        <p>This starts Postgres+pgvector, applies the migrations automatically and runs the server at <code>http://localhost:3000</code>.</p>
+        <h3>Verify</h3>
+        <pre><code>curl http://localhost:3000/health
+# {"status":"ok","version":"0.1.0"}</code></pre>
+      </section>
+
+      <section id="configuration">
+        <h2>Configuration</h2>
+        <p>All variables live in <code>.env</code> (template in <code>.env.example</code>).</p>
+        <table>
+          <thead><tr><th>Variable</th><th>Description</th><th>Default</th></tr></thead>
+          <tbody>
+            <tr><td><code>DATABASE_URL</code></td><td>Postgres connection string</td><td>—</td></tr>
+            <tr><td><code>EMBEDDING_DIMENSIONS</code></td><td>Vector dimensions; must match your embeddings model (1536 for OpenAI small, 768 for nomic-embed-text)</td><td><code>1536</code></td></tr>
+            <tr><td><code>LLM_PROVIDER</code></td><td>Chat provider: <code>anthropic</code> | <code>openai</code> | <code>ollama</code></td><td><code>anthropic</code></td></tr>
+            <tr><td><code>LLM_MODEL</code></td><td>Chat model (optional, each adapter has a sane default)</td><td>—</td></tr>
+            <tr><td><code>EMBEDDING_PROVIDER</code></td><td>Embeddings provider: <code>openai</code> | <code>ollama</code> (Anthropic has none)</td><td><code>openai</code></td></tr>
+            <tr><td><code>EMBEDDING_MODEL</code></td><td>Embeddings model (optional)</td><td>—</td></tr>
+            <tr><td><code>ANTHROPIC_API_KEY</code> / <code>OPENAI_API_KEY</code></td><td>Keys for the providers you use</td><td>—</td></tr>
+            <tr><td><code>OLLAMA_BASE_URL</code></td><td>Ollama server URL</td><td><code>http://localhost:11434</code></td></tr>
+            <tr><td><code>PORT</code></td><td>Server port</td><td><code>3000</code></td></tr>
+            <tr><td><code>ALLOWED_ORIGINS</code></td><td>Comma-separated CORS origins for the widget</td><td>—</td></tr>
+            <tr><td><code>ADMIN_TOKEN</code></td><td>Token protecting <code>POST /ingest</code> and the dashboard</td><td>—</td></tr>
+            <tr><td><code>CHAT_RATE_LIMIT</code></td><td>Requests per IP per minute to <code>POST /chat</code></td><td><code>20</code></td></tr>
+            <tr><td><code>CHAT_MAX_DISTANCE</code></td><td>Max cosine distance for a chunk to count as relevant; <code>2</code> disables the filter</td><td><code>0.8</code></td></tr>
+            <tr><td><code>CHAT_NO_ANSWER_TEXT</code></td><td>Exact phrase when the docs don't have the answer (set it in your users' language)</td><td><code>I don't know.</code></td></tr>
+            <tr><td><code>TRUST_PROXY</code></td><td><code>true</code> only behind a reverse proxy you control that overwrites <code>x-forwarded-for</code></td><td><code>false</code></td></tr>
+          </tbody>
+        </table>
+        <p><strong>Embeddings vs. LLM provider:</strong> intentionally independent. Use Anthropic for chat and OpenAI (or Ollama) just for ingestion embeddings — Anthropic doesn't offer an embeddings API.</p>
+        <p><strong>Zero-cost with Ollama:</strong> <code>LLM_PROVIDER=ollama</code> + <code>EMBEDDING_PROVIDER=ollama</code> (with <code>EMBEDDING_DIMENSIONS=768</code> for <code>nomic-embed-text</code>) means zero external API calls.</p>
+      </section>
+
+      <section id="ingestion">
+        <h2>Ingest your docs</h2>
+        <p>Point Docsera at your existing documentation:</p>
+        <pre><code>curl -X POST http://localhost:3000/ingest \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -d '{"type": "sitemap", "source": "https://yourdomain.com/sitemap.xml"}'</code></pre>
+        <p><code>type</code> can be:</p>
+        <ul>
+          <li><code>"sitemap"</code> — every listed page, up to 200. Sitemap indexes pointing to other sitemaps work too.</li>
+          <li><code>"url"</code> — a single page.</li>
+          <li><code>"markdown"</code> — raw text, handy for CI or unpublished content. Pass a <code>url</code>: it's the document's identity for updates and the link answers will cite.</li>
+        </ul>
+        <p>Re-ingesting an unchanged document costs nothing in embeddings (content-hash deduplication). Headings become anchors, so citations deep-link to the exact section.</p>
+      </section>
+
+      <section id="widget">
+        <h2>Add the widget</h2>
+        <p>One line on any site:</p>
+        <pre><code>&lt;script src="https://your-docsera-server.com/widget.js"
+        data-server="https://your-docsera-server.com"&gt;&lt;/script&gt;</code></pre>
+        <p>Add your site's origin to <code>ALLOWED_ORIGINS</code> in <code>.env</code>.</p>
+        <h3>Languages and customization</h3>
+        <p>The widget ships its UI in English, Spanish, French, German and Portuguese, picked automatically from your page's <code>&lt;html lang&gt;</code> or the browser. Options:</p>
+        <ul>
+          <li><code>data-locale</code> — force a language (<code>en</code>, <code>es</code>, <code>fr</code>, <code>de</code>, <code>pt</code>).</li>
+          <li><code>data-heading</code> / <code>data-placeholder</code> — override individual strings.</li>
+          <li><code>CHAT_NO_ANSWER_TEXT</code> (server-side) — the assistant's no-answer phrase, in your users' language.</li>
+        </ul>
+      </section>
+
+      <section id="dashboard">
+        <h2>The dashboard</h2>
+        <p>Open <code>/dashboard</code> on your server and paste your <code>ADMIN_TOKEN</code>. You'll see the conversation history with a filter to isolate <strong>unanswered questions</strong> — the most direct signal of what's missing in your documentation.</p>
+      </section>
+
+      <section id="http-api">
+        <h2>HTTP API</h2>
+        <table>
+          <thead><tr><th>Endpoint</th><th>Auth</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>GET /health</code></td><td>—</td><td>Status and version</td></tr>
+            <tr><td><code>POST /chat</code></td><td>rate-limited</td><td><code>{question, sessionId?}</code> → <code>{answer, sources[], sessionId}</code></td></tr>
+            <tr><td><code>POST /ingest</code></td><td>Bearer <code>ADMIN_TOKEN</code></td><td><code>{type, source, url?, title?}</code> → per-document results</td></tr>
+            <tr><td><code>GET /admin/conversations</code></td><td>Bearer <code>ADMIN_TOKEN</code></td><td>History with <code>answered</code>, <code>limit</code>, <code>offset</code> filters</td></tr>
+            <tr><td><code>GET /widget.js</code></td><td>—</td><td>The embeddable widget bundle</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="local-development">
+        <h2>Local development</h2>
+        <pre><code>pnpm install
+pnpm db:up          # Postgres+pgvector only, via Docker
+pnpm db:migrate
+pnpm dev            # all packages in parallel, in watch mode</code></pre>
+        <p>See <a href="https://github.com/mikeljc-dev/docsera/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> for the checks to run before a PR.</p>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    © 2026 Docsera · <a href="https://github.com/mikeljc-dev/docsera/blob/main/LICENSE">AGPL-3.0</a> · <a href="https://docsera.dev">docsera.dev</a> · <a href="https://github.com/mikeljc-dev/docsera">GitHub</a>
+  </footer>
+
+  <script src="https://api.docsera.dev/widget.js" data-server="https://api.docsera.dev"></script>
+</body>
+</html>

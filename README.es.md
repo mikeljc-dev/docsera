@@ -48,6 +48,7 @@ Tres piezas dentro de un monorepo, todas dentro de un único servicio desplegabl
 | `packages/widget` | El web component embebible (el chat flotante), compilado a un único `widget.js` |
 | `packages/dashboard` | Panel para ver el historial de conversaciones y detectar preguntas sin respuesta |
 | `packages/web` | La landing de [docsera.dev](https://docsera.dev) (estática; no forma parte del producto desplegable) |
+| `packages/docs` | El sitio de docs.docsera.dev, con el propio widget de Docsera embebido — Docsera respondiendo preguntas sobre Docsera |
 
 El `server` es el único servicio que despliegas tú (además de Postgres): sirve la API, el widget y el dashboard desde el mismo proceso.
 
