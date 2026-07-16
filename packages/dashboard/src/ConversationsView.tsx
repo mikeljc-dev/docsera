@@ -6,9 +6,9 @@ const PAGE_SIZE = 25;
 type Filter = "all" | "answered" | "unanswered";
 
 const FILTERS: { value: Filter; label: string }[] = [
-  { value: "all", label: "Todas" },
-  { value: "answered", label: "Respondidas" },
-  { value: "unanswered", label: "Sin respuesta" },
+  { value: "all", label: "All" },
+  { value: "answered", label: "Answered" },
+  { value: "unanswered", label: "Unanswered" },
 ];
 
 interface Props {
@@ -43,7 +43,7 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
           onUnauthorized();
           return;
         }
-        setError(err instanceof Error ? err.message : "Error desconocido");
+        setError(err instanceof Error ? err.message : "Unknown error");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -59,7 +59,7 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
   return (
     <div class="dashboard">
       <header>
-        <h1>Conversaciones</h1>
+        <h1>Conversations</h1>
         <div class="filters">
           {FILTERS.map(({ value, label }) => (
             <button
@@ -77,18 +77,18 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
       </header>
 
       {error && <p class="error">{error}</p>}
-      {loading && <p class="loading">Cargando…</p>}
+      {loading && <p class="loading">Loading…</p>}
 
       {!loading && !error && (
         <>
           <table>
             <thead>
               <tr>
-                <th>Fecha</th>
-                <th>Pregunta</th>
-                <th>Respuesta</th>
-                <th>Estado</th>
-                <th>Fuentes</th>
+                <th>Date</th>
+                <th>Question</th>
+                <th>Answer</th>
+                <th>Status</th>
+                <th>Sources</th>
               </tr>
             </thead>
             <tbody>
@@ -99,7 +99,7 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
                   <td>{conversation.answer ?? "—"}</td>
                   <td>
                     <span class={conversation.answered ? "badge ok" : "badge warn"}>
-                      {conversation.answered ? "Respondida" : "Sin respuesta"}
+                      {conversation.answered ? "Answered" : "Unanswered"}
                     </span>
                   </td>
                   <td class="center">{conversation.sourceCount}</td>
@@ -108,7 +108,7 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
               {conversations.length === 0 && (
                 <tr>
                   <td colSpan={5} class="empty">
-                    No hay conversaciones para este filtro.
+                    No conversations match this filter.
                   </td>
                 </tr>
               )}
@@ -117,13 +117,13 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
 
           <div class="pagination">
             <button disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
-              Anterior
+              Previous
             </button>
             <span>
-              Página {page + 1} de {totalPages} ({total} en total)
+              Page {page + 1} of {totalPages} ({total} total)
             </span>
             <button disabled={page + 1 >= totalPages} onClick={() => setPage((p) => p + 1)}>
-              Siguiente
+              Next
             </button>
           </div>
         </>

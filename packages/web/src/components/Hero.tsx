@@ -13,7 +13,7 @@ export function Hero() {
         never leaves your server. Every answer cites its sources.
       </p>
       <div class="cta">
-        <a class="btn primary" href={`${GITHUB_URL}#instalación`}>
+        <a class="btn primary" href={`${GITHUB_URL}#installation`}>
           Get started
         </a>
         <a class="btn ghost" href={GITHUB_URL}>

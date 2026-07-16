@@ -4,53 +4,55 @@
 
 [![CI](https://github.com/mikeljc-dev/docsera/actions/workflows/ci.yml/badge.svg)](https://github.com/mikeljc-dev/docsera/actions/workflows/ci.yml)
 
-**Chat con IA sobre tu documentación. Open source, self-hosted, en una línea.**
+**AI chat for your docs. Open source, self-hosted, one line of code.**
 
-Instala un asistente inteligente sobre tus docs con un solo `<script>`.
-Tus datos no salen de tu servidor. Funciona con Anthropic, OpenAI o modelos locales.
+Add an intelligent assistant to your documentation with a single `<script>` tag.
+Your data never leaves your server. Works with Anthropic, OpenAI or local models.
 
-[docsera.dev](https://docsera.dev) · [Instalación](#instalación) · [Uso](#uso) · [Configuración](#configuración) · [Cómo funciona](#cómo-funciona) · [Roadmap](#roadmap) · [Licencia](#licencia)
+[docsera.dev](https://docsera.dev) · [Installation](#installation) · [Usage](#usage) · [Configuration](#configuration) · [How it works](#how-it-works) · [Roadmap](#roadmap) · [License](#license)
+
+**English** · [Español](./README.es.md)
 
 </div>
 
-> ⚠️ **Estado: v0.0.1, núcleo funcional.** Server, ingesta, chat con RAG,
-> widget, dashboard y Docker ya funcionan de extremo a extremo. Pendiente de
-> pulido final antes del lanzamiento público (ver [Roadmap](#roadmap)).
+> ⚠️ **Status: v0.0.1, working core.** Server, ingestion, RAG chat, widget,
+> dashboard and Docker all work end to end. Final polish pending before the
+> public launch (see [Roadmap](#roadmap)).
 
 ---
 
 ## Demo
 
-![Widget de Docsera respondiendo una pregunta con citas a la fuente](./docs/demo.png)
+![Docsera widget answering a question with source citations](./docs/demo.png)
 
-*(Captura real del widget corriendo contra el stack local. Pendiente
-sustituir por un GIF grabado en condiciones antes del lanzamiento.)*
+*(Real screenshot of the widget running against the local stack. To be
+replaced with a proper GIF before launch.)*
 
-## ¿Qué es?
+## What is it?
 
-Docsera es un widget embebible que responde preguntas sobre tu documentación usando IA, **con citas a las fuentes**. Piensa en el chat de soporte de Intercom, pero open source y que puedes alojar tú mismo.
+Docsera is an embeddable widget that answers questions about your documentation using AI, **with citations to the sources**. Think of Intercom's support chat — but open source and hosted by you.
 
-- **Instalación en < 10 minutos** con Docker Compose.
-- **Privacy-first**: en modo self-hosted, los datos nunca salen de tu servidor (salvo las llamadas al proveedor de LLM que tú elijas).
-- **Agnóstico de LLM**: Anthropic, OpenAI o modelos locales vía Ollama — para chat y para embeddings, por separado.
-- **Respuestas con fuentes**: cada respuesta enlaza a la sección de donde salió. Antes de inventar, responde "No lo sé."
+- **Installed in under 10 minutes** with Docker Compose.
+- **Privacy-first**: self-hosted, your data never leaves your server (except the calls to the LLM provider *you* choose — or none at all with Ollama).
+- **LLM-agnostic**: Anthropic, OpenAI, or local models via Ollama — for chat and embeddings, configured independently.
+- **Answers with sources**: every answer links to the doc section it came from. Before hallucinating, it says "I don't know."
 
-## Cómo funciona
+## How it works
 
-Tres piezas dentro de un monorepo, todas dentro de un único servicio desplegable:
+Three pieces in one monorepo, all served by a single deployable service:
 
-| Paquete | Qué hace |
+| Package | What it does |
 |---|---|
-| `packages/server` | La API: `POST /chat` (RAG con citas), `POST /ingest` (markdown/URL/sitemap), y sirve el widget y el dashboard como estáticos |
-| `packages/widget` | El web component embebible (el chat flotante), compilado a un único `widget.js` |
-| `packages/dashboard` | Panel para ver el historial de conversaciones y detectar preguntas sin respuesta |
-| `packages/web` | La landing de [docsera.dev](https://docsera.dev) (estática; no forma parte del producto desplegable) |
+| `packages/server` | The API: `POST /chat` (RAG with citations), `POST /ingest` (markdown/URL/sitemap), and serves the widget and dashboard as static assets |
+| `packages/widget` | The embeddable web component (the floating chat), bundled into a single `widget.js` |
+| `packages/dashboard` | Admin panel to browse conversation history and detect unanswered questions |
+| `packages/web` | The [docsera.dev](https://docsera.dev) landing page (not part of the deployable product) |
 
-El `server` es el único servicio que despliegas tú (además de Postgres): sirve la API, el widget y el dashboard desde el mismo proceso.
+The `server` is the only service you deploy (besides Postgres): it serves the API, the widget and the dashboard from the same process.
 
-## Instalación
+## Installation
 
-Requisitos previos: [Docker](https://docs.docker.com/get-docker/) y Docker Compose (incluido en Docker Desktop). Node ≥ 20 y [pnpm](https://pnpm.io) solo si quieres desarrollar en local sin Docker.
+Prerequisites: [Docker](https://docs.docker.com/get-docker/) and Docker Compose (bundled with Docker Desktop). Node ≥ 20 and [pnpm](https://pnpm.io) only if you want to develop locally without Docker.
 
 ```bash
 git clone https://github.com/mikeljc-dev/docsera.git
@@ -58,28 +60,28 @@ cd docsera
 cp .env.example .env
 ```
 
-Edita `.env` y rellena como mínimo:
+Edit `.env` and fill in at least:
 
-- `ANTHROPIC_API_KEY` (o `OPENAI_API_KEY`, según `LLM_PROVIDER`) — el proveedor para el chat.
-- `OPENAI_API_KEY` — necesaria para generar embeddings en la ingesta aunque uses Anthropic u Ollama para el chat (Anthropic no tiene API de embeddings). Alternativa gratuita: `EMBEDDING_PROVIDER=ollama`.
-- `ADMIN_TOKEN` — genera uno con `openssl rand -hex 32`. Protege `POST /ingest` y el dashboard.
+- `ANTHROPIC_API_KEY` (or `OPENAI_API_KEY`, depending on `LLM_PROVIDER`) — the chat provider.
+- `OPENAI_API_KEY` — needed for ingestion embeddings even if you use Anthropic or Ollama for chat (Anthropic has no embeddings API). Free alternative: `EMBEDDING_PROVIDER=ollama`.
+- `ADMIN_TOKEN` — generate one with `openssl rand -hex 32`. Protects `POST /ingest` and the dashboard.
 
-Levanta todo con un comando:
+Bring everything up with one command:
 
 ```bash
 docker compose up -d --build
 ```
 
-Esto levanta Postgres+pgvector, aplica las migraciones automáticamente y arranca el server en `http://localhost:3000`. Compruébalo:
+This starts Postgres+pgvector, applies migrations automatically and runs the server at `http://localhost:3000`. Check it:
 
 ```bash
 curl http://localhost:3000/health
 # {"status":"ok","version":"0.0.1"}
 ```
 
-## Uso
+## Usage
 
-### 1. Ingiere tu documentación
+### 1. Ingest your documentation
 
 ```bash
 curl -X POST http://localhost:3000/ingest \
@@ -87,11 +89,11 @@ curl -X POST http://localhost:3000/ingest \
   -H "Authorization: Bearer $ADMIN_TOKEN" \
   -d '{
     "type": "sitemap",
-    "source": "https://tudominio.com/sitemap.xml"
+    "source": "https://yourdomain.com/sitemap.xml"
   }'
 ```
 
-`type` puede ser `"url"` (una página), `"sitemap"` (todas las páginas listadas, hasta 200; los sitemaps índice que apuntan a otros sitemaps también funcionan) o `"markdown"` (texto directo, útil para CI o contenido que no está publicado como HTML):
+`type` can be `"url"` (a single page), `"sitemap"` (every listed page, up to 200; sitemap indexes pointing to other sitemaps work too) or `"markdown"` (raw text — handy for CI or content that isn't published as HTML):
 
 ```bash
 curl -X POST http://localhost:3000/ingest \
@@ -99,93 +101,93 @@ curl -X POST http://localhost:3000/ingest \
   -H "Authorization: Bearer $ADMIN_TOKEN" \
   -d '{
     "type": "markdown",
-    "url": "https://tudominio.com/docs/instalacion",
-    "title": "Instalación",
-    "source": "# Instalación\n\n..."
+    "url": "https://yourdomain.com/docs/install",
+    "title": "Installation",
+    "source": "# Installation\n\n..."
   }'
 ```
 
-Re-ingerir un documento sin cambios no vuelve a gastar en embeddings (deduplicación por hash de contenido).
+Re-ingesting an unchanged document costs nothing in embeddings (content-hash deduplication).
 
-Para `"markdown"`, la `url` es opcional pero recomendable: es la identidad del documento (sin ella, una versión modificada del mismo markdown se ingiere como documento nuevo en vez de actualizar el anterior) y además el enlace que citarán las respuestas.
+For `"markdown"`, the `url` is optional but recommended: it's the document's identity (without it, a modified version of the same markdown is ingested as a new document instead of updating the previous one) and it's also the link that answers will cite.
 
-### 2. Instala el widget en tu web
+### 2. Add the widget to your site
 
-Una sola línea:
+One line:
 
 ```html
 <script src="http://localhost:3000/widget.js" data-server="http://localhost:3000"></script>
 ```
 
-En producción, sustituye `localhost:3000` por el dominio donde tengas desplegado el server, y añade el origen de tu web a `ALLOWED_ORIGINS` en `.env`.
+In production, replace `localhost:3000` with the domain where your server is deployed, and add your site's origin to `ALLOWED_ORIGINS` in `.env`.
 
-**Idiomas.** El widget trae sus textos en inglés, español, francés, alemán y portugués, y detecta el idioma automáticamente (del `lang` del `<html>` de tu página, o del navegador). Puedes forzarlo con `data-locale`, sobreescribir textos concretos con `data-heading`/`data-placeholder`, y poner la frase de no-respuesta del asistente en tu idioma con `CHAT_NO_ANSWER_TEXT` en `.env`:
+**Languages.** The widget ships its UI in English, Spanish, French, German and Portuguese, and picks the language automatically (from your page's `<html lang>`, or the browser). Force it with `data-locale`, override individual strings with `data-heading`/`data-placeholder`, and set the assistant's no-answer phrase in your language with `CHAT_NO_ANSWER_TEXT` in `.env`:
 
 ```html
-<script src="https://docs.midominio.com/widget.js"
-        data-server="https://docs.midominio.com"
+<script src="https://docs.yourdomain.com/widget.js"
+        data-server="https://docs.yourdomain.com"
         data-locale="es"
         data-heading="¿Dudas? Pregúntame"></script>
 ```
 
-### 3. Revisa el historial en el dashboard
+### 3. Review the history in the dashboard
 
-Abre `http://localhost:3000/dashboard`, pega tu `ADMIN_TOKEN`, y verás el historial de conversaciones con un filtro para aislar las preguntas sin respuesta — la señal más directa de qué le falta a tu documentación.
+Open `http://localhost:3000/dashboard`, paste your `ADMIN_TOKEN`, and you'll see the conversation history with a filter to isolate unanswered questions — the most direct signal of what's missing in your documentation.
 
-## Configuración
+## Configuration
 
-Todas las variables viven en `.env` (plantilla en `.env.example`).
+All variables live in `.env` (template in `.env.example`).
 
-| Variable | Descripción | Default |
+| Variable | Description | Default |
 |---|---|---|
-| `DATABASE_URL` | Cadena de conexión a Postgres | — |
-| `EMBEDDING_DIMENSIONS` | Dimensiones del vector, debe coincidir con el modelo de embeddings | `1536` |
-| `LLM_PROVIDER` | Proveedor de chat: `anthropic` \| `openai` \| `ollama` | `anthropic` |
-| `LLM_MODEL` | Modelo de chat (opcional, cada adaptador tiene un default) | — |
-| `EMBEDDING_PROVIDER` | Proveedor de embeddings: `openai` \| `ollama` (Anthropic no tiene) | `openai` |
-| `EMBEDDING_MODEL` | Modelo de embeddings (opcional) | — |
-| `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` | Keys de los proveedores que uses | — |
-| `OLLAMA_BASE_URL` | URL del servidor Ollama | `http://localhost:11434` |
-| `PORT` | Puerto del server | `3000` |
-| `ALLOWED_ORIGINS` | Orígenes permitidos por CORS para el widget, separados por coma | `http://localhost:5173` |
-| `ADMIN_TOKEN` | Token que protege `POST /ingest` y `GET /admin/*` (dashboard) | — |
-| `CHAT_RATE_LIMIT` | Peticiones por IP y minuto a `POST /chat` (endpoint público) | `20` |
-| `CHAT_MAX_DISTANCE` | Distancia coseno máxima para considerar un chunk relevante; si ninguno pasa, se responde la frase de no-respuesta sin llamar al LLM. `2` desactiva el filtro | `0.8` |
-| `CHAT_NO_ANSWER_TEXT` | Frase exacta cuando la doc no tiene la respuesta (ponla en el idioma de tus usuarios, ej: `No lo sé.`) | `I don't know.` |
-| `TRUST_PROXY` | `true` solo si hay un reverse proxy propio delante que sobreescriba `x-forwarded-for`; el rate limit usará esa cabecera como IP del cliente | `false` |
+| `DATABASE_URL` | Postgres connection string | — |
+| `EMBEDDING_DIMENSIONS` | Vector dimensions; must match your embeddings model | `1536` |
+| `LLM_PROVIDER` | Chat provider: `anthropic` \| `openai` \| `ollama` | `anthropic` |
+| `LLM_MODEL` | Chat model (optional, each adapter has a sane default) | — |
+| `EMBEDDING_PROVIDER` | Embeddings provider: `openai` \| `ollama` (Anthropic has none) | `openai` |
+| `EMBEDDING_MODEL` | Embeddings model (optional) | — |
+| `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` | Keys for the providers you use | — |
+| `OLLAMA_BASE_URL` | Ollama server URL | `http://localhost:11434` |
+| `PORT` | Server port | `3000` |
+| `ALLOWED_ORIGINS` | Comma-separated CORS origins for the widget | `http://localhost:5173` |
+| `ADMIN_TOKEN` | Token protecting `POST /ingest` and `GET /admin/*` (dashboard) | — |
+| `CHAT_RATE_LIMIT` | Requests per IP per minute to `POST /chat` (public endpoint) | `20` |
+| `CHAT_MAX_DISTANCE` | Max cosine distance for a chunk to count as relevant; if none pass, the no-answer phrase is returned without calling the LLM. `2` disables the filter | `0.8` |
+| `CHAT_NO_ANSWER_TEXT` | Exact phrase when the docs don't have the answer (set it in your users' language, e.g. `No lo sé.`) | `I don't know.` |
+| `TRUST_PROXY` | `true` only if a reverse proxy you control sits in front and overwrites `x-forwarded-for`; the rate limiter will use that header as the client IP | `false` |
 
-**Sobre embeddings y proveedor de LLM:** son configuraciones independientes a propósito. Puedes usar Anthropic para el chat y OpenAI (o Ollama) solo para generar los embeddings de la ingesta, ya que Anthropic no ofrece API de embeddings propia.
+**About embeddings vs. LLM provider:** they're intentionally independent. You can use Anthropic for chat and OpenAI (or Ollama) just for ingestion embeddings, since Anthropic doesn't offer an embeddings API.
 
-**Sobre `EMBEDDING_DIMENSIONS`:** está fijada en la columna `chunks.embedding` de Postgres desde la primera migración. Si cambias de proveedor/modelo de embeddings después de haber ingerido contenido, necesitas una migración nueva que recree esa columna y volver a ingerir todo.
+**About `EMBEDDING_DIMENSIONS`:** it's fixed in the Postgres `chunks.embedding` column from the first migration. If you switch embeddings provider/model after ingesting content, you need a new migration that recreates that column, then re-ingest everything.
 
-**Ollama sin coste:** si prefieres cero llamadas a APIs externas y tienes hardware para correrlo, `LLM_PROVIDER=ollama` + `EMBEDDING_PROVIDER=ollama` (con `EMBEDDING_DIMENSIONS=768` para `nomic-embed-text`) funciona igual de bien, solo que localmente. No es el default porque añade fricción de instalación (hay que tener Ollama corriendo) que no encaja con la promesa de "instalación en <10 minutos" para el caso general.
+**Zero-cost with Ollama:** if you prefer zero external API calls and have the hardware, `LLM_PROVIDER=ollama` + `EMBEDDING_PROVIDER=ollama` (with `EMBEDDING_DIMENSIONS=768` for `nomic-embed-text`) works just as well, only locally. It's not the default because it adds install friction (you need Ollama running) that doesn't fit the "installed in <10 minutes" promise for the general case.
 
-## Desarrollo local (sin Docker)
+## Local development (without Docker)
 
 ```bash
 pnpm install
-pnpm db:up          # solo Postgres+pgvector, vía Docker
+pnpm db:up          # Postgres+pgvector only, via Docker
 pnpm db:migrate
-pnpm dev            # los tres paquetes en paralelo, en modo watch
+pnpm dev            # all packages in parallel, in watch mode
 ```
 
-`pnpm dev` arranca el server (`:3000`), la página de pruebas del widget (`:8000`, esbuild) y el dashboard (`:5173`, Vite con proxy a la API). Para trabajar en un solo paquete: `pnpm --filter @docsera/server dev` (o `widget` / `dashboard`).
+`pnpm dev` starts the server (`:3000`), the widget test page (`:8000`, esbuild) and the dashboard (`:5173`, Vite proxying to the API). To work on a single package: `pnpm --filter @docsera/server dev` (or `widget` / `dashboard`).
 
 ## Roadmap
 
-- [x] **Fase 1 — Núcleo:** server, esquema de BD, ingesta (markdown/URL/sitemap), adaptadores de LLM (Anthropic/OpenAI/Ollama), chat con RAG y citas, widget embebible, Docker.
-- [ ] **Fase 2 — Lanzamiento:** dashboard ✅, README con guía real ✅ (este documento), pulido de código ✅ (rate limiting, umbral de similitud, sitemaps índice, dedupe de ingesta), CI ✅, dominio ([docsera.dev](https://docsera.dev)) ✅. Queda: GIF de demo y publicación (GitHub, Hacker News, r/selfhosted).
-- [ ] **Fase 3 — Tracción:** iterar con feedback real, prototipo de versión cloud (multi-tenant, billing por uso), lista de espera.
+- [x] **Phase 1 — Core:** server, DB schema, ingestion (markdown/URL/sitemap), LLM adapters (Anthropic/OpenAI/Ollama), RAG chat with citations, embeddable widget, Docker.
+- [ ] **Phase 2 — Launch:** dashboard ✅, real installation guide ✅ (this document), code polish ✅ (rate limiting, similarity threshold, sitemap indexes, ingestion dedupe), CI ✅, domain ([docsera.dev](https://docsera.dev)) ✅. Remaining: demo GIF and going public (GitHub, Hacker News, r/selfhosted).
+- [ ] **Phase 3 — Traction:** iterate on real feedback, cloud version prototype (multi-tenant, usage-based billing), waitlist.
 
 ## Stack
 
-TypeScript en todo el monorepo · pnpm workspaces · [Hono](https://hono.dev) · Postgres + [pgvector](https://github.com/pgvector/pgvector) · [Lit](https://lit.dev) (widget) · [Preact](https://preactjs.com) + Vite (dashboard) · Docker.
+TypeScript across the monorepo · pnpm workspaces · [Hono](https://hono.dev) · Postgres + [pgvector](https://github.com/pgvector/pgvector) · [Lit](https://lit.dev) (widget) · [Preact](https://preactjs.com) + Vite (dashboard) · Docker.
 
-## Contribuir
+## Contributing
 
-Ver [CONTRIBUTING.md](./CONTRIBUTING.md) — setup de desarrollo, checks a
-correr antes de un PR (`typecheck`/`lint`/`test`) y estilo de código.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) — dev setup, checks to run before a
+PR (`typecheck`/`lint`/`test`) and code style.
 
-## Licencia
+## License
 
-[AGPL-3.0](./LICENSE). El núcleo es y será siempre open source. La versión cloud gestionada (de pago) llegará más adelante para quien no quiera mantener la infraestructura.
+[AGPL-3.0](./LICENSE). The core is and will always be open source. A managed (paid) cloud version will come later for those who'd rather not run the infrastructure.

@@ -115,7 +115,10 @@ extremo, no solo compilado.
 **Fase 2 en marcha:**
 - [x] Dashboard (historial de conversaciones + detección de preguntas sin
       respuesta).
-- [x] README con guía de instalación real y docs de configuración.
+- [x] README con guía de instalación real y docs de configuración. Desde el
+      2026-07-16, README.md en inglés (audiencia del lanzamiento) y
+      README.es.md en español, enlazados entre sí; el dashboard también
+      pasó a inglés.
 - [x] Pulido de código (rate limiting, umbral de similitud, sitemaps
       índice, dedupe de ingesta) y CI con GitHub Actions (2026-07-16).
 - [x] Dominio docsera.dev registrado y landing en producción (2026-07-16).

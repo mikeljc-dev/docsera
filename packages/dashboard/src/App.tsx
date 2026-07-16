@@ -9,7 +9,7 @@ export function App() {
   if (!token) {
     return (
       <div class="login">
-        <h1>Docsera — Panel de administración</h1>
+        <h1>Docsera — Admin panel</h1>
         <form
           onSubmit={(event) => {
             event.preventDefault();
@@ -20,16 +20,16 @@ export function App() {
           }}
         >
           <label>
-            Token de administración (ADMIN_TOKEN)
+            Admin token (ADMIN_TOKEN)
             <input
               type="password"
               value={inputValue}
               onInput={(event) => setInputValue((event.target as HTMLInputElement).value)}
-              placeholder="Pega tu ADMIN_TOKEN"
+              placeholder="Paste your ADMIN_TOKEN"
               autoFocus
             />
           </label>
-          <button type="submit">Entrar</button>
+          <button type="submit">Sign in</button>
         </form>
       </div>
     );

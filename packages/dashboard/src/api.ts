@@ -61,7 +61,7 @@ export async function fetchConversations(
   });
 
   if (response.status === 401) {
-    throw new UnauthorizedError("Token inválido");
+    throw new UnauthorizedError("Invalid token");
   }
 
   if (!response.ok) {
