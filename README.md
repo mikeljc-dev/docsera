@@ -161,7 +161,7 @@ pnpm dev            # los tres paquetes en paralelo, en modo watch
 ## Roadmap
 
 - [x] **Fase 1 — Núcleo:** server, esquema de BD, ingesta (markdown/URL/sitemap), adaptadores de LLM (Anthropic/OpenAI/Ollama), chat con RAG y citas, widget embebible, Docker.
-- [ ] **Fase 2 — Lanzamiento:** dashboard ✅, README con guía real ✅ (este documento), pulido final para lanzamiento público (GitHub, Hacker News, r/selfhosted).
+- [ ] **Fase 2 — Lanzamiento:** dashboard ✅, README con guía real ✅ (este documento), pulido de código ✅ (rate limiting, umbral de similitud, sitemaps índice, dedupe de ingesta). Queda: dominio definitivo, GIF de demo y publicación (GitHub, Hacker News, r/selfhosted).
 - [ ] **Fase 3 — Tracción:** iterar con feedback real, prototipo de versión cloud (multi-tenant, billing por uso), lista de espera.
 
 ## Stack
