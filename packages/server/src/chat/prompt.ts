@@ -29,7 +29,11 @@ The context items are numbered (e.g. [1], [2]) only so you can relate them
 internally to their titles; those numbers mean nothing to the reader (the
 sources are shown separately, elsewhere in the interface). Never write those
 bracketed numbers in your answer, and never name the context or its titles
-as if quoting them. Answer naturally, as if you simply knew the answer.`;
+as if quoting them. Answer naturally, as if you simply knew the answer.
+
+Your answer is rendered as plain text in a small chat bubble: do NOT use
+Markdown (no asterisks, bullet lists, headers or code fences). Answer in
+short plain prose, at most a few sentences.`;
 }
 
 export function buildChatMessages(question: string, chunks: RetrievedChunk[]): ChatMessage[] {
