@@ -3,17 +3,18 @@ interface Bucket {
   resetAt: number;
 }
 
-const buckets = new Map<string, Bucket>();
 const SWEEP_THRESHOLD = 10_000;
 
-function sweepExpired(now: number): void {
-  if (buckets.size < SWEEP_THRESHOLD) return;
-  for (const [key, bucket] of buckets) {
-    if (bucket.resetAt <= now) buckets.delete(key);
-  }
-}
-
 export function createRateLimiter(limit: number, windowMs: number): (key: string) => boolean {
+  const buckets = new Map<string, Bucket>();
+
+  function sweepExpired(now: number): void {
+    if (buckets.size < SWEEP_THRESHOLD) return;
+    for (const [key, bucket] of buckets) {
+      if (bucket.resetAt <= now) buckets.delete(key);
+    }
+  }
+
   return (key: string): boolean => {
     const now = Date.now();
     sweepExpired(now);

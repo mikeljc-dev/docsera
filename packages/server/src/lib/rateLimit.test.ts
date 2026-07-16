@@ -3,10 +3,6 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { createRateLimiter } from "./rateLimit.js";
 
-// El almacén de buckets es compartido a nivel de módulo (una sola instancia
-// vive en producción), así que cada test usa una key única para no
-// interferir con las demás.
-
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -34,6 +30,15 @@ test("claves distintas tienen contadores independientes", () => {
   assert.equal(allow(keyA), true);
   assert.equal(allow(keyB), true);
   assert.equal(allow(keyA), false);
+});
+
+test("cada limiter tiene su propio almacén de buckets", () => {
+  const allowA = createRateLimiter(1, 60_000);
+  const allowB = createRateLimiter(1, 60_000);
+  const key = randomUUID();
+  assert.equal(allowA(key), true);
+  assert.equal(allowB(key), true);
+  assert.equal(allowA(key), false);
 });
 
 test("el contador se reinicia pasada la ventana", async () => {

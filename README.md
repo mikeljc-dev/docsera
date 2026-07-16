@@ -136,6 +136,7 @@ Todas las variables viven en `.env` (plantilla en `.env.example`).
 | `ALLOWED_ORIGINS` | Orígenes permitidos por CORS para el widget, separados por coma | `http://localhost:5173` |
 | `ADMIN_TOKEN` | Token que protege `POST /ingest` y `GET /admin/*` (dashboard) | — |
 | `CHAT_RATE_LIMIT` | Peticiones por IP y minuto a `POST /chat` (endpoint público) | `20` |
+| `TRUST_PROXY` | `true` solo si hay un reverse proxy propio delante que sobreescriba `x-forwarded-for`; el rate limit usará esa cabecera como IP del cliente | `false` |
 
 **Sobre embeddings y proveedor de LLM:** son configuraciones independientes a propósito. Puedes usar Anthropic para el chat y OpenAI (o Ollama) solo para generar los embeddings de la ingesta, ya que Anthropic no ofrece API de embeddings propia.
 
