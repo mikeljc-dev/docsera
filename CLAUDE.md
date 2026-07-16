@@ -125,7 +125,10 @@ extremo, no solo compilado.
 - [x] GIF de demo en `docs/demo.gif` (2026-07-16): grabado con Playwright
       contra el stack local (Ollama/llama3.2), pregunta con citas por
       sección + pregunta fuera de tema con "I don't know".
-- [ ] Publicación (GitHub, Hacker News, r/selfhosted).
+- [x] Release v0.1.0 publicada en GitHub (2026-07-16), con tag y notas:
+      https://github.com/mikeljc-dev/docsera/releases/tag/v0.1.0
+- [ ] Publicación en Hacker News (Show HN) y r/selfhosted — la hace Mikel
+      con los borradores ya preparados (ver conversación del 2026-07-16).
 
-Siguiente: cerrar el pulido de lanzamiento, o pasar a Fase 3 si se decide
-lanzar tal cual.
+Siguiente: publicar los posts y pasar a Fase 3 (iterar con feedback real,
+prototipo cloud).
