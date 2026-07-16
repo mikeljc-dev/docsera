@@ -6,8 +6,15 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
-    "build": "echo \"TODO: build del widget\"",
+    "dev": "esbuild src/entry.ts --bundle --format=iife --outfile=public/widget.js --watch --servedir=public",
+    "build": "esbuild src/entry.ts --bundle --format=iife --outfile=dist/widget.js --minify",
     "lint": "echo \"TODO: lint\"",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "lit": "^3.3.3"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1"
   }
 }
