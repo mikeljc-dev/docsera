@@ -39,7 +39,8 @@ docsera/
 └── packages/
     ├── widget/     # web component embebible (el chat flotante)
     ├── server/     # API: chat (RAG), ingesta, administración
-    └── dashboard/  # panel: conversaciones y preguntas sin respuesta
+    ├── dashboard/  # panel: conversaciones y preguntas sin respuesta
+    └── web/        # landing de docsera.dev (estática, en inglés, sin build)
 ```
 
 Cada paquete usa el prefijo `@docsera/`. Los `tsconfig.json` de cada paquete
