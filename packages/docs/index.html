@@ -41,8 +41,8 @@
 
       <div class="tip">💬 This site runs Docsera itself — try the assistant in the corner. It answers from this page and cites its sources.</div>
 
-      <section id="what-is-docsera">
-        <h2>What is Docsera?</h2>
+      <section>
+        <h2 id="what-is-docsera">What is Docsera?</h2>
         <p>Docsera is an embeddable widget that answers questions about your documentation using AI, <strong>with citations to the sources</strong>. Think of Intercom's support chat — but open source (AGPL-3.0) and hosted by you.</p>
         <ul>
           <li><strong>Installed in under 10 minutes</strong> with Docker Compose.</li>
@@ -53,8 +53,8 @@
         <p>Under the hood it's classic RAG: your docs are split into sections and stored as embeddings in Postgres with pgvector. Each question is matched by cosine similarity; if nothing relevant passes the threshold, Docsera answers "I don't know" without even calling the LLM.</p>
       </section>
 
-      <section id="installation">
-        <h2>Installation</h2>
+      <section>
+        <h2 id="installation">Installation</h2>
         <h3>Requirements</h3>
         <p>Docker and Docker Compose (bundled with Docker Desktop). That's it — Postgres with pgvector ships in the compose file.</p>
         <h3>Quick start</h3>
@@ -69,8 +69,8 @@ docker compose up -d --build</code></pre>
 # {"status":"ok","version":"0.1.0"}</code></pre>
       </section>
 
-      <section id="configuration">
-        <h2>Configuration</h2>
+      <section>
+        <h2 id="configuration">Configuration</h2>
         <p>All variables live in <code>.env</code> (template in <code>.env.example</code>).</p>
         <table>
           <thead><tr><th>Variable</th><th>Description</th><th>Default</th></tr></thead>
@@ -96,8 +96,8 @@ docker compose up -d --build</code></pre>
         <p><strong>Zero-cost with Ollama:</strong> <code>LLM_PROVIDER=ollama</code> + <code>EMBEDDING_PROVIDER=ollama</code> (with <code>EMBEDDING_DIMENSIONS=768</code> for <code>nomic-embed-text</code>) means zero external API calls.</p>
       </section>
 
-      <section id="ingestion">
-        <h2>Ingest your docs</h2>
+      <section>
+        <h2 id="ingestion">Ingest your docs</h2>
         <p>Point Docsera at your existing documentation:</p>
         <pre><code>curl -X POST http://localhost:3000/ingest \
   -H "Content-Type: application/json" \
@@ -112,8 +112,8 @@ docker compose up -d --build</code></pre>
         <p>Re-ingesting an unchanged document costs nothing in embeddings (content-hash deduplication). Headings become anchors, so citations deep-link to the exact section.</p>
       </section>
 
-      <section id="widget">
-        <h2>Add the widget</h2>
+      <section>
+        <h2 id="widget">Add the widget</h2>
         <p>One line on any site:</p>
         <pre><code>&lt;script src="https://your-docsera-server.com/widget.js"
         data-server="https://your-docsera-server.com"&gt;&lt;/script&gt;</code></pre>
@@ -127,13 +127,13 @@ docker compose up -d --build</code></pre>
         </ul>
       </section>
 
-      <section id="dashboard">
-        <h2>The dashboard</h2>
+      <section>
+        <h2 id="dashboard">The dashboard</h2>
         <p>Open <code>/dashboard</code> on your server and paste your <code>ADMIN_TOKEN</code>. You'll see the conversation history with a filter to isolate <strong>unanswered questions</strong> — the most direct signal of what's missing in your documentation.</p>
       </section>
 
-      <section id="http-api">
-        <h2>HTTP API</h2>
+      <section>
+        <h2 id="http-api">HTTP API</h2>
         <table>
           <thead><tr><th>Endpoint</th><th>Auth</th><th>Description</th></tr></thead>
           <tbody>
@@ -146,8 +146,8 @@ docker compose up -d --build</code></pre>
         </table>
       </section>
 
-      <section id="local-development">
-        <h2>Local development</h2>
+      <section>
+        <h2 id="local-development">Local development</h2>
         <pre><code>pnpm install
 pnpm db:up          # Postgres+pgvector only, via Docker
 pnpm db:migrate
