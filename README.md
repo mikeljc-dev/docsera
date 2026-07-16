@@ -164,6 +164,11 @@ pnpm --filter @docsera/dashboard dev    # opcional, para trabajar en el dashboar
 
 TypeScript en todo el monorepo · pnpm workspaces · [Hono](https://hono.dev) · Postgres + [pgvector](https://github.com/pgvector/pgvector) · [Lit](https://lit.dev) (widget) · [Preact](https://preactjs.com) + Vite (dashboard) · Docker.
 
+## Contribuir
+
+Ver [CONTRIBUTING.md](./CONTRIBUTING.md) — setup de desarrollo, checks a
+correr antes de un PR (`typecheck`/`lint`/`test`) y estilo de código.
+
 ## Licencia
 
 [AGPL-3.0](./LICENSE). El núcleo es y será siempre open source. La versión cloud gestionada (de pago) llegará más adelante para quien no quiera mantener la infraestructura.

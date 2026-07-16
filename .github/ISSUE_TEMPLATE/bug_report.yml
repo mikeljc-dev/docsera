@@ -1,0 +1,49 @@
+name: Bug report
+description: Algo no funciona como esperabas
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: ¿Qué pasó?
+      description: Descripción del problema. Si hay un mensaje de error, pégalo tal cual.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para reproducirlo
+      placeholder: |
+        1. Ingesté con `POST /ingest` tipo "sitemap"
+        2. Pregunté "..." en el widget
+        3. La respuesta fue X, esperaba Y
+    validations:
+      required: true
+
+  - type: input
+    id: llm-provider
+    attributes:
+      label: LLM_PROVIDER / EMBEDDING_PROVIDER
+      placeholder: "ej: anthropic / openai"
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Versión / commit
+      placeholder: "ej: v0.0.1, o el hash del commit"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: ¿Cómo lo tienes desplegado?
+      options:
+        - Docker Compose (docker compose up)
+        - Desarrollo local (pnpm dev, sin Docker)
+        - Otro
+    validations:
+      required: false
