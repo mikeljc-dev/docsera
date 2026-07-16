@@ -1,12 +1,9 @@
-import { fileURLToPath } from "node:url";
-import { dirname, resolve } from "node:path";
-import { config } from "dotenv";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { loadEnv } from "./env.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-config({ path: resolve(__dirname, "../../../.env") });
+loadEnv();
 
 const PORT = Number(process.env.PORT ?? 3000);
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? "")

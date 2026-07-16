@@ -15,7 +15,8 @@
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
     "db:up": "docker compose up -d db",
-    "db:down": "docker compose down"
+    "db:down": "docker compose down",
+    "db:migrate": "pnpm --filter @askdocs/server db:migrate"
   },
   "devDependencies": {
     "typescript": "^5.5.0"
