@@ -13,13 +13,20 @@ export function Hero() {
         never leaves your server. Every answer cites its sources.
       </p>
       <div class="cta">
-        <a class="btn primary" href={`${GITHUB_URL}#installation`}>
+        <a class="btn primary" href="https://docs.docsera.dev">
+          Try the live demo
+        </a>
+        <a class="btn ghost" href={`${GITHUB_URL}#installation`}>
           Get started
         </a>
         <a class="btn ghost" href={GITHUB_URL}>
           Star on GitHub
         </a>
       </div>
+      <p class="cta-note">
+        The chat bubble on this page — and on the docs — is Docsera itself, running on its own
+        documentation.
+      </p>
 
       <div class="snippet">
         <div class="bar">
