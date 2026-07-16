@@ -24,8 +24,10 @@ Analogía: "el chat de soporte de Intercom, pero open source y self-hosted".
 - **Estructura:** monorepo con pnpm workspaces.
 - **Nombre:** Docsera (antes "AskDocs" — renombrado por colisión con un
   producto comercial existente del mismo nombre). Repo, paquetes y
-  contenedores ya renombrados. Pendiente: registrar el dominio de verdad
-  (solo se comprobó por búsqueda web, no un whois real).
+  contenedores ya renombrados. Disponibilidad de dominios verificada con
+  whois/RDAP el 2026-07-16: libres .dev, .io, .org, .ai, .es, .so, .sh;
+  cogidos .com (GoDaddy 2021, expira 2026-11), .net (feb 2026) y .app
+  (sep 2025). Pendiente: elegir y registrar uno.
 
 ## Estructura del monorepo
 
@@ -101,7 +103,8 @@ cómo probarlo antes de seguir.
 - [x] Reemplazar `LICENSE` con el texto oficial.
 - [x] Nombre definitivo elegido: Docsera. Repo/paquetes/contenedores
       renombrados.
-- [ ] Registrar el dominio de verdad (solo comprobado por búsqueda web).
+- [ ] Registrar el dominio. Disponibilidad ya verificada con whois/RDAP
+      (2026-07-16): ver "Decisiones ya tomadas". Falta elegir TLD y comprar.
 
 ## Estado actual
 
