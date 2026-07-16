@@ -9,7 +9,7 @@
 Instala un asistente inteligente sobre tus docs con un solo `<script>`.
 Tus datos no salen de tu servidor. Funciona con Anthropic, OpenAI o modelos locales.
 
-[Instalación](#instalación) · [Uso](#uso) · [Configuración](#configuración) · [Cómo funciona](#cómo-funciona) · [Roadmap](#roadmap) · [Licencia](#licencia)
+[docsera.dev](https://docsera.dev) · [Instalación](#instalación) · [Uso](#uso) · [Configuración](#configuración) · [Cómo funciona](#cómo-funciona) · [Roadmap](#roadmap) · [Licencia](#licencia)
 
 </div>
 

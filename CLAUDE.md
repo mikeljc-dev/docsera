@@ -25,7 +25,8 @@ Analogía: "el chat de soporte de Intercom, pero open source y self-hosted".
 - **Nombre y dominio:** Docsera (antes "AskDocs" — renombrado por colisión
   con un producto comercial existente del mismo nombre). Repo, paquetes y
   contenedores ya renombrados. Dominio **docsera.dev** registrado el
-  2026-07-16 (en Vercel; verificado por RDAP). Aún sin nada desplegado en él.
+  2026-07-16 (en Vercel) y con la landing (`packages/web`) desplegada en
+  producción desde Vercel (root directory `packages/web`, preset Vite).
 
 ## Estructura del monorepo
 
@@ -103,7 +104,7 @@ cómo probarlo antes de seguir.
 - [x] Nombre definitivo elegido: Docsera. Repo/paquetes/contenedores
       renombrados.
 - [x] Registrar el dominio: **docsera.dev**, registrado el 2026-07-16 en
-      Vercel (verificado por RDAP). Pendiente desplegar algo en él.
+      Vercel. Landing desplegada y en producción en https://docsera.dev.
 
 ## Estado actual
 
@@ -117,7 +118,7 @@ extremo, no solo compilado.
 - [x] README con guía de instalación real y docs de configuración.
 - [x] Pulido de código (rate limiting, umbral de similitud, sitemaps
       índice, dedupe de ingesta) y CI con GitHub Actions (2026-07-16).
-- [x] Dominio docsera.dev registrado (2026-07-16, sin desplegar aún).
+- [x] Dominio docsera.dev registrado y landing en producción (2026-07-16).
 - [ ] GIF de demo grabado en condiciones — hay un screenshot estático en
       `docs/demo.png` como placeholder, no un GIF.
 - [ ] Publicación (GitHub, Hacker News, r/selfhosted).
