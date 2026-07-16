@@ -2,6 +2,7 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { loadEnv } from "./env.js";
+import { ingestRoute } from "./routes/ingest.js";
 
 loadEnv();
 
@@ -16,6 +17,8 @@ const app = new Hono();
 app.use("*", cors({ origin: ALLOWED_ORIGINS }));
 
 app.get("/health", (c) => c.json({ status: "ok", version: "0.0.1" }));
+
+app.route("/", ingestRoute);
 
 serve({ fetch: app.fetch, port: PORT }, (info) => {
   console.log(`AskDocs server listening on http://localhost:${info.port}`);
