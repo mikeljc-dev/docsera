@@ -22,12 +22,10 @@ Analogía: "el chat de soporte de Intercom, pero open source y self-hosted".
 - **Framework del server:** Hono + @hono/node-server.
 - **Base de datos:** Postgres + pgvector (un solo servicio para datos y vectores).
 - **Estructura:** monorepo con pnpm workspaces.
-- **Nombre:** Docsera (antes "AskDocs" — renombrado por colisión con un
-  producto comercial existente del mismo nombre). Repo, paquetes y
-  contenedores ya renombrados. Disponibilidad de dominios verificada con
-  whois/RDAP el 2026-07-16: libres .dev, .io, .org, .ai, .es, .so, .sh;
-  cogidos .com (GoDaddy 2021, expira 2026-11), .net (feb 2026) y .app
-  (sep 2025). Pendiente: elegir y registrar uno.
+- **Nombre y dominio:** Docsera (antes "AskDocs" — renombrado por colisión
+  con un producto comercial existente del mismo nombre). Repo, paquetes y
+  contenedores ya renombrados. Dominio **docsera.dev** registrado el
+  2026-07-16 (en Vercel; verificado por RDAP). Aún sin nada desplegado en él.
 
 ## Estructura del monorepo
 
@@ -103,8 +101,8 @@ cómo probarlo antes de seguir.
 - [x] Reemplazar `LICENSE` con el texto oficial.
 - [x] Nombre definitivo elegido: Docsera. Repo/paquetes/contenedores
       renombrados.
-- [ ] Registrar el dominio. Disponibilidad ya verificada con whois/RDAP
-      (2026-07-16): ver "Decisiones ya tomadas". Falta elegir TLD y comprar.
+- [x] Registrar el dominio: **docsera.dev**, registrado el 2026-07-16 en
+      Vercel (verificado por RDAP). Pendiente desplegar algo en él.
 
 ## Estado actual
 
@@ -116,9 +114,12 @@ extremo, no solo compilado.
 - [x] Dashboard (historial de conversaciones + detección de preguntas sin
       respuesta).
 - [x] README con guía de instalación real y docs de configuración.
-- [ ] Pulido final para lanzamiento público (nombre/dominio definitivo,
-      GIF de demo grabado en condiciones — hay un screenshot estático en
-      `docs/demo.png` como placeholder, no un GIF).
+- [x] Pulido de código (rate limiting, umbral de similitud, sitemaps
+      índice, dedupe de ingesta) y CI con GitHub Actions (2026-07-16).
+- [x] Dominio docsera.dev registrado (2026-07-16, sin desplegar aún).
+- [ ] GIF de demo grabado en condiciones — hay un screenshot estático en
+      `docs/demo.png` como placeholder, no un GIF.
+- [ ] Publicación (GitHub, Hacker News, r/selfhosted).
 
 Siguiente: cerrar el pulido de lanzamiento, o pasar a Fase 3 si se decide
 lanzar tal cual.
