@@ -1,8 +1,8 @@
 {
-  "name": "@askdocs/dashboard",
+  "name": "@docsera/dashboard",
   "version": "0.0.1",
   "private": true,
-  "description": "Panel de administracion de AskDocs: conversaciones y preguntas sin respuesta",
+  "description": "Panel de administracion de Docsera: conversaciones y preguntas sin respuesta",
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {

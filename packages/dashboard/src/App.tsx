@@ -9,7 +9,7 @@ export function App() {
   if (!token) {
     return (
       <div class="login">
-        <h1>AskDocs — Panel de administración</h1>
+        <h1>Docsera — Panel de administración</h1>
         <form
           onSubmit={(event) => {
             event.preventDefault();

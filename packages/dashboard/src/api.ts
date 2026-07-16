@@ -13,7 +13,7 @@ export interface ConversationsResponse {
   total: number;
 }
 
-const TOKEN_STORAGE_KEY = "askdocs-admin-token";
+const TOKEN_STORAGE_KEY = "docsera-admin-token";
 
 export function getStoredToken(): string | null {
   try {

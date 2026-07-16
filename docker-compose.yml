@@ -1,21 +1,22 @@
-# db + server levantan el backend completo con un solo comando (`pnpm up` o
-# `docker compose up -d --build`). El dashboard se anadira en Fase 2.
+# db + server levantan el backend completo con un solo comando (`pnpm
+# compose:up` o `docker compose up -d --build`). El server sirve tambien
+# el widget y el dashboard como estaticos.
 
 services:
   db:
     image: pgvector/pgvector:pg16
-    container_name: askdocs-db
+    container_name: docsera-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: askdocs
-      POSTGRES_PASSWORD: askdocs
-      POSTGRES_DB: askdocs
+      POSTGRES_USER: docsera
+      POSTGRES_PASSWORD: docsera
+      POSTGRES_DB: docsera
     ports:
       - "5432:5432"
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U askdocs"]
+      test: ["CMD-SHELL", "pg_isready -U docsera"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -24,7 +25,7 @@ services:
     build:
       context: .
       dockerfile: packages/server/Dockerfile
-    container_name: askdocs-server
+    container_name: docsera-server
     restart: unless-stopped
     env_file:
       - .env
@@ -33,7 +34,7 @@ services:
       # resto de valores de .env (pensados para `pnpm dev` en el host) no
       # sirven aqui, hay que sobreescribirlos apuntando a los nombres de
       # servicio / al host real.
-      DATABASE_URL: postgresql://askdocs:askdocs@db:5432/askdocs
+      DATABASE_URL: postgresql://docsera:docsera@db:5432/docsera
       OLLAMA_BASE_URL: http://host.docker.internal:11434
     extra_hosts:
       # host.docker.internal solo existe por defecto en Docker Desktop

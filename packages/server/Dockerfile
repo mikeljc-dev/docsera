@@ -17,11 +17,11 @@ RUN pnpm install --frozen-lockfile
 
 COPY packages packages
 
-RUN pnpm --filter @askdocs/widget build \
+RUN pnpm --filter @docsera/widget build \
   && mkdir -p packages/server/public \
   && cp packages/widget/dist/widget.js packages/server/public/widget.js
 
-RUN pnpm --filter @askdocs/dashboard build \
+RUN pnpm --filter @docsera/dashboard build \
   && mkdir -p packages/server/public/dashboard \
   && cp -r packages/dashboard/dist/. packages/server/public/dashboard/
 

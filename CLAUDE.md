@@ -1,10 +1,10 @@
-# CLAUDE.md — Contexto del proyecto AskDocs
+# CLAUDE.md — Contexto del proyecto Docsera
 
 Este archivo te da el contexto para trabajar en este repositorio. Léelo al
 empezar cada sesión. Trabajas de forma incremental y por fases: no adelantes
 trabajo de fases futuras salvo que se te pida.
 
-## Qué es AskDocs
+## Qué es Docsera
 
 Widget open source de chat con IA sobre documentación propia. Cualquiera puede
 instalar un asistente inteligente sobre sus docs con una sola línea de
@@ -22,12 +22,15 @@ Analogía: "el chat de soporte de Intercom, pero open source y self-hosted".
 - **Framework del server:** Hono + @hono/node-server.
 - **Base de datos:** Postgres + pgvector (un solo servicio para datos y vectores).
 - **Estructura:** monorepo con pnpm workspaces.
-- **Nombre de trabajo:** AskDocs (a confirmar antes del lanzamiento público).
+- **Nombre:** Docsera (antes "AskDocs" — renombrado por colisión con un
+  producto comercial existente del mismo nombre). Repo, paquetes y
+  contenedores ya renombrados. Pendiente: registrar el dominio de verdad
+  (solo se comprobó por búsqueda web, no un whois real).
 
 ## Estructura del monorepo
 
 ```
-askdocs/
+docsera/
 ├── package.json            # raíz, workspaces + scripts (db:up, build...)
 ├── pnpm-workspace.yaml
 ├── tsconfig.base.json      # config TS estricta compartida
@@ -39,7 +42,7 @@ askdocs/
     └── dashboard/  # panel: conversaciones y preguntas sin respuesta
 ```
 
-Cada paquete usa el prefijo `@askdocs/`. Los `tsconfig.json` de cada paquete
+Cada paquete usa el prefijo `@docsera/`. Los `tsconfig.json` de cada paquete
 deben extender `../../tsconfig.base.json`.
 
 ## Principios de diseño (mantener siempre)
@@ -96,7 +99,9 @@ cómo probarlo antes de seguir.
 ## Antes de publicar el repo
 
 - [x] Reemplazar `LICENSE` con el texto oficial.
-- [ ] Confirmar el nombre definitivo y disponibilidad de dominio.
+- [x] Nombre definitivo elegido: Docsera. Repo/paquetes/contenedores
+      renombrados.
+- [ ] Registrar el dominio de verdad (solo comprobado por búsqueda web).
 
 ## Estado actual
 

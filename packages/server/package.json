@@ -1,8 +1,8 @@
 {
-  "name": "@askdocs/server",
+  "name": "@docsera/server",
   "version": "0.0.1",
   "private": true,
-  "description": "API de AskDocs: chat (RAG), ingesta y administracion",
+  "description": "API de Docsera: chat (RAG), ingesta y administracion",
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {

@@ -12,7 +12,7 @@ const widgetJs = existsSync(WIDGET_PATH) ? readFileSync(WIDGET_PATH, "utf-8") : 
 widgetRoute.get("/widget.js", (c) => {
   if (!widgetJs) {
     return c.text(
-      "widget.js no encontrado. Ejecuta `pnpm --filter @askdocs/widget build` y copia " +
+      "widget.js no encontrado. Ejecuta `pnpm --filter @docsera/widget build` y copia " +
         "dist/widget.js a packages/server/public/widget.js.",
       404,
     );

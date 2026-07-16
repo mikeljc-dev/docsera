@@ -1,5 +1,5 @@
 {
-  "name": "askdocs",
+  "name": "docsera",
   "version": "0.0.1",
   "private": true,
   "description": "Widget open source de chat con IA sobre tu documentacion. Self-hosted, privacy-first, agnostico de LLM.",
@@ -16,7 +16,7 @@
     "typecheck": "pnpm -r typecheck",
     "db:up": "docker compose up -d db",
     "db:down": "docker compose down",
-    "db:migrate": "pnpm --filter @askdocs/server db:migrate",
+    "db:migrate": "pnpm --filter @docsera/server db:migrate",
     "compose:up": "docker compose up -d --build",
     "compose:down": "docker compose down"
   },

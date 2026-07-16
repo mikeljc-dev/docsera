@@ -1,6 +1,6 @@
 <div align="center">
 
-# AskDocs
+# Docsera
 
 **Chat con IA sobre tu documentación. Open source, self-hosted, en una línea.**
 
@@ -19,14 +19,14 @@ Tus datos no salen de tu servidor. Funciona con Anthropic, OpenAI o modelos loca
 
 ## Demo
 
-![Widget de AskDocs respondiendo una pregunta con citas a la fuente](./docs/demo.png)
+![Widget de Docsera respondiendo una pregunta con citas a la fuente](./docs/demo.png)
 
 *(Captura real del widget corriendo contra el stack local. Pendiente
 sustituir por un GIF grabado en condiciones antes del lanzamiento.)*
 
 ## ¿Qué es?
 
-AskDocs es un widget embebible que responde preguntas sobre tu documentación usando IA, **con citas a las fuentes**. Piensa en el chat de soporte de Intercom, pero open source y que puedes alojar tú mismo.
+Docsera es un widget embebible que responde preguntas sobre tu documentación usando IA, **con citas a las fuentes**. Piensa en el chat de soporte de Intercom, pero open source y que puedes alojar tú mismo.
 
 - **Instalación en < 10 minutos** con Docker Compose.
 - **Privacy-first**: en modo self-hosted, los datos nunca salen de tu servidor (salvo las llamadas al proveedor de LLM que tú elijas).
@@ -50,8 +50,8 @@ El `server` es el único servicio que despliegas tú (además de Postgres): sirv
 Requisitos previos: [Docker](https://docs.docker.com/get-docker/) y Docker Compose (incluido en Docker Desktop). Node ≥ 20 y [pnpm](https://pnpm.io) solo si quieres desarrollar en local sin Docker.
 
 ```bash
-git clone https://github.com/mikeljc-dev/askdocs.git
-cd askdocs
+git clone https://github.com/mikeljc-dev/docsera.git
+cd docsera
 cp .env.example .env
 ```
 
@@ -149,9 +149,9 @@ Todas las variables viven en `.env` (plantilla en `.env.example`).
 pnpm install
 pnpm db:up          # solo Postgres+pgvector, vía Docker
 pnpm db:migrate
-pnpm --filter @askdocs/server dev
-pnpm --filter @askdocs/widget dev       # opcional, para trabajar en el widget
-pnpm --filter @askdocs/dashboard dev    # opcional, para trabajar en el dashboard
+pnpm --filter @docsera/server dev
+pnpm --filter @docsera/widget dev       # opcional, para trabajar en el widget
+pnpm --filter @docsera/dashboard dev    # opcional, para trabajar en el dashboard
 ```
 
 ## Roadmap

@@ -3,7 +3,7 @@ import * as cheerio from "cheerio";
 export const MAX_PAGES = 200;
 const FETCH_CONCURRENCY = 3;
 const FETCH_TIMEOUT_MS = 15_000;
-const USER_AGENT = "AskDocsBot/0.0.1";
+const USER_AGENT = "DocseraBot/0.0.1";
 
 export interface RawDocument {
   url: string | null;

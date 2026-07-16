@@ -29,5 +29,5 @@ app.route("/", adminRoute);
 app.route("/", dashboardRoute);
 
 serve({ fetch: app.fetch, port: PORT }, (info) => {
-  console.log(`AskDocs server listening on http://localhost:${info.port}`);
+  console.log(`Docsera server listening on http://localhost:${info.port}`);
 });

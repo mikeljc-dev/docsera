@@ -1,7 +1,7 @@
 import { LitElement, html, css, type PropertyValues } from "lit";
 import type { ChatMessage, ChatResponse, Source } from "./types.js";
 
-const SESSION_STORAGE_KEY = "askdocs-session-id";
+const SESSION_STORAGE_KEY = "docsera-session-id";
 
 function loadSessionId(): string {
   try {
@@ -24,7 +24,7 @@ function sourceHref(source: Source): string {
   return source.anchor ? `${source.url}#${source.anchor}` : source.url;
 }
 
-export class AskDocsWidget extends LitElement {
+export class DocseraWidget extends LitElement {
   static properties = {
     server: { type: String },
     heading: { type: String },
@@ -41,13 +41,13 @@ export class AskDocsWidget extends LitElement {
       bottom: 1.5rem;
       z-index: 2147483000;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --askdocs-primary: #2563eb;
-      --askdocs-primary-fg: #ffffff;
-      --askdocs-bg: #ffffff;
-      --askdocs-fg: #1f2937;
-      --askdocs-muted: #6b7280;
-      --askdocs-border: #e5e7eb;
-      --askdocs-radius: 14px;
+      --docsera-primary: #2563eb;
+      --docsera-primary-fg: #ffffff;
+      --docsera-bg: #ffffff;
+      --docsera-fg: #1f2937;
+      --docsera-muted: #6b7280;
+      --docsera-border: #e5e7eb;
+      --docsera-radius: 14px;
     }
 
     .fab {
@@ -55,8 +55,8 @@ export class AskDocsWidget extends LitElement {
       height: 56px;
       border-radius: 50%;
       border: none;
-      background: var(--askdocs-primary);
-      color: var(--askdocs-primary-fg);
+      background: var(--docsera-primary);
+      color: var(--docsera-primary-fg);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -76,14 +76,14 @@ export class AskDocsWidget extends LitElement {
       max-width: calc(100vw - 2rem);
       height: 520px;
       max-height: calc(100vh - 6rem);
-      background: var(--askdocs-bg);
-      color: var(--askdocs-fg);
-      border-radius: var(--askdocs-radius);
+      background: var(--docsera-bg);
+      color: var(--docsera-fg);
+      border-radius: var(--docsera-radius);
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      border: 1px solid var(--askdocs-border);
+      border: 1px solid var(--docsera-border);
     }
 
     header {
@@ -91,8 +91,8 @@ export class AskDocsWidget extends LitElement {
       align-items: center;
       justify-content: space-between;
       padding: 0.85rem 1rem;
-      background: var(--askdocs-primary);
-      color: var(--askdocs-primary-fg);
+      background: var(--docsera-primary);
+      color: var(--docsera-primary-fg);
       font-weight: 600;
       font-size: 0.95rem;
     }
@@ -117,7 +117,7 @@ export class AskDocsWidget extends LitElement {
     }
 
     .empty {
-      color: var(--askdocs-muted);
+      color: var(--docsera-muted);
       font-size: 0.9rem;
       text-align: center;
       margin-top: 2rem;
@@ -149,8 +149,8 @@ export class AskDocsWidget extends LitElement {
     }
 
     .message.user .bubble {
-      background: var(--askdocs-primary);
-      color: var(--askdocs-primary-fg);
+      background: var(--docsera-primary);
+      color: var(--docsera-primary-fg);
     }
 
     .message.assistant .bubble {
@@ -165,14 +165,14 @@ export class AskDocsWidget extends LitElement {
     .sources {
       margin-top: 0.3rem;
       font-size: 0.75rem;
-      color: var(--askdocs-muted);
+      color: var(--docsera-muted);
       display: flex;
       flex-direction: column;
       gap: 0.15rem;
     }
 
     .sources a {
-      color: var(--askdocs-primary);
+      color: var(--docsera-primary);
       text-decoration: none;
     }
 
@@ -182,7 +182,7 @@ export class AskDocsWidget extends LitElement {
 
     .pending .bubble {
       background: #f3f4f6;
-      color: var(--askdocs-muted);
+      color: var(--docsera-muted);
       font-style: italic;
     }
 
@@ -190,12 +190,12 @@ export class AskDocsWidget extends LitElement {
       display: flex;
       gap: 0.5rem;
       padding: 0.75rem;
-      border-top: 1px solid var(--askdocs-border);
+      border-top: 1px solid var(--docsera-border);
     }
 
     input {
       flex: 1;
-      border: 1px solid var(--askdocs-border);
+      border: 1px solid var(--docsera-border);
       border-radius: 8px;
       padding: 0.5rem 0.65rem;
       font-size: 0.9rem;
@@ -204,13 +204,13 @@ export class AskDocsWidget extends LitElement {
     }
 
     input:focus {
-      outline: 2px solid var(--askdocs-primary);
+      outline: 2px solid var(--docsera-primary);
       outline-offset: 1px;
     }
 
     form button {
-      background: var(--askdocs-primary);
-      color: var(--askdocs-primary-fg);
+      background: var(--docsera-primary);
+      color: var(--docsera-primary-fg);
       border: none;
       border-radius: 8px;
       padding: 0 0.9rem;
@@ -378,4 +378,4 @@ function closeIcon() {
   </svg>`;
 }
 
-customElements.define("askdocs-widget", AskDocsWidget);
+customElements.define("docsera-widget", DocseraWidget);
