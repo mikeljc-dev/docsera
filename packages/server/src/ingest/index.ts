@@ -4,7 +4,12 @@ import { chunkBlocks } from "./chunk.js";
 import { extractFromHtml } from "./extractHtml.js";
 import { extractFromMarkdown } from "./extractMarkdown.js";
 import { type IngestSourceInput, resolveSources } from "./fetchSource.js";
-import { findDocumentByUrl, hashContent, upsertDocumentWithChunks } from "./store.js";
+import {
+  findDocumentByUrl,
+  findUrllessDocumentByHash,
+  hashContent,
+  upsertDocumentWithChunks,
+} from "./store.js";
 
 export type { IngestSourceInput } from "./fetchSource.js";
 
@@ -36,7 +41,11 @@ export async function runIngest(input: IngestSourceInput): Promise<IngestResult>
   for (const rawDoc of rawDocuments) {
     try {
       const contentHash = hashContent(rawDoc.rawContent);
-      const existing = rawDoc.url ? await findDocumentByUrl(pool, rawDoc.url) : null;
+      // Sin url no hay identidad estable: el hash al menos evita duplicar
+      // el documento al re-ingerir el mismo markdown tal cual.
+      const existing = rawDoc.url
+        ? await findDocumentByUrl(pool, rawDoc.url)
+        : await findUrllessDocumentByHash(pool, contentHash);
 
       if (existing && existing.contentHash === contentHash) {
         results.push({

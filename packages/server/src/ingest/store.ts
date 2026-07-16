@@ -18,6 +18,21 @@ export async function findDocumentByUrl(
   return row ? { id: row.id, contentHash: row.content_hash } : null;
 }
 
+// Los documentos sin url no tienen identidad estable (UNIQUE(url) admite
+// múltiples NULL): el hash exacto del contenido es lo único que permite
+// detectar una re-ingesta idéntica y no duplicar filas.
+export async function findUrllessDocumentByHash(
+  pool: Pool,
+  contentHash: string,
+): Promise<{ id: string; contentHash: string } | null> {
+  const result = await pool.query<{ id: string; content_hash: string }>(
+    "SELECT id, content_hash FROM documents WHERE url IS NULL AND content_hash = $1 LIMIT 1",
+    [contentHash],
+  );
+  const row = result.rows[0];
+  return row ? { id: row.id, contentHash: row.content_hash } : null;
+}
+
 export interface DocumentIdentity {
   url: string | null;
   title: string;
