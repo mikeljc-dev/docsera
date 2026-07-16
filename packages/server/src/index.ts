@@ -2,6 +2,7 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { loadEnv } from "./env.js";
+import { chatRoute } from "./routes/chat.js";
 import { ingestRoute } from "./routes/ingest.js";
 
 loadEnv();
@@ -19,6 +20,7 @@ app.use("*", cors({ origin: ALLOWED_ORIGINS }));
 app.get("/health", (c) => c.json({ status: "ok", version: "0.0.1" }));
 
 app.route("/", ingestRoute);
+app.route("/", chatRoute);
 
 serve({ fetch: app.fetch, port: PORT }, (info) => {
   console.log(`AskDocs server listening on http://localhost:${info.port}`);

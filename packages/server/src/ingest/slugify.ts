@@ -1,10 +1,7 @@
-const DIACRITICS_PATTERN = /[̀-ͯ]/g;
+import { stripDiacritics } from "../lib/text.js";
 
 export function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(DIACRITICS_PATTERN, "")
+  return stripDiacritics(text.toLowerCase())
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 }
