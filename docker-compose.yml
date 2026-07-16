@@ -1,0 +1,21 @@
+# De momento solo levantamos la base de datos.
+# Los servicios (server, dashboard) se anadiran en fases posteriores.
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: askdocs-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: askdocs
+      POSTGRES_PASSWORD: askdocs
+      POSTGRES_DB: askdocs
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U askdocs"]
+      interval: 5s
+      timeout: 5s
+      retries: 5

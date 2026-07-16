@@ -1,0 +1,14 @@
+{
+  "name": "@askdocs/dashboard",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Panel de administracion de AskDocs: conversaciones y preguntas sin respuesta",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "dev": "echo \"TODO: arrancar dashboard en modo dev\"",
+    "build": "echo \"TODO: build del dashboard\"",
+    "lint": "echo \"TODO: lint\"",
+    "typecheck": "tsc --noEmit"
+  }
+}

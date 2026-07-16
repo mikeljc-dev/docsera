@@ -1,0 +1,23 @@
+{
+  "name": "@askdocs/server",
+  "version": "0.0.1",
+  "private": true,
+  "description": "API de AskDocs: chat (RAG), ingesta y administracion",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "echo \"TODO: build del server\"",
+    "lint": "echo \"TODO: lint\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.0.10",
+    "dotenv": "^17.4.2",
+    "hono": "^4.12.30"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.23.1"
+  }
+}

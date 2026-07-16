@@ -1,0 +1,23 @@
+{
+  "name": "askdocs",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Widget open source de chat con IA sobre tu documentacion. Self-hosted, privacy-first, agnostico de LLM.",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "echo \"TODO: arrancar server + dashboard + widget en modo dev\"",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}

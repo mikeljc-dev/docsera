@@ -1,0 +1,13 @@
+{
+  "name": "@askdocs/widget",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Web component embebible del chat AskDocs",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"TODO: build del widget\"",
+    "lint": "echo \"TODO: lint\"",
+    "typecheck": "tsc --noEmit"
+  }
+}
