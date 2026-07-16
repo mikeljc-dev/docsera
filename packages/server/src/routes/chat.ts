@@ -5,7 +5,10 @@ import { chatRateLimit } from "../lib/chatRateLimit.js";
 
 const chatSchema = z.object({
   question: z.string().min(1).max(2000),
-  sessionId: z.string().min(1).max(200).optional(),
+  // La columna conversations.session_id es UUID: un sessionId con otro
+  // formato (ej: localStorage manipulado) rompería el INSERT después de
+  // haber pagado la llamada al LLM. Se descarta y se abre sesión nueva.
+  sessionId: z.uuid().optional().catch(undefined),
 });
 
 export const chatRoute = new Hono();
