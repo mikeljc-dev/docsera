@@ -16,7 +16,9 @@
     "typecheck": "pnpm -r typecheck",
     "db:up": "docker compose up -d db",
     "db:down": "docker compose down",
-    "db:migrate": "pnpm --filter @askdocs/server db:migrate"
+    "db:migrate": "pnpm --filter @askdocs/server db:migrate",
+    "compose:up": "docker compose up -d --build",
+    "compose:down": "docker compose down"
   },
   "devDependencies": {
     "typescript": "^5.5.0"
