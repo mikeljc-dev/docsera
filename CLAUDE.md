@@ -138,9 +138,13 @@ extremo, no solo compilado.
       (modo compatibilidad OpenAI, LLM_MODEL=gemini-flash-lite-latest,
       EMBEDDING_MODEL=gemini-embedding-001 a 1536 dims). README en inglés
       ingerido como contenido inicial.
-- [ ] Pendiente de la demo: proyecto Vercel para docs.docsera.dev (root
-      packages/docs) y custom domain api.docsera.dev en Railway + CNAME
-      en el DNS de Vercel; después, ingerir https://docs.docsera.dev/.
+- [x] Demo completa en vivo (2026-07-17): docs.docsera.dev (Vercel, root
+      packages/docs) con el widget funcionando contra api.docsera.dev
+      (custom domain en Railway; CNAME + TXT _railway-verify.api en el
+      DNS de Vercel — un wildcard * ALIAS de Vercel responde por
+      cualquier subdominio sin registro explícito). Contenido ingerido:
+      README inglés + https://docs.docsera.dev/. Verificado E2E con
+      Playwright contra producción.
 - [ ] Publicación en Hacker News (Show HN) y r/selfhosted — la hace Mikel
       con los borradores ya preparados (ver conversación del 2026-07-16).
 
