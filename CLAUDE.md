@@ -95,11 +95,22 @@ cómo probarlo antes de seguir.
 
 ## Antes de publicar el repo
 
-- [ ] Reemplazar `LICENSE` con el texto oficial:
-      `curl -o LICENSE https://www.gnu.org/licenses/agpl-3.0.txt`
+- [x] Reemplazar `LICENSE` con el texto oficial.
 - [ ] Confirmar el nombre definitivo y disponibilidad de dominio.
 
 ## Estado actual
 
-Esqueleto del monorepo montado (Paso 1 hecho). Siguiente: **Fase 1, punto 1**
-(API mínima del server con `/health`).
+**Fase 1 completa** (server, esquema de BD, ingesta, adaptadores de LLM,
+chat RAG con citas, widget embebible, Docker) — todo probado de extremo a
+extremo, no solo compilado.
+
+**Fase 2 en marcha:**
+- [x] Dashboard (historial de conversaciones + detección de preguntas sin
+      respuesta).
+- [x] README con guía de instalación real y docs de configuración.
+- [ ] Pulido final para lanzamiento público (nombre/dominio definitivo,
+      GIF de demo grabado en condiciones — hay un screenshot estático en
+      `docs/demo.png` como placeholder, no un GIF).
+
+Siguiente: cerrar el pulido de lanzamiento, o pasar a Fase 3 si se decide
+lanzar tal cual.
