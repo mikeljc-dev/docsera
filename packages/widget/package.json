@@ -1,6 +1,6 @@
 {
   "name": "@docsera/widget",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "description": "Web component embebible del chat Docsera",
   "license": "AGPL-3.0-only",

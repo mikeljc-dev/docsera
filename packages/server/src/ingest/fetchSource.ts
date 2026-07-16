@@ -6,7 +6,7 @@ export const MAX_PAGES = 200;
 const MAX_SITEMAP_DEPTH = 2;
 const FETCH_CONCURRENCY = 3;
 const FETCH_TIMEOUT_MS = 15_000;
-const USER_AGENT = "DocseraBot/0.0.1";
+const USER_AGENT = "DocseraBot/0.1.0";
 
 export interface RawDocument {
   url: string | null;
