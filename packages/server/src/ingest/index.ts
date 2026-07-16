@@ -1,6 +1,6 @@
 import { getPool } from "../lib/db.js";
+import { getEmbeddingsAdapter } from "../llm/index.js";
 import { chunkBlocks } from "./chunk.js";
-import { embedTexts } from "./embeddings.js";
 import { extractFromHtml } from "./extractHtml.js";
 import { extractFromMarkdown } from "./extractMarkdown.js";
 import { type IngestSourceInput, resolveSources } from "./fetchSource.js";
@@ -61,7 +61,7 @@ export async function runIngest(input: IngestSourceInput): Promise<IngestResult>
         continue;
       }
 
-      const embeddings = await embedTexts(chunks.map((chunk) => chunk.content));
+      const embeddings = await getEmbeddingsAdapter().embed(chunks.map((chunk) => chunk.content));
 
       const stored = await upsertDocumentWithChunks(
         pool,
