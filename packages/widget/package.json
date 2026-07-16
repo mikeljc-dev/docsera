@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "esbuild src/entry.ts --bundle --format=iife --outfile=public/widget.js --watch --servedir=public",
     "build": "esbuild src/entry.ts --bundle --format=iife --outfile=dist/widget.js --minify",
-    "lint": "echo \"TODO: lint\"",
+    "lint": "eslint src",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
