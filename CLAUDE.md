@@ -129,6 +129,18 @@ extremo, no solo compilado.
       sección + pregunta fuera de tema con "I don't know".
 - [x] Release v0.1.0 publicada en GitHub (2026-07-16), con tag y notas:
       https://github.com/mikeljc-dev/docsera/releases/tag/v0.1.0
+- [x] Demo pública desplegada (2026-07-16), todo en free tiers: server en
+      Railway (deploy automático desde main con Wait for CI; el CMD del
+      Dockerfile aplica las migraciones al arrancar — ojo con los "Custom
+      Start Command" de Railway, que lo pisan), BD en Neon
+      (Postgres+pgvector, branch production/neondb, región eu-west-2), y
+      LLM+embeddings en el free tier de Gemini vía OPENAI_BASE_URL
+      (modo compatibilidad OpenAI, LLM_MODEL=gemini-flash-lite-latest,
+      EMBEDDING_MODEL=gemini-embedding-001 a 1536 dims). README en inglés
+      ingerido como contenido inicial.
+- [ ] Pendiente de la demo: proyecto Vercel para docs.docsera.dev (root
+      packages/docs) y custom domain api.docsera.dev en Railway + CNAME
+      en el DNS de Vercel; después, ingerir https://docs.docsera.dev/.
 - [ ] Publicación en Hacker News (Show HN) y r/selfhosted — la hace Mikel
       con los borradores ya preparados (ver conversación del 2026-07-16).
 
