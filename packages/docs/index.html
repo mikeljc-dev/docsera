@@ -55,16 +55,16 @@
 
       <section>
         <h2 id="installation">Installation</h2>
-        <h3>Requirements</h3>
+        <h3 id="requirements">Requirements</h3>
         <p>Docker and Docker Compose (bundled with Docker Desktop). That's it — Postgres with pgvector ships in the compose file.</p>
-        <h3>Quick start</h3>
+        <h3 id="quick-start">Quick start</h3>
         <pre><code>git clone https://github.com/mikeljc-dev/docsera.git
 cd docsera
 cp .env.example .env
 # edit .env: LLM keys + ADMIN_TOKEN (openssl rand -hex 32)
 docker compose up -d --build</code></pre>
         <p>This starts Postgres+pgvector, applies the migrations automatically and runs the server at <code>http://localhost:3000</code>.</p>
-        <h3>Verify</h3>
+        <h3 id="verify">Verify</h3>
         <pre><code>curl http://localhost:3000/health
 # {"status":"ok","version":"0.1.0"}</code></pre>
       </section>
@@ -118,7 +118,7 @@ docker compose up -d --build</code></pre>
         <pre><code>&lt;script src="https://your-docsera-server.com/widget.js"
         data-server="https://your-docsera-server.com"&gt;&lt;/script&gt;</code></pre>
         <p>Add your site's origin to <code>ALLOWED_ORIGINS</code> in <code>.env</code>.</p>
-        <h3>Languages and customization</h3>
+        <h3 id="languages-and-customization">Languages and customization</h3>
         <p>The widget ships its UI in English, Spanish, French, German and Portuguese, picked automatically from your page's <code>&lt;html lang&gt;</code> or the browser. Options:</p>
         <ul>
           <li><code>data-locale</code> — force a language (<code>en</code>, <code>es</code>, <code>fr</code>, <code>de</code>, <code>pt</code>).</li>
