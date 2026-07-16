@@ -8,6 +8,7 @@ build/
 *.tsbuildinfo
 packages/widget/public/widget.js*
 packages/server/public/widget.js*
+packages/server/public/dashboard/
 
 # Entorno
 .env

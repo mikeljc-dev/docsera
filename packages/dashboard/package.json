@@ -6,9 +6,16 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
-    "dev": "echo \"TODO: arrancar dashboard en modo dev\"",
-    "build": "echo \"TODO: build del dashboard\"",
+    "dev": "vite",
+    "build": "vite build",
     "lint": "echo \"TODO: lint\"",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "preact": "^10.29.7"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.5",
+    "vite": "^8.1.5"
   }
 }
