@@ -27,9 +27,9 @@ chatRoute.post("/chat", chatRateLimit, async (c) => {
     const result = await runChat({ question: parsed.data.question, sessionId });
     return c.json(result);
   } catch (error) {
-    return c.json(
-      { error: error instanceof Error ? error.message : "Error desconocido durante el chat" },
-      500,
-    );
+    // Endpoint público: el detalle (que puede incluir errores crudos del
+    // proveedor de LLM) va solo al log del servidor, nunca al cliente.
+    console.error("Error en /chat:", error);
+    return c.json({ error: "Something went wrong. Please try again in a moment." }, 500);
   }
 });
