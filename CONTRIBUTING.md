@@ -1,23 +1,26 @@
-# Contribuir a Docsera
+# Contributing to Docsera
 
-Gracias por el interés. Esto es un proyecto joven (ver el [roadmap del
-README](./README.md#roadmap)), así que las contribuciones más útiles ahora
-mismo son: reportar bugs de uso real, proponer mejoras concretas, y PRs
-pequeños y enfocados.
+**English** · [Español](./CONTRIBUTING.es.md)
 
-## Desarrollo local
+Thanks for your interest. This is a young project (see the
+[README roadmap](./README.md#roadmap)), so the most useful contributions
+right now are: reporting bugs from real usage, proposing concrete
+improvements, and small, focused PRs.
+
+## Local development
 
 ```bash
 pnpm install
-pnpm db:up          # Postgres + pgvector vía Docker
+pnpm db:up          # Postgres + pgvector via Docker
 pnpm db:migrate
 pnpm --filter @docsera/server dev
 ```
 
-Ver el [README](./README.md#desarrollo-local-sin-docker) para el resto de
-paquetes (`widget`, `dashboard`) y la [configuración completa](./README.md#configuración).
+See the [README](./README.md#local-development-without-docker) for the rest
+of the packages (`widget`, `dashboard`) and the
+[full configuration](./README.md#configuration).
 
-## Antes de abrir un PR
+## Before opening a PR
 
 ```bash
 pnpm typecheck
@@ -25,30 +28,30 @@ pnpm lint
 pnpm test
 ```
 
-Los tres deben pasar limpio. `pnpm test` de momento solo cubre
-`packages/server` (lógica de ingesta/chunking y del chat) — si tocas esa
-zona, añade o actualiza los tests correspondientes junto al código
-(`*.test.ts` al lado del archivo que prueban).
+All three must pass clean. `pnpm test` currently only covers
+`packages/server` (ingestion/chunking and chat logic) — if you touch that
+area, add or update the corresponding tests next to the code
+(`*.test.ts` beside the file they test).
 
-## Estilo de código
+## Code style
 
-- TypeScript estricto (ver `tsconfig.base.json`). Evita `any` sin
-  justificar en un comentario.
-- Sin comentarios que expliquen *qué* hace el código (eso ya lo dicen los
-  nombres) — solo cuándo hay una razón no obvia detrás de una decisión.
-- Commits pequeños, un cambio lógico por commit, mensaje en imperativo
-  explicando el *por qué* más que el *qué*.
-- No introduzcas abstracciones o dependencias nuevas para un caso
-  hipotético futuro. Si hace falta, se añade cuando haga falta de verdad.
+- Strict TypeScript (see `tsconfig.base.json`). Avoid `any` unless
+  justified in a comment.
+- No comments explaining *what* the code does (the names already say that) —
+  only when there's a non-obvious reason behind a decision.
+- Small commits, one logical change per commit, imperative message
+  explaining the *why* more than the *what*.
+- Don't introduce abstractions or new dependencies for a hypothetical
+  future case. If it's needed, it gets added when it's actually needed.
 
-## Reportar bugs / proponer features
+## Reporting bugs / proposing features
 
-Usa las plantillas de [issues](../../issues/new/choose). Para bugs,
-incluye pasos para reproducir y, si aplica, qué proveedor de LLM/embeddings
-estabas usando (`LLM_PROVIDER`/`EMBEDDING_PROVIDER`) — muchos problemas son
-específicos de un proveedor o modelo concreto.
+Use the [issue templates](../../issues/new/choose). For bugs, include steps
+to reproduce and, if applicable, which LLM/embeddings provider you were
+using (`LLM_PROVIDER`/`EMBEDDING_PROVIDER`) — many problems are specific to
+a particular provider or model.
 
-## Licencia
+## License
 
-Docsera es [AGPL-3.0](./LICENSE). Al contribuir, aceptas que tu
-contribución se distribuya bajo la misma licencia.
+Docsera is [AGPL-3.0](./LICENSE). By contributing, you agree that your
+contribution is distributed under the same license.

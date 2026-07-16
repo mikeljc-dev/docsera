@@ -1,15 +1,15 @@
-## Qué cambia y por qué
+## What changes and why
 
-<!-- Resume el cambio. Si arregla un issue, enlázalo: "Fixes #123". -->
+<!-- Summarize the change. If it fixes an issue, link it: "Fixes #123". -->
 
-## Cómo lo probaste
+## How you tested it
 
-<!-- pnpm typecheck / pnpm lint / pnpm test, y cualquier prueba manual
-(qué endpoint/flujo, con qué LLM_PROVIDER). -->
+<!-- pnpm typecheck / pnpm lint / pnpm test, plus any manual testing
+(which endpoint/flow, with which LLM_PROVIDER). -->
 
 ## Checklist
 
-- [ ] `pnpm typecheck` pasa
-- [ ] `pnpm lint` pasa
-- [ ] `pnpm test` pasa
-- [ ] Probado manualmente el flujo afectado (no solo compilación)
+- [ ] `pnpm typecheck` passes
+- [ ] `pnpm lint` passes
+- [ ] `pnpm test` passes
+- [ ] Manually tested the affected flow (not just compilation)

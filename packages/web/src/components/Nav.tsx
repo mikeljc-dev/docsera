@@ -9,6 +9,7 @@ export function Nav() {
       <div class="links">
         <a href="#features">Features</a>
         <a href="#how">How it works</a>
+        <a href="https://docs.docsera.dev">Docs</a>
         <a class="gh-btn" href={GITHUB_URL}>
           GitHub ↗
         </a>

@@ -188,7 +188,7 @@ TypeScript en todo el monorepo · pnpm workspaces · [Hono](https://hono.dev) ·
 
 ## Contribuir
 
-Ver [CONTRIBUTING.md](./CONTRIBUTING.md) — setup de desarrollo, checks a
+Ver [CONTRIBUTING.es.md](./CONTRIBUTING.es.md) — setup de desarrollo, checks a
 correr antes de un PR (`typecheck`/`lint`/`test`) y estilo de código.
 
 ## Licencia

@@ -1,23 +1,23 @@
 name: Bug report
-description: Algo no funciona como esperabas
+description: Something doesn't work as expected
 labels: ["bug"]
 body:
   - type: textarea
     id: description
     attributes:
-      label: ¿Qué pasó?
-      description: Descripción del problema. Si hay un mensaje de error, pégalo tal cual.
+      label: What happened?
+      description: Describe the problem. If there's an error message, paste it verbatim.
     validations:
       required: true
 
   - type: textarea
     id: steps
     attributes:
-      label: Pasos para reproducirlo
+      label: Steps to reproduce
       placeholder: |
-        1. Ingesté con `POST /ingest` tipo "sitemap"
-        2. Pregunté "..." en el widget
-        3. La respuesta fue X, esperaba Y
+        1. Ingested with `POST /ingest` type "sitemap"
+        2. Asked "..." in the widget
+        3. The answer was X, expected Y
     validations:
       required: true
 
@@ -25,25 +25,25 @@ body:
     id: llm-provider
     attributes:
       label: LLM_PROVIDER / EMBEDDING_PROVIDER
-      placeholder: "ej: anthropic / openai"
+      placeholder: "e.g. anthropic / openai"
     validations:
       required: false
 
   - type: input
     id: version
     attributes:
-      label: Versión / commit
-      placeholder: "ej: v0.0.1, o el hash del commit"
+      label: Version / commit
+      placeholder: "e.g. v0.1.0, or the commit hash"
     validations:
       required: false
 
   - type: dropdown
     id: deployment
     attributes:
-      label: ¿Cómo lo tienes desplegado?
+      label: How are you running it?
       options:
         - Docker Compose (docker compose up)
-        - Desarrollo local (pnpm dev, sin Docker)
-        - Otro
+        - Local development (pnpm dev, no Docker)
+        - Other
     validations:
       required: false
