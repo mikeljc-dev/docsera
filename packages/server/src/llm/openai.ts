@@ -1,10 +1,16 @@
 import type { ChatAdapter, ChatMessage, EmbeddingsAdapter } from "./types.js";
 
-const CHAT_URL = "https://api.openai.com/v1/chat/completions";
-const EMBEDDINGS_URL = "https://api.openai.com/v1/embeddings";
+const DEFAULT_BASE_URL = "https://api.openai.com/v1";
 const DEFAULT_CHAT_MODEL = "gpt-4o-mini";
 const DEFAULT_EMBEDDING_MODEL = "text-embedding-3-small";
 const EMBEDDING_BATCH_SIZE = 100;
+
+// OPENAI_BASE_URL permite usar cualquier API compatible con OpenAI
+// (Gemini en modo compatibilidad, Groq, Mistral, LM Studio, vLLM...)
+// con este mismo adaptador; la key sigue viniendo de OPENAI_API_KEY.
+function baseUrl(): string {
+  return (process.env.OPENAI_BASE_URL ?? DEFAULT_BASE_URL).replace(/\/+$/, "");
+}
 
 interface OpenAiChatResponse {
   choices: { message: { content: string } }[];
@@ -27,7 +33,7 @@ export class OpenAiChatAdapter implements ChatAdapter {
     const apiKey = requireApiKey();
     const model = process.env.LLM_MODEL ?? DEFAULT_CHAT_MODEL;
 
-    const response = await fetch(CHAT_URL, {
+    const response = await fetch(`${baseUrl()}/chat/completions`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify({ model, messages }),
@@ -61,7 +67,7 @@ export class OpenAiEmbeddingsAdapter implements EmbeddingsAdapter {
     const model = process.env.EMBEDDING_MODEL ?? DEFAULT_EMBEDDING_MODEL;
     const dimensions = Number(process.env.EMBEDDING_DIMENSIONS ?? 1536);
 
-    const response = await fetch(EMBEDDINGS_URL, {
+    const response = await fetch(`${baseUrl()}/embeddings`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify({ model, input: texts, dimensions }),

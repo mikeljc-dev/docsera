@@ -149,6 +149,7 @@ All variables live in `.env` (template in `.env.example`).
 | `EMBEDDING_PROVIDER` | Embeddings provider: `openai` \| `ollama` (Anthropic has none) | `openai` |
 | `EMBEDDING_MODEL` | Embeddings model (optional) | — |
 | `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` | Keys for the providers you use | — |
+| `OPENAI_BASE_URL` | Point the `openai` adapter at any OpenAI-compatible API (Gemini compat mode, Groq, Mistral, LM Studio, vLLM…) | OpenAI's API |
 | `OLLAMA_BASE_URL` | Ollama server URL | `http://localhost:11434` |
 | `PORT` | Server port | `3000` |
 | `ALLOWED_ORIGINS` | Comma-separated CORS origins for the widget | `http://localhost:5173` |
