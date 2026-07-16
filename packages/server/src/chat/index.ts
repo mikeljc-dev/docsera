@@ -1,6 +1,6 @@
 import { getPool } from "../lib/db.js";
 import { getChatAdapter, getEmbeddingsAdapter } from "../llm/index.js";
-import { buildChatMessages, isNoAnswer, NO_ANSWER_TEXT } from "./prompt.js";
+import { buildChatMessages, isNoAnswer, noAnswerText } from "./prompt.js";
 import { retrieveRelevantChunks, type RetrievedChunk } from "./retrieve.js";
 import { saveConversation } from "./store.js";
 
@@ -43,19 +43,23 @@ export async function runChat(input: ChatInput): Promise<ChatResult> {
   const chunks = await retrieveRelevantChunks(pool, questionEmbedding);
 
   if (chunks.length === 0) {
+    const answer = noAnswerText();
     await saveConversation(pool, {
       sessionId: input.sessionId,
       question: input.question,
-      answer: NO_ANSWER_TEXT,
+      answer,
       answered: false,
       chunkIds: [],
     });
-    return { answer: NO_ANSWER_TEXT, sources: [], sessionId: input.sessionId };
+    return { answer, sources: [], sessionId: input.sessionId };
   }
 
   const messages = buildChatMessages(input.question, chunks);
-  const answer = await getChatAdapter().chat(messages);
-  const answered = !isNoAnswer(answer);
+  const rawAnswer = await getChatAdapter().chat(messages);
+  const answered = !isNoAnswer(rawAnswer);
+  // El LLM señala la falta de respuesta con un centinela; lo que se guarda
+  // y se devuelve es siempre la frase configurada para el usuario final.
+  const answer = answered ? rawAnswer : noAnswerText();
 
   await saveConversation(pool, {
     sessionId: input.sessionId,

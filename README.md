@@ -119,6 +119,15 @@ Una sola línea:
 
 En producción, sustituye `localhost:3000` por el dominio donde tengas desplegado el server, y añade el origen de tu web a `ALLOWED_ORIGINS` en `.env`.
 
+**Idiomas.** El widget trae sus textos en inglés, español, francés, alemán y portugués, y detecta el idioma automáticamente (del `lang` del `<html>` de tu página, o del navegador). Puedes forzarlo con `data-locale`, sobreescribir textos concretos con `data-heading`/`data-placeholder`, y poner la frase de no-respuesta del asistente en tu idioma con `CHAT_NO_ANSWER_TEXT` en `.env`:
+
+```html
+<script src="https://docs.midominio.com/widget.js"
+        data-server="https://docs.midominio.com"
+        data-locale="es"
+        data-heading="¿Dudas? Pregúntame"></script>
+```
+
 ### 3. Revisa el historial en el dashboard
 
 Abre `http://localhost:3000/dashboard`, pega tu `ADMIN_TOKEN`, y verás el historial de conversaciones con un filtro para aislar las preguntas sin respuesta — la señal más directa de qué le falta a tu documentación.
@@ -141,7 +150,8 @@ Todas las variables viven en `.env` (plantilla en `.env.example`).
 | `ALLOWED_ORIGINS` | Orígenes permitidos por CORS para el widget, separados por coma | `http://localhost:5173` |
 | `ADMIN_TOKEN` | Token que protege `POST /ingest` y `GET /admin/*` (dashboard) | — |
 | `CHAT_RATE_LIMIT` | Peticiones por IP y minuto a `POST /chat` (endpoint público) | `20` |
-| `CHAT_MAX_DISTANCE` | Distancia coseno máxima para considerar un chunk relevante; si ninguno pasa, se responde "No lo sé" sin llamar al LLM. `2` desactiva el filtro | `0.8` |
+| `CHAT_MAX_DISTANCE` | Distancia coseno máxima para considerar un chunk relevante; si ninguno pasa, se responde la frase de no-respuesta sin llamar al LLM. `2` desactiva el filtro | `0.8` |
+| `CHAT_NO_ANSWER_TEXT` | Frase exacta cuando la doc no tiene la respuesta (ponla en el idioma de tus usuarios, ej: `No lo sé.`) | `I don't know.` |
 | `TRUST_PROXY` | `true` solo si hay un reverse proxy propio delante que sobreescriba `x-forwarded-for`; el rate limit usará esa cabecera como IP del cliente | `false` |
 
 **Sobre embeddings y proveedor de LLM:** son configuraciones independientes a propósito. Puedes usar Anthropic para el chat y OpenAI (o Ollama) solo para generar los embeddings de la ingesta, ya que Anthropic no ofrece API de embeddings propia.

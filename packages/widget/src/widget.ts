@@ -1,4 +1,5 @@
 import { LitElement, html, css, type PropertyValues } from "lit";
+import { resolveStrings, type WidgetStrings } from "./locales.js";
 import type { ChatMessage, ChatResponse, Source } from "./types.js";
 
 const SESSION_STORAGE_KEY = "docsera-session-id";
@@ -27,7 +28,9 @@ function sourceHref(source: Source): string {
 export class DocseraWidget extends LitElement {
   static properties = {
     server: { type: String },
+    locale: { type: String },
     heading: { type: String },
+    placeholder: { type: String },
     open: { state: true },
     messages: { state: true },
     pending: { state: true },
@@ -225,7 +228,9 @@ export class DocseraWidget extends LitElement {
   `;
 
   declare server: string;
+  declare locale: string;
   declare heading: string;
+  declare placeholder: string;
   declare open: boolean;
   declare messages: ChatMessage[];
   declare pending: boolean;
@@ -236,11 +241,24 @@ export class DocseraWidget extends LitElement {
   constructor() {
     super();
     this.server = "";
-    this.heading = "Pregúntame sobre la documentación";
+    this.locale = "";
+    this.heading = "";
+    this.placeholder = "";
     this.open = false;
     this.messages = [];
     this.pending = false;
     this.inputValue = "";
+  }
+
+  // Los atributos heading/placeholder tienen prioridad sobre el idioma
+  // resuelto (locale explícito > <html lang> > navegador > inglés).
+  private get strings(): WidgetStrings {
+    const strings = resolveStrings(this.locale || undefined);
+    return {
+      ...strings,
+      heading: this.heading || strings.heading,
+      placeholder: this.placeholder || strings.placeholder,
+    };
   }
 
   override connectedCallback(): void {
@@ -295,7 +313,7 @@ export class DocseraWidget extends LitElement {
         ...this.messages,
         {
           role: "assistant",
-          content: "Ha ocurrido un error. Inténtalo de nuevo en un momento.",
+          content: this.strings.error,
           error: true,
         },
       ];
@@ -306,7 +324,7 @@ export class DocseraWidget extends LitElement {
 
   protected override render() {
     return html`
-      <button class="fab" @click=${this.toggleOpen} aria-label="Abrir chat de ayuda">
+      <button class="fab" @click=${this.toggleOpen} aria-label=${this.strings.openChat}>
         ${this.open ? closeIcon() : chatIcon()}
       </button>
       ${this.open ? this.renderPanel() : null}
@@ -314,28 +332,31 @@ export class DocseraWidget extends LitElement {
   }
 
   private renderPanel() {
+    const strings = this.strings;
     return html`
       <div class="panel">
         <header>
-          <span>${this.heading}</span>
-          <button @click=${this.toggleOpen} aria-label="Cerrar">✕</button>
+          <span>${strings.heading}</span>
+          <button @click=${this.toggleOpen} aria-label=${strings.close}>✕</button>
         </header>
         <div class="messages">
           ${this.messages.length === 0
-            ? html`<p class="empty">Escribe una pregunta sobre la documentación.</p>`
+            ? html`<p class="empty">${strings.empty}</p>`
             : this.messages.map((message) => this.renderMessage(message))}
           ${this.pending
-            ? html`<div class="message assistant pending"><div class="bubble">Escribiendo…</div></div>`
+            ? html`<div class="message assistant pending"><div class="bubble">${strings.typing}</div></div>`
             : null}
         </div>
         <form @submit=${this.onSubmit}>
           <input
             .value=${this.inputValue}
             @input=${this.onInput}
-            placeholder="Escribe tu pregunta…"
+            placeholder=${strings.placeholder}
             ?disabled=${this.pending}
           />
-          <button type="submit" ?disabled=${this.pending || !this.inputValue.trim()}>Enviar</button>
+          <button type="submit" ?disabled=${this.pending || !this.inputValue.trim()}>
+            ${strings.send}
+          </button>
         </form>
       </div>
     `;

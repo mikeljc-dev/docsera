@@ -2,20 +2,35 @@ import { stripDiacritics } from "../lib/text.js";
 import type { ChatMessage } from "../llm/types.js";
 import type { RetrievedChunk } from "./retrieve.js";
 
-export const NO_ANSWER_TEXT = "No lo sé.";
+export const DEFAULT_NO_ANSWER_TEXT = "I don't know.";
 
-const NORMALIZED_NO_ANSWER = "no lo se";
+// El LLM señala "no hay respuesta" con un centinela ASCII estable en vez de
+// una frase localizada: pedirle repetir una frase exacta en el idioma del
+// usuario falla con modelos pequeños (responden variantes tipo "No sé" y la
+// detección se rompe). El server sustituye el centinela por la frase
+// configurada antes de guardarla o devolverla.
+const NO_ANSWER_SENTINEL = "NO_ANSWER";
 
-const SYSTEM_PROMPT = `Eres un asistente que responde preguntas basándote ÚNICAMENTE en la
-documentación proporcionada como contexto. No inventes información que no
-esté en el contexto. Si el contexto no contiene información suficiente para
-responder la pregunta, responde exactamente y solo con: "${NO_ANSWER_TEXT}"
+// Frase que ve el usuario final cuando la doc no tiene la respuesta.
+// Configurable (CHAT_NO_ANSWER_TEXT) para ponerla en el idioma de sus
+// usuarios; isNoAnswer() también la reconoce por si el LLM la repite.
+export function noAnswerText(): string {
+  return process.env.CHAT_NO_ANSWER_TEXT?.trim() || DEFAULT_NO_ANSWER_TEXT;
+}
 
-El contexto viene numerado (ej: [1], [2]) solo para que tú lo relaciones
-internamente con su título; esos números no significan nada para quien lee
-tu respuesta (las fuentes se muestran aparte, en otra parte de la interfaz).
-No los menciones ni los copies en tu respuesta. Responde de forma natural,
-como si simplemente supieras la respuesta.`;
+function buildSystemPrompt(): string {
+  return `You are an assistant that answers questions based ONLY on the
+documentation provided as context. Never invent information that is not in
+the context. Answer in the same language the question is asked in. If the
+context does not contain enough information to answer the question, reply
+exactly and only with: ${NO_ANSWER_SENTINEL}
+
+The context items are numbered (e.g. [1], [2]) only so you can relate them
+internally to their titles; those numbers mean nothing to the reader (the
+sources are shown separately, elsewhere in the interface). Never write those
+bracketed numbers in your answer, and never name the context or its titles
+as if quoting them. Answer naturally, as if you simply knew the answer.`;
+}
 
 export function buildChatMessages(question: string, chunks: RetrievedChunk[]): ChatMessage[] {
   const context = chunks
@@ -23,14 +38,22 @@ export function buildChatMessages(question: string, chunks: RetrievedChunk[]): C
     .join("\n\n");
 
   return [
-    { role: "system", content: SYSTEM_PROMPT },
-    { role: "user", content: `Contexto:\n\n${context}\n\nPregunta: ${question}` },
+    { role: "system", content: buildSystemPrompt() },
+    { role: "user", content: `Context:\n\n${context}\n\nQuestion: ${question}` },
   ];
 }
 
-export function isNoAnswer(answer: string): boolean {
-  const normalized = stripDiacritics(answer.trim().toLowerCase())
+function normalize(text: string): string {
+  return stripDiacritics(text.trim().toLowerCase())
     .replace(/["'.!¡¿?]+$/g, "")
     .replace(/^["'.!¡¿?]+/g, "");
-  return normalized === NORMALIZED_NO_ANSWER;
+}
+
+export function isNoAnswer(answer: string): boolean {
+  const normalized = normalize(answer);
+  return (
+    normalized === NO_ANSWER_SENTINEL.toLowerCase() ||
+    normalized === "no answer" ||
+    normalized === normalize(noAnswerText())
+  );
 }
