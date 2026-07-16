@@ -65,6 +65,19 @@ importers:
         specifier: ^4.23.1
         version: 4.23.1
 
+  packages/web:
+    dependencies:
+      preact:
+        specifier: ^10.29.7
+        version: 10.29.7
+    devDependencies:
+      '@preact/preset-vite':
+        specifier: ^2.10.5
+        version: 2.10.5(@babel/core@7.29.7)(preact@10.29.7)(vite@8.1.5(@types/node@20.19.43)(esbuild@0.28.1)(tsx@4.23.1))
+      vite:
+        specifier: ^8.1.5
+        version: 8.1.5(@types/node@20.19.43)(esbuild@0.28.1)(tsx@4.23.1)
+
   packages/widget:
     dependencies:
       lit:
