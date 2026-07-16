@@ -2,6 +2,8 @@
 
 # Docsera
 
+[![CI](https://github.com/mikeljc-dev/docsera/actions/workflows/ci.yml/badge.svg)](https://github.com/mikeljc-dev/docsera/actions/workflows/ci.yml)
+
 **Chat con IA sobre tu documentación. Open source, self-hosted, en una línea.**
 
 Instala un asistente inteligente sobre tus docs con un solo `<script>`.
