@@ -10,7 +10,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "echo \"TODO: arrancar server + dashboard + widget en modo dev\"",
+    "dev": "pnpm -r --parallel dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",

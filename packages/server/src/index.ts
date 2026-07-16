@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -10,6 +11,12 @@ import { widgetRoute } from "./routes/widget.js";
 
 loadEnv();
 
+const VERSION = (
+  JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf-8")) as {
+    version: string;
+  }
+).version;
+
 const PORT = Number(process.env.PORT ?? 3000);
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? "")
   .split(",")
@@ -20,7 +27,7 @@ const app = new Hono();
 
 app.use("*", cors({ origin: ALLOWED_ORIGINS }));
 
-app.get("/health", (c) => c.json({ status: "ok", version: "0.0.1" }));
+app.get("/health", (c) => c.json({ status: "ok", version: VERSION }));
 
 app.route("/", ingestRoute);
 app.route("/", chatRoute);

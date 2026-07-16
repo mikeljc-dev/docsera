@@ -7,9 +7,12 @@ const WIDGET_PATH = resolve(dirname(fileURLToPath(import.meta.url)), "../../publ
 
 export const widgetRoute = new Hono();
 
-const widgetJs = existsSync(WIDGET_PATH) ? readFileSync(WIDGET_PATH, "utf-8") : null;
+// Perezoso: si el bundle se genera con el server ya arrancado, la siguiente
+// petición lo encuentra sin necesidad de reiniciar.
+let widgetJs: string | null = null;
 
 widgetRoute.get("/widget.js", (c) => {
+  widgetJs ??= existsSync(WIDGET_PATH) ? readFileSync(WIDGET_PATH, "utf-8") : null;
   if (!widgetJs) {
     return c.text(
       "widget.js no encontrado. Ejecuta `pnpm --filter @docsera/widget build` y copia " +
