@@ -153,10 +153,10 @@ Todas las variables viven en `.env` (plantilla en `.env.example`).
 pnpm install
 pnpm db:up          # solo Postgres+pgvector, vía Docker
 pnpm db:migrate
-pnpm --filter @docsera/server dev
-pnpm --filter @docsera/widget dev       # opcional, para trabajar en el widget
-pnpm --filter @docsera/dashboard dev    # opcional, para trabajar en el dashboard
+pnpm dev            # los tres paquetes en paralelo, en modo watch
 ```
+
+`pnpm dev` arranca el server (`:3000`), la página de pruebas del widget (`:8000`, esbuild) y el dashboard (`:5173`, Vite con proxy a la API). Para trabajar en un solo paquete: `pnpm --filter @docsera/server dev` (o `widget` / `dashboard`).
 
 ## Roadmap
 
