@@ -10,6 +10,7 @@
     "build": "echo \"TODO: build del server\"",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
+    "test": "tsx --test src/**/*.test.ts",
     "db:migrate": "tsx src/db/migrate.ts"
   },
   "dependencies": {
