@@ -23,10 +23,11 @@ Tus datos no salen de tu servidor. Funciona con Anthropic, OpenAI o modelos loca
 
 ## Demo
 
-![Widget de Docsera respondiendo una pregunta con citas a la fuente](./docs/demo.png)
+![Widget de Docsera respondiendo una pregunta con citas a la fuente y diciendo "I don't know" a una pregunta fuera de tema](./docs/demo.gif)
 
-*(Captura real del widget corriendo contra el stack local. Pendiente
-sustituir por un GIF grabado en condiciones antes del lanzamiento.)*
+*(Grabación real contra el stack local con un modelo local vía Ollama: una
+respuesta con citas por sección, y una pregunta fuera de tema respondida con
+un honesto "I don't know" — sin llegar a llamar al LLM.)*
 
 ## ¿Qué es?
 
@@ -176,7 +177,7 @@ pnpm dev            # los tres paquetes en paralelo, en modo watch
 ## Roadmap
 
 - [x] **Fase 1 — Núcleo:** server, esquema de BD, ingesta (markdown/URL/sitemap), adaptadores de LLM (Anthropic/OpenAI/Ollama), chat con RAG y citas, widget embebible, Docker.
-- [ ] **Fase 2 — Lanzamiento:** dashboard ✅, README con guía real ✅ (este documento), pulido de código ✅ (rate limiting, umbral de similitud, sitemaps índice, dedupe de ingesta), CI ✅, dominio ([docsera.dev](https://docsera.dev)) ✅. Queda: GIF de demo y publicación (GitHub, Hacker News, r/selfhosted).
+- [ ] **Fase 2 — Lanzamiento:** dashboard ✅, README con guía real ✅ (este documento), pulido de código ✅ (rate limiting, umbral de similitud, sitemaps índice, dedupe de ingesta), CI ✅, dominio ([docsera.dev](https://docsera.dev)) ✅, GIF de demo ✅. Queda: publicación (GitHub, Hacker News, r/selfhosted).
 - [ ] **Fase 3 — Tracción:** iterar con feedback real, prototipo de versión cloud (multi-tenant, billing por uso), lista de espera.
 
 ## Stack

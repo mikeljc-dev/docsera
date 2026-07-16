@@ -25,6 +25,13 @@ function sourceHref(source: Source): string {
   return source.anchor ? `${source.url}#${source.anchor}` : source.url;
 }
 
+// Varias fuentes suelen compartir documento (mismo título): el anchor
+// humanizado ("add-the-widget" → "add the widget") las hace distinguibles.
+function sourceLabel(source: Source): string {
+  if (!source.anchor) return source.title;
+  return `${source.title} § ${source.anchor.replace(/-/g, " ")}`;
+}
+
 export class DocseraWidget extends LitElement {
   static properties = {
     server: { type: String },
@@ -372,7 +379,7 @@ export class DocseraWidget extends LitElement {
                 ${message.sources.map(
                   (source) =>
                     html`<a href=${sourceHref(source)} target="_blank" rel="noopener noreferrer"
-                      >${source.title}</a
+                      >${sourceLabel(source)}</a
                     >`,
                 )}
               </div>

@@ -122,8 +122,9 @@ extremo, no solo compilado.
 - [x] Pulido de código (rate limiting, umbral de similitud, sitemaps
       índice, dedupe de ingesta) y CI con GitHub Actions (2026-07-16).
 - [x] Dominio docsera.dev registrado y landing en producción (2026-07-16).
-- [ ] GIF de demo grabado en condiciones — hay un screenshot estático en
-      `docs/demo.png` como placeholder, no un GIF.
+- [x] GIF de demo en `docs/demo.gif` (2026-07-16): grabado con Playwright
+      contra el stack local (Ollama/llama3.2), pregunta con citas por
+      sección + pregunta fuera de tema con "I don't know".
 - [ ] Publicación (GitHub, Hacker News, r/selfhosted).
 
 Siguiente: cerrar el pulido de lanzamiento, o pasar a Fase 3 si se decide

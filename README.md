@@ -23,10 +23,11 @@ Your data never leaves your server. Works with Anthropic, OpenAI or local models
 
 ## Demo
 
-![Docsera widget answering a question with source citations](./docs/demo.png)
+![Docsera widget answering a question with source citations, then saying "I don't know" to an off-topic question](./docs/demo.gif)
 
-*(Real screenshot of the widget running against the local stack. To be
-replaced with a proper GIF before launch.)*
+*(Real recording against the local stack with a local model via Ollama: an
+answer with per-section citations, and an off-topic question getting an
+honest "I don't know" — without even calling the LLM.)*
 
 ## What is it?
 
@@ -176,7 +177,7 @@ pnpm dev            # all packages in parallel, in watch mode
 ## Roadmap
 
 - [x] **Phase 1 — Core:** server, DB schema, ingestion (markdown/URL/sitemap), LLM adapters (Anthropic/OpenAI/Ollama), RAG chat with citations, embeddable widget, Docker.
-- [ ] **Phase 2 — Launch:** dashboard ✅, real installation guide ✅ (this document), code polish ✅ (rate limiting, similarity threshold, sitemap indexes, ingestion dedupe), CI ✅, domain ([docsera.dev](https://docsera.dev)) ✅. Remaining: demo GIF and going public (GitHub, Hacker News, r/selfhosted).
+- [ ] **Phase 2 — Launch:** dashboard ✅, real installation guide ✅ (this document), code polish ✅ (rate limiting, similarity threshold, sitemap indexes, ingestion dedupe), CI ✅, domain ([docsera.dev](https://docsera.dev)) ✅, demo GIF ✅. Remaining: going public (GitHub, Hacker News, r/selfhosted).
 - [ ] **Phase 3 — Traction:** iterate on real feedback, cloud version prototype (multi-tenant, usage-based billing), waitlist.
 
 ## Stack
