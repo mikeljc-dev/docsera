@@ -88,7 +88,7 @@ curl -X POST http://localhost:3000/ingest \
   }'
 ```
 
-`type` puede ser `"url"` (una página), `"sitemap"` (todas las páginas listadas, hasta 200) o `"markdown"` (texto directo, útil para CI o contenido que no está publicado como HTML):
+`type` puede ser `"url"` (una página), `"sitemap"` (todas las páginas listadas, hasta 200; los sitemaps índice que apuntan a otros sitemaps también funcionan) o `"markdown"` (texto directo, útil para CI o contenido que no está publicado como HTML):
 
 ```bash
 curl -X POST http://localhost:3000/ingest \
@@ -103,6 +103,8 @@ curl -X POST http://localhost:3000/ingest \
 ```
 
 Re-ingerir un documento sin cambios no vuelve a gastar en embeddings (deduplicación por hash de contenido).
+
+Para `"markdown"`, la `url` es opcional pero recomendable: es la identidad del documento (sin ella, una versión modificada del mismo markdown se ingiere como documento nuevo en vez de actualizar el anterior) y además el enlace que citarán las respuestas.
 
 ### 2. Instala el widget en tu web
 
@@ -136,6 +138,7 @@ Todas las variables viven en `.env` (plantilla en `.env.example`).
 | `ALLOWED_ORIGINS` | Orígenes permitidos por CORS para el widget, separados por coma | `http://localhost:5173` |
 | `ADMIN_TOKEN` | Token que protege `POST /ingest` y `GET /admin/*` (dashboard) | — |
 | `CHAT_RATE_LIMIT` | Peticiones por IP y minuto a `POST /chat` (endpoint público) | `20` |
+| `CHAT_MAX_DISTANCE` | Distancia coseno máxima para considerar un chunk relevante; si ninguno pasa, se responde "No lo sé" sin llamar al LLM. `2` desactiva el filtro | `0.8` |
 | `TRUST_PROXY` | `true` solo si hay un reverse proxy propio delante que sobreescriba `x-forwarded-for`; el rate limit usará esa cabecera como IP del cliente | `false` |
 
 **Sobre embeddings y proveedor de LLM:** son configuraciones independientes a propósito. Puedes usar Anthropic para el chat y OpenAI (o Ollama) solo para generar los embeddings de la ingesta, ya que Anthropic no ofrece API de embeddings propia.
