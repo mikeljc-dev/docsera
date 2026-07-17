@@ -200,6 +200,9 @@ pnpm dev            # all packages in parallel, in watch mode</code></pre>
         <h3 id="can-it-hallucinate">Can it hallucinate?</h3>
         <p>It's designed not to. The assistant answers only from your documentation: if nothing relevant passes the similarity threshold, it answers "I don't know" without even calling the LLM, and every answer cites the exact sections it came from, so users can verify. The dashboard also surfaces every unanswered question.</p>
 
+        <h3 id="how-does-docsera-compare-to-intercom-fin-or-mintlify">How does Docsera compare to Intercom Fin or Mintlify?</h3>
+        <p>Products like Intercom Fin, Mintlify's assistant, DocsBot or kapa.ai solve the same problem as hosted services: your docs and your users' questions flow through their infrastructure, with models they manage, for a subscription. Docsera is the open-source (AGPL-3.0), self-hosted alternative: it runs on your server, your data stays in your Postgres, you choose the LLM (including fully local via Ollama), and it's free — you only pay your own infrastructure and optional LLM usage. If you want a managed, zero-ops product, the hosted options are excellent; if you want control, privacy and no vendor lock-in, that's Docsera.</p>
+
         <h3 id="is-there-a-hosted-version">Is there a hosted version?</h3>
         <p>Not yet. Today Docsera is self-hosted only; a managed cloud version with usage-based pricing is on the roadmap. If you'd use one, open an issue on GitHub and tell us — it helps prioritize.</p>
 

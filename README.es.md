@@ -39,6 +39,20 @@ Docsera es un widget embebible que responde preguntas sobre tu documentación us
 - **Agnóstico de LLM**: Anthropic, OpenAI o modelos locales vía Ollama — para chat y para embeddings, por separado.
 - **Respuestas con fuentes**: cada respuesta enlaza a la sección de donde salió. Antes de inventar, responde "No lo sé."
 
+## ¿Cómo se compara?
+
+Productos como **Intercom Fin, el asistente de Mintlify, DocsBot o kapa.ai** resuelven el mismo problema como servicio gestionado: tus docs y las preguntas de tus usuarios pasan por su infraestructura, con los modelos que ellos gestionan, por suscripción. Docsera es la versión open source y self-hosted de la misma idea:
+
+| | Docsera | Alternativas gestionadas |
+|---|---|---|
+| Código | Abierto (AGPL-3.0) | Propietario |
+| Dónde corre | Tu servidor | Su nube |
+| Dónde viven tus datos | Tu Postgres | Su infraestructura |
+| LLM | El que elijas — Anthropic, OpenAI, cualquier API compatible, o totalmente local vía Ollama | El que ellos gestionan |
+| Coste | Gratis — tu infra más el uso de LLM opcional | Suscripción |
+
+Si quieres un producto gestionado, sin operaciones y con soporte detrás, las opciones hosted son excelentes. Si quieres control, privacidad y cero vendor lock-in — para eso existe Docsera.
+
 ## Cómo funciona
 
 Tres piezas dentro de un monorepo, todas dentro de un único servicio desplegable:
