@@ -19,6 +19,8 @@ export interface ChatResult {
   answer: string;
   sources: Source[];
   sessionId: string;
+  conversationId: string;
+  answered: boolean;
 }
 
 function dedupeSources(chunks: RetrievedChunk[]): Source[] {
@@ -44,14 +46,14 @@ export async function runChat(input: ChatInput): Promise<ChatResult> {
 
   if (chunks.length === 0) {
     const answer = noAnswerText();
-    await saveConversation(pool, {
+    const conversationId = await saveConversation(pool, {
       sessionId: input.sessionId,
       question: input.question,
       answer,
       answered: false,
       chunkIds: [],
     });
-    return { answer, sources: [], sessionId: input.sessionId };
+    return { answer, sources: [], sessionId: input.sessionId, conversationId, answered: false };
   }
 
   const messages = buildChatMessages(input.question, chunks);
@@ -61,7 +63,7 @@ export async function runChat(input: ChatInput): Promise<ChatResult> {
   // y se devuelve es siempre la frase configurada para el usuario final.
   const answer = answered ? rawAnswer : noAnswerText();
 
-  await saveConversation(pool, {
+  const conversationId = await saveConversation(pool, {
     sessionId: input.sessionId,
     question: input.question,
     answer,
@@ -69,5 +71,11 @@ export async function runChat(input: ChatInput): Promise<ChatResult> {
     chunkIds: answered ? chunks.map((chunk) => chunk.id) : [],
   });
 
-  return { answer, sources: answered ? dedupeSources(chunks) : [], sessionId: input.sessionId };
+  return {
+    answer,
+    sources: answered ? dedupeSources(chunks) : [],
+    sessionId: input.sessionId,
+    conversationId,
+    answered,
+  };
 }

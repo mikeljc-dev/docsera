@@ -89,6 +89,7 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
                 <th>Answer</th>
                 <th>Status</th>
                 <th>Sources</th>
+                <th>Feedback</th>
               </tr>
             </thead>
             <tbody>
@@ -103,11 +104,14 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
                     </span>
                   </td>
                   <td class="center">{conversation.sourceCount}</td>
+                  <td class="center">
+                    {conversation.feedback === 1 ? "👍" : conversation.feedback === -1 ? "👎" : "—"}
+                  </td>
                 </tr>
               ))}
               {conversations.length === 0 && (
                 <tr>
-                  <td colSpan={5} class="empty">
+                  <td colSpan={6} class="empty">
                     No conversations match this filter.
                   </td>
                 </tr>

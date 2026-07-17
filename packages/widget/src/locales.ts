@@ -7,6 +7,12 @@ export interface WidgetStrings {
   error: string;
   openChat: string;
   close: string;
+  copy: string;
+  copied: string;
+  contact: string;
+  helpful: string;
+  notHelpful: string;
+  feedbackThanks: string;
 }
 
 export const DEFAULT_LOCALE = "en";
@@ -21,6 +27,12 @@ export const LOCALES: Record<string, WidgetStrings> = {
     error: "Something went wrong. Please try again in a moment.",
     openChat: "Open help chat",
     close: "Close",
+    copy: "Copy",
+    copied: "Copied!",
+    contact: "Contact support",
+    helpful: "Helpful answer",
+    notHelpful: "Not helpful",
+    feedbackThanks: "Thanks for the feedback!",
   },
   es: {
     heading: "Pregúntame sobre la documentación",
@@ -31,6 +43,12 @@ export const LOCALES: Record<string, WidgetStrings> = {
     error: "Ha ocurrido un error. Inténtalo de nuevo en un momento.",
     openChat: "Abrir chat de ayuda",
     close: "Cerrar",
+    copy: "Copiar",
+    copied: "¡Copiado!",
+    contact: "Contactar con soporte",
+    helpful: "Respuesta útil",
+    notHelpful: "No me ha servido",
+    feedbackThanks: "¡Gracias por el feedback!",
   },
   fr: {
     heading: "Posez-moi vos questions sur la doc",
@@ -41,6 +59,12 @@ export const LOCALES: Record<string, WidgetStrings> = {
     error: "Une erreur est survenue. Réessayez dans un instant.",
     openChat: "Ouvrir le chat d'aide",
     close: "Fermer",
+    copy: "Copier",
+    copied: "Copié !",
+    contact: "Contacter le support",
+    helpful: "Réponse utile",
+    notHelpful: "Pas utile",
+    feedbackThanks: "Merci pour votre retour !",
   },
   de: {
     heading: "Frag mich zur Dokumentation",
@@ -51,6 +75,12 @@ export const LOCALES: Record<string, WidgetStrings> = {
     error: "Etwas ist schiefgelaufen. Bitte versuche es gleich noch einmal.",
     openChat: "Hilfe-Chat öffnen",
     close: "Schließen",
+    copy: "Kopieren",
+    copied: "Kopiert!",
+    contact: "Support kontaktieren",
+    helpful: "Hilfreiche Antwort",
+    notHelpful: "Nicht hilfreich",
+    feedbackThanks: "Danke für dein Feedback!",
   },
   pt: {
     heading: "Pergunte-me sobre a documentação",
@@ -61,6 +91,12 @@ export const LOCALES: Record<string, WidgetStrings> = {
     error: "Ocorreu um erro. Tente novamente em instantes.",
     openChat: "Abrir chat de ajuda",
     close: "Fechar",
+    copy: "Copiar",
+    copied: "Copiado!",
+    contact: "Contactar o suporte",
+    helpful: "Resposta útil",
+    notHelpful: "Não ajudou",
+    feedbackThanks: "Obrigado pelo feedback!",
   },
 };
 

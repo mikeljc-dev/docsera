@@ -4,6 +4,7 @@ export interface Conversation {
   question: string;
   answer: string | null;
   answered: boolean;
+  feedback: number | null;
   createdAt: string;
   sourceCount: number;
 }

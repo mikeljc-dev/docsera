@@ -142,7 +142,7 @@ Una sola línea:
 
 En producción, sustituye `localhost:3000` por el dominio donde tengas desplegado el server, y añade el origen de tu web a `ALLOWED_ORIGINS` en `.env`.
 
-**Personalización.** Todo se configura con atributos `data-*` en el script: `data-primary` (tu color de marca), `data-position` (`right`/`left`), `data-locale` (idioma de la interfaz — viene en inglés, español, francés, alemán y portugués, autodetectado del `lang` del `<html>` o del navegador), y `data-heading`/`data-placeholder` para sobreescribir textos concretos. La frase de no-respuesta del asistente se pone en el server con `CHAT_NO_ANSWER_TEXT`:
+**Personalización.** Todo se configura con atributos `data-*` en el script: `data-primary` (tu color de marca), `data-position` (`right`/`left`), `data-locale` (idioma de la interfaz — viene en inglés, español, francés, alemán y portugués, autodetectado del `lang` del `<html>` o del navegador), `data-suggestions` (preguntas iniciales como chips, separadas por `|`), `data-contact` (enlace que se ofrece cuando no sabe responder), y `data-heading`/`data-placeholder` para sobreescribir textos concretos. Las respuestas renderizan Markdown simple con bloques de código copiables, y cada respuesta tiene botones 👍/👎 que alimentan el dashboard. La frase de no-respuesta del asistente se pone en el server con `CHAT_NO_ANSWER_TEXT`:
 
 ```html
 <script src="https://docs.midominio.com/widget.js"

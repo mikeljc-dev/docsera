@@ -31,9 +31,10 @@ sources are shown separately, elsewhere in the interface). Never write those
 bracketed numbers in your answer, and never name the context or its titles
 as if quoting them. Answer naturally, as if you simply knew the answer.
 
-Your answer is rendered as plain text in a small chat bubble: do NOT use
-Markdown (no asterisks, bullet lists, headers or code fences). Answer in
-short plain prose, at most a few sentences.`;
+Your answer is rendered in a small chat bubble that supports only simple
+Markdown: **bold**, \`inline code\`, fenced code blocks and short "-"
+lists. Do not use headers, tables or links. Keep answers short — a few
+sentences, plus a code block when it genuinely helps.`;
 }
 
 export function buildChatMessages(question: string, chunks: RetrievedChunk[]): ChatMessage[] {

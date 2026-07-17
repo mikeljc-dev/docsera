@@ -17,5 +17,9 @@ if (server && !document.querySelector("docsera-widget")) {
   if (primary) el.setAttribute("primary", primary);
   const position = currentScript?.dataset["position"];
   if (position) el.setAttribute("position", position);
+  const suggestions = currentScript?.dataset["suggestions"];
+  if (suggestions) el.setAttribute("suggestions", suggestions);
+  const contact = currentScript?.dataset["contact"];
+  if (contact) el.setAttribute("contact", contact);
   document.body.appendChild(el);
 }

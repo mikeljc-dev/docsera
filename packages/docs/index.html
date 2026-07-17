@@ -143,12 +143,15 @@ jobs:
         <pre><code>&lt;script src="https://your-docsera-server.com/widget.js"
         data-server="https://your-docsera-server.com"&gt;&lt;/script&gt;</code></pre>
         <p>Add your site's origin to <code>ALLOWED_ORIGINS</code> in <code>.env</code>.</p>
+        <p>Answers render simple Markdown — including code blocks with a copy button — and every answer shows 👍/👎 feedback buttons; the votes appear in the dashboard so you can spot answers that aren't landing.</p>
         <h3 id="languages-and-customization">Languages and customization</h3>
         <p>The widget ships its UI in English, Spanish, French, German and Portuguese, picked automatically from your page's <code>&lt;html lang&gt;</code> or the browser. Everything is configured with <code>data-*</code> attributes on the script tag:</p>
         <ul>
           <li><code>data-primary</code> — your brand color for the bubble, header and buttons (any CSS color, e.g. <code>#4F46E5</code>).</li>
           <li><code>data-position</code> — <code>right</code> (default) or <code>left</code>.</li>
           <li><code>data-locale</code> — force a language (<code>en</code>, <code>es</code>, <code>fr</code>, <code>de</code>, <code>pt</code>).</li>
+          <li><code>data-suggestions</code> — starter questions shown as clickable chips, separated by <code>|</code>.</li>
+          <li><code>data-contact</code> — a URL or <code>mailto:</code> offered as "Contact support" when the assistant doesn't know the answer.</li>
           <li><code>data-heading</code> / <code>data-placeholder</code> — override individual strings.</li>
           <li><code>CHAT_NO_ANSWER_TEXT</code> (server-side) — the assistant's no-answer phrase, in your users' language.</li>
         </ul>
@@ -170,7 +173,8 @@ jobs:
           <thead><tr><th>Endpoint</th><th>Auth</th><th>Description</th></tr></thead>
           <tbody>
             <tr><td><code>GET /health</code></td><td>—</td><td>Status and version</td></tr>
-            <tr><td><code>POST /chat</code></td><td>rate-limited</td><td><code>{question, sessionId?}</code> → <code>{answer, sources[], sessionId}</code></td></tr>
+            <tr><td><code>POST /chat</code></td><td>rate-limited</td><td><code>{question, sessionId?}</code> → <code>{answer, sources[], sessionId, conversationId, answered}</code></td></tr>
+            <tr><td><code>POST /feedback</code></td><td>rate-limited</td><td><code>{conversationId, rating: "up"|"down"}</code> — 👍/👎 on an answer</td></tr>
             <tr><td><code>POST /ingest</code></td><td>Bearer <code>ADMIN_TOKEN</code></td><td><code>{type, source, url?, title?}</code> → per-document results</td></tr>
             <tr><td><code>GET /admin/conversations</code></td><td>Bearer <code>ADMIN_TOKEN</code></td><td>History with <code>answered</code>, <code>limit</code>, <code>offset</code> filters</td></tr>
             <tr><td><code>GET /widget.js</code></td><td>—</td><td>The embeddable widget bundle</td></tr>
@@ -224,7 +228,12 @@ pnpm dev            # all packages in parallel, in watch mode</code></pre>
     © 2026 Docsera · <a href="https://github.com/mikeljc-dev/docsera/blob/main/LICENSE">AGPL-3.0</a> · <a href="https://docsera.dev">docsera.dev</a> · <a href="https://github.com/mikeljc-dev/docsera">GitHub</a>
   </footer>
 
-  <script src="https://api.docsera.dev/widget.js" data-server="https://api.docsera.dev"></script>
+  <script
+    src="https://api.docsera.dev/widget.js"
+    data-server="https://api.docsera.dev"
+    data-suggestions="How do I install Docsera?|Which LLM providers can I use?|How do I customize the widget?"
+    data-contact="https://github.com/mikeljc-dev/docsera/issues/new/choose"
+  ></script>
   <script type="module" src="/src/tour.ts"></script>
   <script type="module" src="/src/theme.ts"></script>
 </body>

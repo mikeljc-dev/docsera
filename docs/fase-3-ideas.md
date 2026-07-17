@@ -6,17 +6,19 @@ webs y docs oficiales de cada producto a fecha del análisis.
 
 ## Quick wins (días, no semanas)
 
-1. **Feedback 👍/👎 en cada respuesta** *(lo tienen todos)* — columna en
+*(1-4 implementados el 2026-07-17; queda el 5.)*
+
+1. ✅ **Feedback 👍/👎 en cada respuesta** *(lo tienen todos)* — columna en
    `conversations`, dos botones en el widget, filtro en el dashboard. Base
    del "CSAT" y alimenta la detección de huecos de contenido.
-2. **Markdown renderizado y código copiable en el widget** *(Mintlify)* —
+2. ✅ **Markdown renderizado y código copiable en el widget** *(Mintlify)* —
    la burbuja hoy es texto plano; para docs técnicas, bloques de código
    copiables son oro. (En vez de prohibirle el Markdown al modelo,
    renderizarlo.)
-3. **Botón de escape a humano** *(Fin)* — cuando responde "I don't know",
+3. ✅ **Botón de escape a humano** *(Fin)* — cuando responde "I don't know",
    ofrecer un enlace configurable (`data-contact` → mailto/URL de soporte).
    Convierte el fallo en derivación.
-4. **Preguntas sugeridas al abrir el chat** *(DocsBot, kapa)* — chips
+4. ✅ **Preguntas sugeridas al abrir el chat** *(DocsBot, kapa)* — chips
    configurables (`data-suggestions`) que eliminan la página en blanco.
 5. **Ingesta de repos de GitHub** *(DocsBot, kapa)* — `type: "github"` que
    trae los `.md` de un repo público; el conector más barato de construir

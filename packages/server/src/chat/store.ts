@@ -8,7 +8,7 @@ export interface ConversationInput {
   chunkIds: string[];
 }
 
-export async function saveConversation(pool: Pool, input: ConversationInput): Promise<void> {
+export async function saveConversation(pool: Pool, input: ConversationInput): Promise<string> {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -30,6 +30,7 @@ export async function saveConversation(pool: Pool, input: ConversationInput): Pr
     }
 
     await client.query("COMMIT");
+    return conversationId;
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;

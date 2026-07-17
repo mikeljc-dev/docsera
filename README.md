@@ -142,7 +142,7 @@ One line:
 
 In production, replace `localhost:3000` with the domain where your server is deployed, and add your site's origin to `ALLOWED_ORIGINS` in `.env`.
 
-**Customization.** Everything is configured with `data-*` attributes on the script tag: `data-primary` (your brand color), `data-position` (`right`/`left`), `data-locale` (UI language — ships in English, Spanish, French, German and Portuguese, auto-detected from your page's `<html lang>` or the browser), and `data-heading`/`data-placeholder` to override individual strings. The assistant's no-answer phrase is set server-side with `CHAT_NO_ANSWER_TEXT`:
+**Customization.** Everything is configured with `data-*` attributes on the script tag: `data-primary` (your brand color), `data-position` (`right`/`left`), `data-locale` (UI language — ships in English, Spanish, French, German and Portuguese, auto-detected from your page's `<html lang>` or the browser), `data-suggestions` (starter questions as chips, `|`-separated), `data-contact` (link offered when it can't answer), and `data-heading`/`data-placeholder` to override individual strings. Answers render simple Markdown with copyable code blocks, and every answer has 👍/👎 feedback buttons that feed the dashboard. The assistant's no-answer phrase is set server-side with `CHAT_NO_ANSWER_TEXT`:
 
 ```html
 <script src="https://docs.yourdomain.com/widget.js"

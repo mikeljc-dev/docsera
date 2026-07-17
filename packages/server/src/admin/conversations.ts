@@ -6,6 +6,7 @@ export interface ConversationRow {
   question: string;
   answer: string | null;
   answered: boolean;
+  feedback: number | null;
   createdAt: string;
   sourceCount: number;
 }
@@ -27,6 +28,7 @@ interface RawConversationRow {
   question: string;
   answer: string | null;
   answered: boolean;
+  feedback: number | null;
   created_at: string;
   source_count: number;
 }
@@ -39,7 +41,7 @@ export async function listConversations(
 
   const [conversationsResult, totalResult] = await Promise.all([
     pool.query<RawConversationRow>(
-      `SELECT c.id, c.session_id, c.question, c.answer, c.answered, c.created_at,
+      `SELECT c.id, c.session_id, c.question, c.answer, c.answered, c.feedback, c.created_at,
               count(cs.chunk_id)::int AS source_count
        FROM conversations c
        LEFT JOIN conversation_sources cs ON cs.conversation_id = c.id
@@ -62,6 +64,7 @@ export async function listConversations(
       question: row.question,
       answer: row.answer,
       answered: row.answered,
+      feedback: row.feedback,
       createdAt: row.created_at,
       sourceCount: row.source_count,
     })),

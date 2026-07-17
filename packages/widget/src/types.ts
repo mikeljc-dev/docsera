@@ -9,10 +9,15 @@ export interface ChatMessage {
   content: string;
   sources?: Source[];
   error?: boolean;
+  conversationId?: string;
+  answered?: boolean;
+  feedback?: "up" | "down";
 }
 
 export interface ChatResponse {
   answer: string;
   sources: Source[];
   sessionId: string;
+  conversationId: string;
+  answered: boolean;
 }

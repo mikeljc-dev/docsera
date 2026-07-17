@@ -1,5 +1,6 @@
 import { LitElement, html, css, type PropertyValues } from "lit";
 import { resolveStrings, type WidgetStrings } from "./locales.js";
+import { renderMarkdown } from "./markdown.js";
 import type { ChatMessage, ChatResponse, Source } from "./types.js";
 
 const SESSION_STORAGE_KEY = "docsera-session-id";
@@ -40,6 +41,8 @@ export class DocseraWidget extends LitElement {
     placeholder: { type: String },
     primary: { type: String },
     position: { type: String, reflect: true },
+    suggestions: { type: String },
+    contact: { type: String },
     open: { state: true },
     messages: { state: true },
     pending: { state: true },
@@ -184,6 +187,151 @@ export class DocseraWidget extends LitElement {
       color: #991b1b;
     }
 
+    .bubble.md {
+      white-space: normal;
+    }
+
+    .bubble.md p {
+      margin: 0 0 0.5rem;
+    }
+
+    .bubble.md p:last-child,
+    .bubble.md ul:last-child,
+    .bubble.md .codeblock:last-child {
+      margin-bottom: 0;
+    }
+
+    .bubble.md ul {
+      margin: 0 0 0.5rem;
+      padding-left: 1.1rem;
+    }
+
+    .bubble.md li {
+      margin-bottom: 0.15rem;
+    }
+
+    .bubble.md code {
+      background: #e5e7eb;
+      border-radius: 4px;
+      padding: 0.05em 0.3em;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 0.85em;
+    }
+
+    .codeblock {
+      position: relative;
+      margin: 0 0 0.5rem;
+    }
+
+    .codeblock pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 0.6rem 0.75rem;
+      padding-top: 1.6rem;
+      overflow-x: auto;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+
+    .codeblock pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+      font-size: inherit;
+    }
+
+    .codeblock .copy {
+      position: absolute;
+      top: 0.35rem;
+      right: 0.4rem;
+      background: rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+      border: none;
+      border-radius: 5px;
+      padding: 0.15rem 0.5rem;
+      font-size: 0.7rem;
+      cursor: pointer;
+    }
+
+    .codeblock .copy:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .chips {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-top: 1rem;
+      align-items: center;
+    }
+
+    .chip {
+      background: none;
+      border: 1px solid var(--docsera-border);
+      border-radius: 999px;
+      color: var(--docsera-primary);
+      padding: 0.4rem 0.85rem;
+      font-size: 0.85rem;
+      font-family: inherit;
+      cursor: pointer;
+      max-width: 100%;
+    }
+
+    .chip:hover {
+      border-color: var(--docsera-primary);
+      background: rgba(37, 99, 235, 0.06);
+    }
+
+    .contact {
+      margin-top: 0.35rem;
+      font-size: 0.8rem;
+      color: var(--docsera-primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .contact:hover {
+      text-decoration: underline;
+    }
+
+    .feedback {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      margin-top: 0.3rem;
+    }
+
+    .feedback button {
+      background: none;
+      border: none;
+      color: #9ca3af;
+      cursor: pointer;
+      padding: 0.15rem;
+      line-height: 0;
+      border-radius: 5px;
+    }
+
+    .feedback button:hover {
+      color: var(--docsera-fg);
+      background: #f3f4f6;
+    }
+
+    .feedback button.down svg {
+      transform: rotate(180deg);
+    }
+
+    .feedback button.active {
+      color: var(--docsera-primary);
+    }
+
+    .feedback .thanks {
+      font-size: 0.72rem;
+      color: var(--docsera-muted);
+      margin-left: 0.2rem;
+    }
+
     .sources {
       margin-top: 0.3rem;
       font-size: 0.75rem;
@@ -252,6 +400,8 @@ export class DocseraWidget extends LitElement {
   declare placeholder: string;
   declare primary: string;
   declare position: string;
+  declare suggestions: string;
+  declare contact: string;
   declare open: boolean;
   declare messages: ChatMessage[];
   declare pending: boolean;
@@ -267,6 +417,8 @@ export class DocseraWidget extends LitElement {
     this.placeholder = "";
     this.primary = "";
     this.position = "";
+    this.suggestions = "";
+    this.contact = "";
     this.open = false;
     this.messages = [];
     this.pending = false;
@@ -318,7 +470,10 @@ export class DocseraWidget extends LitElement {
 
   private async onSubmit(event: Event): Promise<void> {
     event.preventDefault();
-    const question = this.inputValue.trim();
+    await this.send(this.inputValue.trim());
+  }
+
+  private async send(question: string): Promise<void> {
     if (!question || this.pending || !this.server) return;
 
     this.messages = [...this.messages, { role: "user", content: question }];
@@ -338,7 +493,16 @@ export class DocseraWidget extends LitElement {
 
       const data = (await response.json()) as ChatResponse;
       this.sessionId = data.sessionId;
-      this.messages = [...this.messages, { role: "assistant", content: data.answer, sources: data.sources }];
+      this.messages = [
+        ...this.messages,
+        {
+          role: "assistant",
+          content: data.answer,
+          sources: data.sources,
+          conversationId: data.conversationId,
+          answered: data.answered,
+        },
+      ];
     } catch {
       this.messages = [
         ...this.messages,
@@ -350,6 +514,26 @@ export class DocseraWidget extends LitElement {
       ];
     } finally {
       this.pending = false;
+    }
+  }
+
+  private async sendFeedback(message: ChatMessage, rating: "up" | "down"): Promise<void> {
+    if (!message.conversationId || message.feedback === rating) return;
+    // Optimista: el voto se refleja al instante; si la petición falla, se
+    // revierte sin molestar al usuario con un error por un pulgar.
+    const previous = message.feedback;
+    this.messages = this.messages.map((m) => (m === message ? { ...m, feedback: rating } : m));
+    try {
+      const response = await fetch(`${this.server}/feedback`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ conversationId: message.conversationId, rating }),
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    } catch {
+      this.messages = this.messages.map((m) =>
+        m.conversationId === message.conversationId ? { ...m, feedback: previous } : m,
+      );
     }
   }
 
@@ -372,7 +556,10 @@ export class DocseraWidget extends LitElement {
         </header>
         <div class="messages">
           ${this.messages.length === 0
-            ? html`<p class="empty">${strings.empty}</p>`
+            ? html`
+                <p class="empty">${strings.empty}</p>
+                ${this.renderSuggestions()}
+              `
             : this.messages.map((message) => this.renderMessage(message))}
           ${this.pending
             ? html`<div class="message assistant pending"><div class="bubble">${strings.typing}</div></div>`
@@ -393,10 +580,32 @@ export class DocseraWidget extends LitElement {
     `;
   }
 
+  private renderSuggestions() {
+    const items = this.suggestions
+      .split("|")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (items.length === 0) return null;
+    return html`
+      <div class="chips">
+        ${items.map(
+          (question) =>
+            html`<button class="chip" @click=${() => this.send(question)}>${question}</button>`,
+        )}
+      </div>
+    `;
+  }
+
   private renderMessage(message: ChatMessage) {
+    const strings = this.strings;
+    const isMarkdown = message.role === "assistant" && !message.error;
     return html`
       <div class="message ${message.role}">
-        <div class="bubble ${message.error ? "error" : ""}">${message.content}</div>
+        <div class="bubble ${message.error ? "error" : ""} ${isMarkdown ? "md" : ""}">
+          ${isMarkdown
+            ? renderMarkdown(message.content, { copy: strings.copy, copied: strings.copied })
+            : message.content}
+        </div>
         ${message.sources && message.sources.length > 0
           ? html`
               <div class="sources">
@@ -409,9 +618,43 @@ export class DocseraWidget extends LitElement {
               </div>
             `
           : null}
+        ${message.answered === false && this.contact
+          ? html`<a class="contact" href=${this.contact} target="_blank" rel="noopener noreferrer"
+              >${strings.contact} →</a
+            >`
+          : null}
+        ${message.conversationId
+          ? html`
+              <div class="feedback ${message.feedback ? "voted" : ""}">
+                <button
+                  class=${message.feedback === "up" ? "active" : ""}
+                  aria-label=${strings.helpful}
+                  title=${strings.helpful}
+                  @click=${() => this.sendFeedback(message, "up")}
+                >
+                  ${thumbIcon()}
+                </button>
+                <button
+                  class="down ${message.feedback === "down" ? "active" : ""}"
+                  aria-label=${strings.notHelpful}
+                  title=${strings.notHelpful}
+                  @click=${() => this.sendFeedback(message, "down")}
+                >
+                  ${thumbIcon()}
+                </button>
+                ${message.feedback ? html`<span class="thanks">${strings.feedbackThanks}</span>` : null}
+              </div>
+            `
+          : null}
       </div>
     `;
   }
+}
+
+function thumbIcon() {
+  return html`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 10v12M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z" />
+  </svg>`;
 }
 
 function chatIcon() {
