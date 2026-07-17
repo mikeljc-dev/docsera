@@ -162,7 +162,8 @@ conversación del 2026-07-16/17). Lo que se hizo:
 Siguiente: Fase 3 — iterar con feedback real tras publicar los posts.
 Primeras candidatas (ver roadmap del README): streaming de respuestas en
 el widget y conversaciones multi-turno (hoy cada pregunta va sin
-historial al LLM). Higiene pendiente: rotar la key de Gemini (expuesta en
+historial al LLM). Hay un análisis de la competencia (Fin, Mintlify,
+DocsBot, kapa.ai) con ideas priorizadas en `docs/fase-3-ideas.md`. Higiene pendiente: rotar la key de Gemini (expuesta en
 una captura durante el setup) y decidir plan de Railway cuando se agote
 el crédito del trial (Hobby ~5 $/mes o migrar a Cloud Run + Neon con la
 misma imagen).
