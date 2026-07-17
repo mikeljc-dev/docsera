@@ -114,7 +114,10 @@ cómo probarlo antes de seguir.
 chat RAG con citas, widget embebible, Docker) — todo probado de extremo a
 extremo, no solo compilado.
 
-**Fase 2 en marcha:**
+**Fase 2 cerrada (2026-07-17).** Todo el trabajo de lanzamiento está hecho
+y verificado en producción; el único acto pendiente es personal de Mikel:
+publicar los posts (Show HN y r/selfhosted, borradores listos en la
+conversación del 2026-07-16/17). Lo que se hizo:
 - [x] Dashboard (historial de conversaciones + detección de preguntas sin
       respuesta).
 - [x] README con guía de instalación real y docs de configuración. Desde el
@@ -149,8 +152,17 @@ extremo, no solo compilado.
       cualquier subdominio sin registro explícito). Contenido ingerido:
       README inglés + https://docs.docsera.dev/. Verificado E2E con
       Playwright contra producción.
-- [ ] Publicación en Hacker News (Show HN) y r/selfhosted — la hace Mikel
-      con los borradores ya preparados (ver conversación del 2026-07-16).
+- [x] Última pasada pre-lanzamiento (2026-07-17), a partir de feedback de
+      revisión externa: tour con Driver.js desde el CTA de la landing,
+      FAQ ingerida para preguntas de evaluación, favicon de marca,
+      nav móvil, og:image, widget personalizable (data-primary/
+      data-position), receta de reindexado desde CI, roadmap Fase 3
+      detallado y ARCHITECTURE.md con las decisiones de diseño.
 
-Siguiente: publicar los posts y pasar a Fase 3 (iterar con feedback real,
-prototipo cloud).
+Siguiente: Fase 3 — iterar con feedback real tras publicar los posts.
+Primeras candidatas (ver roadmap del README): streaming de respuestas en
+el widget y conversaciones multi-turno (hoy cada pregunta va sin
+historial al LLM). Higiene pendiente: rotar la key de Gemini (expuesta en
+una captura durante el setup) y decidir plan de Railway cuando se agote
+el crédito del trial (Hobby ~5 $/mes o migrar a Cloud Run + Neon con la
+misma imagen).
