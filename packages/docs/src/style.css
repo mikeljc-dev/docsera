@@ -28,11 +28,26 @@ a { color: var(--primary); }
   position: sticky; top: 0; background: var(--bg); z-index: 10;
 }
 .theme-toggle {
-  background: none; border: 1px solid var(--border); border-radius: 8px;
-  color: var(--muted); cursor: pointer; font-size: 0.95rem;
-  padding: 0.25rem 0.55rem; margin-left: 1.2rem; line-height: 1;
+  position: relative; display: inline-flex; align-items: center;
+  width: 52px; height: 26px; flex-shrink: 0; vertical-align: middle;
+  border-radius: 999px; border: 1px solid var(--border);
+  background: var(--bg-soft); cursor: pointer; padding: 0;
+  margin-left: 1.2rem; transition: border-color 0.2s;
 }
-.theme-toggle:hover { color: var(--fg); border-color: var(--muted); }
+.theme-toggle:hover { border-color: var(--muted); }
+.theme-toggle .icon {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  color: var(--muted); display: inline-flex; pointer-events: none;
+}
+.theme-toggle .icon.sun { left: 6px; }
+.theme-toggle .icon.moon { right: 6px; }
+.theme-toggle .knob {
+  position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
+  border-radius: 50%; background: var(--primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.theme-toggle[aria-checked="true"] .knob { transform: translateX(26px); }
 .topbar .brand { display: flex; align-items: center; gap: 0.6rem; }
 .topbar .logo { font-weight: 700; font-size: 1.05rem; color: var(--fg); text-decoration: none; }
 .topbar .logo span { color: var(--primary); }
