@@ -14,6 +14,10 @@
   <meta property="og:image" content="https://docsera.dev/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://docsera.dev/og.png" />
+  <script>
+    // Antes del primer pintado: aplica el tema elegido si lo hay
+    try { var t = localStorage.getItem("docsera-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
 </head>
 <body>
   <div id="app"></div>

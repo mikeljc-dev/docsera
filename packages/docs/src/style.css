@@ -1,19 +1,38 @@
 :root {
-  --fg: #1f2937; --muted: #6b7280; --border: #e5e7eb;
+  --bg: #ffffff; --fg: #1f2937; --muted: #6b7280; --border: #e5e7eb;
   --primary: #2563eb; --bg-soft: #f8fafc; --code-bg: #0f172a;
+  --tip-bg: #eff6ff; --code-inline-bg: #f1f5f9;
+}
+:root[data-theme="dark"] {
+  --bg: #0f172a; --fg: #e2e8f0; --muted: #94a3b8; --border: #1f2a4a;
+  --primary: #60a5fa; --bg-soft: #16213f; --code-bg: #0b1020;
+  --tip-bg: #16213f; --code-inline-bg: #16213f;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f172a; --fg: #e2e8f0; --muted: #94a3b8; --border: #1f2a4a;
+    --primary: #60a5fa; --bg-soft: #16213f; --code-bg: #0b1020;
+    --tip-bg: #16213f; --code-inline-bg: #16213f;
+  }
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 70px; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  color: var(--fg); line-height: 1.65; background: #fff;
+  color: var(--fg); line-height: 1.65; background: var(--bg);
 }
 a { color: var(--primary); }
 .topbar {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0.8rem 1.5rem; border-bottom: 1px solid var(--border);
-  position: sticky; top: 0; background: #fff; z-index: 10;
+  position: sticky; top: 0; background: var(--bg); z-index: 10;
 }
+.theme-toggle {
+  background: none; border: 1px solid var(--border); border-radius: 8px;
+  color: var(--muted); cursor: pointer; font-size: 0.95rem;
+  padding: 0.25rem 0.55rem; margin-left: 1.2rem; line-height: 1;
+}
+.theme-toggle:hover { color: var(--fg); border-color: var(--muted); }
 .topbar .brand { display: flex; align-items: center; gap: 0.6rem; }
 .topbar .logo { font-weight: 700; font-size: 1.05rem; color: var(--fg); text-decoration: none; }
 .topbar .logo span { color: var(--primary); }
@@ -44,7 +63,7 @@ main h3 { font-size: 1.08rem; margin: 1.4rem 0 0.4rem; }
 main p, main ul, main ol { margin-bottom: 0.9rem; }
 main ul, main ol { padding-left: 1.4rem; }
 main li { margin-bottom: 0.3rem; }
-main code { background: #f1f5f9; border: 1px solid var(--border); border-radius: 5px; padding: 0.08em 0.35em; font-size: 0.88em; }
+main code { background: var(--code-inline-bg); border: 1px solid var(--border); border-radius: 5px; padding: 0.08em 0.35em; font-size: 0.88em; }
 pre {
   background: var(--code-bg); color: #e2e8f0; border-radius: 10px;
   padding: 1rem 1.2rem; overflow-x: auto; margin: 0.9rem 0 1.3rem;
@@ -52,7 +71,7 @@ pre {
 }
 pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
 .tip {
-  background: #eff6ff; border-left: 3px solid var(--primary);
+  background: var(--tip-bg); border-left: 3px solid var(--primary);
   border-radius: 0 8px 8px 0; padding: 0.75rem 1rem; margin: 1.2rem 0;
   font-size: 0.92rem;
 }

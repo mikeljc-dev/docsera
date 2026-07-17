@@ -8,6 +8,29 @@
   --border: #1f2a4a;
   --radius: 14px;
   --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  /* el bloque de código del hero es una "ventana de editor": oscuro siempre */
+  --snippet-bg: #111832;
+  --snippet-border: #1f2a4a;
+}
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-soft: #f6f8fc;
+  --fg: #0f172a;
+  --muted: #5b6577;
+  --primary: #2563eb;
+  --primary-soft: #2563eb;
+  --border: #e2e8f0;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #ffffff;
+    --bg-soft: #f6f8fc;
+    --fg: #0f172a;
+    --muted: #5b6577;
+    --primary: #2563eb;
+    --primary-soft: #2563eb;
+    --border: #e2e8f0;
+  }
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -41,6 +64,12 @@ nav .links a:hover { color: var(--fg); text-decoration: none; }
   color: var(--fg) !important; font-weight: 500;
 }
 .gh-btn:hover { border-color: var(--primary); }
+.theme-toggle {
+  background: none; border: 1px solid var(--border); border-radius: 8px;
+  color: var(--muted); cursor: pointer; font-size: 0.95rem;
+  padding: 0.3rem 0.55rem; line-height: 1;
+}
+.theme-toggle:hover { color: var(--fg); border-color: var(--muted); }
 
 header.hero { padding: 5rem 0 4rem; text-align: center; }
 .hero h1 {
@@ -66,15 +95,16 @@ header.hero { padding: 5rem 0 4rem; text-align: center; }
 
 .snippet {
   margin: 3rem auto 0; max-width: 720px; text-align: left;
-  background: var(--bg-soft); border: 1px solid var(--border);
+  background: var(--snippet-bg); border: 1px solid var(--snippet-border);
   border-radius: var(--radius); overflow: hidden;
+  color: #e6e9f2;
 }
 .snippet .bar {
   display: flex; align-items: center; gap: 0.4rem;
-  padding: 0.6rem 1rem; border-bottom: 1px solid var(--border);
-  color: var(--muted); font-size: 0.8rem;
+  padding: 0.6rem 1rem; border-bottom: 1px solid var(--snippet-border);
+  color: #9aa3b8; font-size: 0.8rem;
 }
-.snippet .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
+.snippet .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--snippet-border); }
 .snippet pre {
   padding: 1.1rem 1.25rem; overflow-x: auto;
   font-family: var(--mono); font-size: 0.88rem; line-height: 1.7;

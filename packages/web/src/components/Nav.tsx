@@ -1,4 +1,5 @@
 import { GITHUB_URL } from "../links.js";
+import { ThemeToggle } from "./ThemeToggle.js";
 
 export function Nav() {
   return (
@@ -13,6 +14,7 @@ export function Nav() {
         <a class="gh-btn" href={GITHUB_URL}>
           GitHub ↗
         </a>
+        <ThemeToggle />
       </div>
     </nav>
   );
