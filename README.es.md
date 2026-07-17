@@ -25,7 +25,7 @@ Tus datos no salen de tu servidor. Funciona con Anthropic, OpenAI o modelos loca
 
 ![Widget de Docsera respondiendo una pregunta con citas a la fuente y diciendo "I don't know" a una pregunta fuera de tema](./docs/demo.gif)
 
-*(Grabación real de la [demo pública](https://docs.docsera.dev): una
+*(Grabación real de la [demo pública](https://docs.docsera.dev/?demo=1): una
 respuesta con citas por sección, y una pregunta fuera de tema respondida con
 un honesto "I don't know" — sin llegar a llamar al LLM. Pruébalo tú mismo —
 la burbuja de chat de esa página es Docsera corriendo sobre sus propias docs.)*
