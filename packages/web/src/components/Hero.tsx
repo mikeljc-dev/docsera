@@ -13,7 +13,7 @@ export function Hero() {
         never leaves your server. Every answer cites its sources.
       </p>
       <div class="cta">
-        <a class="btn primary" href="https://docs.docsera.dev">
+        <a class="btn primary" href="https://docs.docsera.dev/?demo=1">
           Try the live demo
         </a>
         <a class="btn ghost" href={`${GITHUB_URL}#installation`}>
