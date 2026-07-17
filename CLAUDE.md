@@ -124,9 +124,13 @@ extremo, no solo compilado.
 - [x] Pulido de código (rate limiting, umbral de similitud, sitemaps
       índice, dedupe de ingesta) y CI con GitHub Actions (2026-07-16).
 - [x] Dominio docsera.dev registrado y landing en producción (2026-07-16).
-- [x] GIF de demo en `docs/demo.gif` (2026-07-16): grabado con Playwright
-      contra el stack local (Ollama/llama3.2), pregunta con citas por
-      sección + pregunta fuera de tema con "I don't know".
+- [x] GIF de demo en `docs/demo.gif` (regrabado 2026-07-17 con Playwright
+      contra la demo pública en vivo): pregunta con citas por sección +
+      pregunta fuera de tema con "I don't know".
+- [x] Landing lista para lanzamiento (2026-07-17): CTA a la demo en vivo,
+      widget embebido funcionando (docsera.dev está en ALLOWED_ORIGINS),
+      og:image para previews sociales, enlace a docs. CONTRIBUTING y
+      plantillas de GitHub en inglés.
 - [x] Release v0.1.0 publicada en GitHub (2026-07-16), con tag y notas:
       https://github.com/mikeljc-dev/docsera/releases/tag/v0.1.0
 - [x] Demo pública desplegada (2026-07-16), todo en free tiers: server en
