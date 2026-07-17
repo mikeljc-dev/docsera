@@ -112,6 +112,24 @@ docker compose up -d --build</code></pre>
           <li><code>"markdown"</code> — raw text, handy for CI or unpublished content. Pass a <code>url</code>: it's the document's identity for updates and the link answers will cite.</li>
         </ul>
         <p>Re-ingesting an unchanged document costs nothing in embeddings (content-hash deduplication). Headings become anchors, so citations deep-link to the exact section.</p>
+
+        <h3 id="reindex-from-ci">Reindex from CI</h3>
+        <p>Keep the assistant in sync with your docs automatically: call <code>/ingest</code> from your pipeline on every deploy. Unchanged pages are skipped for free, so this is safe to run on every merge. Example GitHub Actions workflow:</p>
+        <pre><code>name: Reindex docs
+on:
+  push:
+    branches: [main]
+
+jobs:
+  reindex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reingest documentation into Docsera
+        run: |
+          curl -sf -X POST https://your-docsera-server.com/ingest \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.DOCSERA_ADMIN_TOKEN }}" \
+            -d '{"type": "sitemap", "source": "https://yourdomain.com/sitemap.xml"}'</code></pre>
       </section>
 
       <section>
@@ -121,12 +139,19 @@ docker compose up -d --build</code></pre>
         data-server="https://your-docsera-server.com"&gt;&lt;/script&gt;</code></pre>
         <p>Add your site's origin to <code>ALLOWED_ORIGINS</code> in <code>.env</code>.</p>
         <h3 id="languages-and-customization">Languages and customization</h3>
-        <p>The widget ships its UI in English, Spanish, French, German and Portuguese, picked automatically from your page's <code>&lt;html lang&gt;</code> or the browser. Options:</p>
+        <p>The widget ships its UI in English, Spanish, French, German and Portuguese, picked automatically from your page's <code>&lt;html lang&gt;</code> or the browser. Everything is configured with <code>data-*</code> attributes on the script tag:</p>
         <ul>
+          <li><code>data-primary</code> — your brand color for the bubble, header and buttons (any CSS color, e.g. <code>#4F46E5</code>).</li>
+          <li><code>data-position</code> — <code>right</code> (default) or <code>left</code>.</li>
           <li><code>data-locale</code> — force a language (<code>en</code>, <code>es</code>, <code>fr</code>, <code>de</code>, <code>pt</code>).</li>
           <li><code>data-heading</code> / <code>data-placeholder</code> — override individual strings.</li>
           <li><code>CHAT_NO_ANSWER_TEXT</code> (server-side) — the assistant's no-answer phrase, in your users' language.</li>
         </ul>
+        <pre><code>&lt;script src="https://your-docsera-server.com/widget.js"
+        data-server="https://your-docsera-server.com"
+        data-primary="#4F46E5"
+        data-position="left"
+        data-locale="en"&gt;&lt;/script&gt;</code></pre>
       </section>
 
       <section>

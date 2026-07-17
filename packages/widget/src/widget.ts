@@ -38,6 +38,8 @@ export class DocseraWidget extends LitElement {
     locale: { type: String },
     heading: { type: String },
     placeholder: { type: String },
+    primary: { type: String },
+    position: { type: String, reflect: true },
     open: { state: true },
     messages: { state: true },
     pending: { state: true },
@@ -58,6 +60,16 @@ export class DocseraWidget extends LitElement {
       --docsera-muted: #6b7280;
       --docsera-border: #e5e7eb;
       --docsera-radius: 14px;
+    }
+
+    :host([position="left"]) {
+      left: 1.5rem;
+      right: auto;
+    }
+
+    :host([position="left"]) .panel {
+      left: 0;
+      right: auto;
     }
 
     .fab {
@@ -238,6 +250,8 @@ export class DocseraWidget extends LitElement {
   declare locale: string;
   declare heading: string;
   declare placeholder: string;
+  declare primary: string;
+  declare position: string;
   declare open: boolean;
   declare messages: ChatMessage[];
   declare pending: boolean;
@@ -251,6 +265,8 @@ export class DocseraWidget extends LitElement {
     this.locale = "";
     this.heading = "";
     this.placeholder = "";
+    this.primary = "";
+    this.position = "";
     this.open = false;
     this.messages = [];
     this.pending = false;
@@ -274,6 +290,14 @@ export class DocseraWidget extends LitElement {
   }
 
   protected override updated(changed: PropertyValues): void {
+    if (changed.has("primary")) {
+      // Color de marca del sitio anfitrion: pisa la variable CSS del host
+      if (this.primary) {
+        this.style.setProperty("--docsera-primary", this.primary);
+      } else {
+        this.style.removeProperty("--docsera-primary");
+      }
+    }
     if (changed.has("messages") || changed.has("pending")) {
       this.scrollToBottom();
     }

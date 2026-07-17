@@ -53,6 +53,8 @@ Three pieces in one monorepo, all served by a single deployable service:
 
 The `server` is the only service you deploy (besides Postgres): it serves the API, the widget and the dashboard from the same process.
 
+Curious about the design decisions (chunking, retrieval strategy, document invalidation, why one server)? See [ARCHITECTURE.md](./ARCHITECTURE.md).
+
 ## Installation
 
 Prerequisites: [Docker](https://docs.docker.com/get-docker/) and Docker Compose (bundled with Docker Desktop). Node ≥ 20 and [pnpm](https://pnpm.io) only if you want to develop locally without Docker.
@@ -114,6 +116,8 @@ Re-ingesting an unchanged document costs nothing in embeddings (content-hash ded
 
 For `"markdown"`, the `url` is optional but recommended: it's the document's identity (without it, a modified version of the same markdown is ingested as a new document instead of updating the previous one) and it's also the link that answers will cite.
 
+**Keep it in sync from CI:** call `/ingest` from your pipeline on every docs deploy — unchanged pages cost nothing, so it's safe on every merge. See the [ready-made GitHub Actions workflow](https://docs.docsera.dev/#reindex-from-ci) in the docs.
+
 ### 2. Add the widget to your site
 
 One line:
@@ -124,11 +128,13 @@ One line:
 
 In production, replace `localhost:3000` with the domain where your server is deployed, and add your site's origin to `ALLOWED_ORIGINS` in `.env`.
 
-**Languages.** The widget ships its UI in English, Spanish, French, German and Portuguese, and picks the language automatically (from your page's `<html lang>`, or the browser). Force it with `data-locale`, override individual strings with `data-heading`/`data-placeholder`, and set the assistant's no-answer phrase in your language with `CHAT_NO_ANSWER_TEXT` in `.env`:
+**Customization.** Everything is configured with `data-*` attributes on the script tag: `data-primary` (your brand color), `data-position` (`right`/`left`), `data-locale` (UI language — ships in English, Spanish, French, German and Portuguese, auto-detected from your page's `<html lang>` or the browser), and `data-heading`/`data-placeholder` to override individual strings. The assistant's no-answer phrase is set server-side with `CHAT_NO_ANSWER_TEXT`:
 
 ```html
 <script src="https://docs.yourdomain.com/widget.js"
         data-server="https://docs.yourdomain.com"
+        data-primary="#4F46E5"
+        data-position="left"
         data-locale="es"
         data-heading="¿Dudas? Pregúntame"></script>
 ```
@@ -181,7 +187,7 @@ pnpm dev            # all packages in parallel, in watch mode
 
 - [x] **Phase 1 — Core:** server, DB schema, ingestion (markdown/URL/sitemap), LLM adapters (Anthropic/OpenAI/Ollama), RAG chat with citations, embeddable widget, Docker.
 - [ ] **Phase 2 — Launch:** dashboard ✅, real installation guide ✅ (this document), code polish ✅ (rate limiting, similarity threshold, sitemap indexes, ingestion dedupe), CI ✅, domain ([docsera.dev](https://docsera.dev)) ✅, demo GIF ✅. Remaining: going public (GitHub, Hacker News, r/selfhosted).
-- [ ] **Phase 3 — Traction:** iterate on real feedback, cloud version prototype (multi-tenant, usage-based billing), waitlist.
+- [ ] **Phase 3 — Traction:** iterate on real feedback. On the radar: answer streaming in the widget · hybrid retrieval (BM25 + embeddings) and re-ranking · 👍/👎 feedback on answers · more ingestion connectors (GitHub repos, Notion, PDF, Docusaurus/VitePress) · richer analytics (top questions, most-cited sources, token usage) · multi-project instances · cloud version prototype (multi-tenant, usage-based billing).
 
 ## Stack
 

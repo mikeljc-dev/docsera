@@ -13,5 +13,9 @@ if (server && !document.querySelector("docsera-widget")) {
   if (heading) el.setAttribute("heading", heading);
   const placeholder = currentScript?.dataset["placeholder"];
   if (placeholder) el.setAttribute("placeholder", placeholder);
+  const primary = currentScript?.dataset["primary"];
+  if (primary) el.setAttribute("primary", primary);
+  const position = currentScript?.dataset["position"];
+  if (position) el.setAttribute("position", position);
   document.body.appendChild(el);
 }
