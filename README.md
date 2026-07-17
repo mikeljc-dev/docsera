@@ -25,9 +25,10 @@ Your data never leaves your server. Works with Anthropic, OpenAI or local models
 
 ![Docsera widget answering a question with source citations, then saying "I don't know" to an off-topic question](./docs/demo.gif)
 
-*(Real recording against the local stack with a local model via Ollama: an
-answer with per-section citations, and an off-topic question getting an
-honest "I don't know" — without even calling the LLM.)*
+*(Real recording of the [live demo](https://docs.docsera.dev): an answer
+with per-section citations, and an off-topic question getting an honest
+"I don't know" — without even calling the LLM. Try it yourself — the chat
+bubble on that page is Docsera running on its own docs.)*
 
 ## What is it?
 
