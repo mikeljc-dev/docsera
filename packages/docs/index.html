@@ -33,6 +33,7 @@
       <div class="group">Reference</div>
       <a href="#http-api">HTTP API</a>
       <a href="#local-development">Local development</a>
+      <a href="#faq">FAQ</a>
     </aside>
 
     <main>
@@ -153,6 +154,34 @@ pnpm db:up          # Postgres+pgvector only, via Docker
 pnpm db:migrate
 pnpm dev            # all packages in parallel, in watch mode</code></pre>
         <p>See <a href="https://github.com/mikeljc-dev/docsera/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> for the checks to run before a PR.</p>
+      </section>
+
+      <section>
+        <h2 id="faq">FAQ</h2>
+
+        <h3 id="is-docsera-free">Is Docsera free?</h3>
+        <p>Yes. Docsera is open source under the AGPL-3.0 license and free to self-host, forever. You only pay for your own infrastructure and, if you choose a cloud LLM provider, its API usage — with Ollama both chat and embeddings run locally at zero cost. A managed (paid) cloud version is planned for the future, for teams that prefer not to run the infrastructure.</p>
+
+        <h3 id="does-my-data-leave-my-server">Does my data leave my server?</h3>
+        <p>Self-hosted, your documents and conversations live in your own Postgres and never leave your server. The only external calls are to the LLM provider you configure for chat and embeddings — and if you use Ollama, there are no external calls at all. Docsera has no telemetry, no analytics, and no third-party services in between.</p>
+
+        <h3 id="which-llm-providers-can-i-use">Which LLM providers can I use?</h3>
+        <p>Anthropic, OpenAI, or any OpenAI-compatible API (Gemini in compatibility mode, Groq, Mistral, LM Studio, vLLM…) via <code>OPENAI_BASE_URL</code> — plus fully local models via Ollama. Chat and embeddings are configured independently, so you can mix providers.</p>
+
+        <h3 id="what-do-i-need-to-run-it">What do I need to run it?</h3>
+        <p>Just Docker and Docker Compose. Postgres with pgvector ships in the compose file, migrations run automatically, and the whole thing is up in under 10 minutes. Any small VPS or container platform works — this very demo runs on free-tier hosting.</p>
+
+        <h3 id="can-it-hallucinate">Can it hallucinate?</h3>
+        <p>It's designed not to. The assistant answers only from your documentation: if nothing relevant passes the similarity threshold, it answers "I don't know" without even calling the LLM, and every answer cites the exact sections it came from, so users can verify. The dashboard also surfaces every unanswered question.</p>
+
+        <h3 id="is-there-a-hosted-version">Is there a hosted version?</h3>
+        <p>Not yet. Today Docsera is self-hosted only; a managed cloud version with usage-based pricing is on the roadmap. If you'd use one, open an issue on GitHub and tell us — it helps prioritize.</p>
+
+        <h3 id="which-languages-does-it-support">Which languages does it support?</h3>
+        <p>The widget UI ships in English, Spanish, French, German and Portuguese, auto-detected from your page or the visitor's browser. The assistant answers in the language the question was asked in, and the "I don't know" phrase is configurable so it matches your users' language.</p>
+
+        <h3 id="how-can-i-contribute">How can I contribute?</h3>
+        <p>Bug reports from real usage, focused PRs and concrete proposals are all welcome — see the <a href="https://github.com/mikeljc-dev/docsera/blob/main/CONTRIBUTING.md">contributing guide</a> on GitHub. Docsera is AGPL-3.0: contributions are distributed under the same license.</p>
       </section>
     </main>
   </div>
