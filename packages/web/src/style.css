@@ -29,8 +29,13 @@ nav {
 .logo { font-weight: 700; font-size: 1.2rem; color: var(--fg); letter-spacing: -0.02em; }
 .logo span { color: var(--primary-soft); }
 nav .links { display: flex; gap: 1.5rem; align-items: center; }
-nav .links a { color: var(--muted); font-size: 0.95rem; }
+nav .links a { color: var(--muted); font-size: 0.95rem; white-space: nowrap; }
 nav .links a:hover { color: var(--fg); text-decoration: none; }
+@media (max-width: 640px) {
+  nav .links { gap: 1rem; }
+  /* en movil, fuera los enlaces de ancla: la pagina se recorre scrolleando */
+  nav .links a[href^="#"] { display: none; }
+}
 .gh-btn {
   border: 1px solid var(--border); border-radius: 8px; padding: 0.4rem 0.9rem;
   color: var(--fg) !important; font-weight: 500;
