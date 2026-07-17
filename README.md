@@ -186,7 +186,7 @@ pnpm dev            # all packages in parallel, in watch mode
 ## Roadmap
 
 - [x] **Phase 1 — Core:** server, DB schema, ingestion (markdown/URL/sitemap), LLM adapters (Anthropic/OpenAI/Ollama), RAG chat with citations, embeddable widget, Docker.
-- [ ] **Phase 2 — Launch:** dashboard ✅, real installation guide ✅ (this document), code polish ✅ (rate limiting, similarity threshold, sitemap indexes, ingestion dedupe), CI ✅, domain ([docsera.dev](https://docsera.dev)) ✅, demo GIF ✅. Remaining: going public (GitHub, Hacker News, r/selfhosted).
+- [x] **Phase 2 — Launch:** dashboard, real installation guide (this document), code polish (rate limiting, similarity threshold, sitemap indexes, ingestion dedupe), CI, [landing](https://docsera.dev) and [docs site](https://docs.docsera.dev) with the widget running live on both, customizable widget, demo GIF, v0.1.0 release.
 - [ ] **Phase 3 — Traction:** iterate on real feedback. On the radar: answer streaming in the widget · hybrid retrieval (BM25 + embeddings) and re-ranking · 👍/👎 feedback on answers · more ingestion connectors (GitHub repos, Notion, PDF, Docusaurus/VitePress) · richer analytics (top questions, most-cited sources, token usage) · multi-project instances · cloud version prototype (multi-tenant, usage-based billing).
 
 ## Stack
