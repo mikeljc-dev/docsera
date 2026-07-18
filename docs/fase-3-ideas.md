@@ -31,6 +31,11 @@ webs y docs oficiales de cada producto a fecha del análisis.
    que ya tenemos), fuentes más citadas, tasa respondidas/no respondidas,
    CSAT del feedback. Con `conversations` + `conversation_sources` es
    mayormente SQL.
+6b. ✅ **Búsqueda híbrida (full-text + vector, RRF)** *(2026-07-18)* — rama FTS
+    de Postgres (`tsvector` 'simple' + `websearch_to_tsquery`) fusionada con
+    la vectorial por Reciprocal Rank Fusion. Caza términos exactos (nombres de
+    variables, códigos de error) donde el embedding flojea; sin dependencias
+    ni servicios nuevos. Re-ranking con cross-encoder queda para después.
 7. **Multi-turno con refinado de pregunta** *(Fin: refinar → recuperar →
    responder)* — reescribir la pregunta con el historial antes de embeber.
 8. **Señal de confianza** *(kapa)* — marcar respuestas cerca del umbral
@@ -43,8 +48,10 @@ webs y docs oficiales de cada producto a fecha del análisis.
 
 11. **Bot de Slack/Discord sobre la misma API** *(kapa, DocsBot)* — mismo
     backend, otra superficie; Discord encaja con comunidades open source.
-12. **Exponer las docs como servidor MCP / `llms.txt`** *(Mintlify)* —
-    "tus docs, consumibles por agentes"; encaja con nuestra audiencia.
+12. ✅ **Exponer las docs como servidor MCP** *(2026-07-18)* *(Mintlify)* —
+    `POST /mcp` (Streamable HTTP, stateless) con tools `search_docs` (retrieval
+    puro) y `ask_docs` (RAG con citas). "Tus docs, consumibles por agentes";
+    encaja con nuestra audiencia developer. Pendiente el `llms.txt` estático.
 13. **PII masking en la ingesta** *(kapa)* — argumento enterprise que casa
     con el "privacy-first".
 14. **Targeting por audiencia y acciones multi-paso** *(Fin

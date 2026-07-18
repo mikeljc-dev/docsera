@@ -27,14 +27,20 @@ resolve.
 
 ## What's the retrieval strategy?
 
-Plain cosine similarity over pgvector with an HNSW index: the question is
-embedded, the top 6 chunks within a **distance threshold**
-(`CHAT_MAX_DISTANCE`, default 0.8) are retrieved, and if none qualify the
-server answers the configured no-answer phrase **without calling the LLM** —
-irrelevant questions cost retrieval, not generation. Hybrid retrieval
-(BM25 + embeddings) and re-ranking are on the roadmap; they're deliberately
-not in yet because plain vector search with a threshold covers the core
-use case well and keeps the mental model simple.
+**Hybrid retrieval**: two branches run in parallel and are fused. The
+vector branch embeds the question and takes the nearest chunks over pgvector
+(HNSW, cosine) within a **distance threshold** (`CHAT_MAX_DISTANCE`, default
+0.8); the full-text branch runs Postgres FTS (`websearch_to_tsquery` over a
+`tsvector` generated column with the `simple` config — no stemming, no
+stopwords, language-agnostic) so exact terms like identifiers, env-var names
+and error codes are matched verbatim, which is exactly where embeddings are
+weakest. The two ranked lists are merged by **Reciprocal Rank Fusion**
+(score = Σ 1/(k + rank), k=60) and the top 6 go to the prompt. If *neither*
+branch returns anything, the server answers the configured no-answer phrase
+**without calling the LLM** — irrelevant questions cost retrieval, not
+generation. FTS was chosen over a second embedding model or an external
+re-ranker because it adds one generated column and no new dependency or
+network call. Cross-encoder re-ranking is still on the roadmap.
 
 ## How does the "I don't know" detection work?
 
@@ -78,8 +84,8 @@ local (Ollama) is most practical.
 
 ## How are the public endpoints protected?
 
-The public surface is `/chat`, `/feedback` and (opt-in, aggregates only)
-`/stats/public`: CORS restricted to `ALLOWED_ORIGINS`, per-IP rate limiting
+The public surface is `/chat`, `/feedback`, `/mcp` and (opt-in, aggregates
+only) `/stats/public`: CORS restricted to `ALLOWED_ORIGINS`, per-IP rate limiting
 (in-memory token bucket — per instance, which is why the deployment docs
 cap instances) plus optional per-IP-daily and instance-daily question caps
 for public demos, and internal errors are logged server-side but never
@@ -89,9 +95,25 @@ trusted behind a proxy you control (`TRUST_PROXY`). Admin endpoints
 
 ## What's deliberately left out (for now)?
 
-Answer streaming, hybrid search + re-ranking, multi-turn conversations,
+Answer streaming, cross-encoder re-ranking, multi-turn conversations,
 multi-project instances and connectors beyond sitemap/URL/Markdown/GitHub.
 See the [roadmap](./README.md#roadmap) — each is planned; the project
 optimizes for a complete, verifiable end-to-end product over feature
-breadth. (Answer feedback, coverage analytics and GitHub repo ingestion
-started on that list and have since shipped.)
+breadth. (Answer feedback, coverage analytics, GitHub repo ingestion,
+hybrid retrieval and the MCP server started on that list and have since
+shipped.)
+
+## Why an MCP server?
+
+The same retrieval pipeline that powers the widget is exposed over the
+[Model Context Protocol](https://modelcontextprotocol.io) at `POST /mcp`, so
+AI coding agents can query your docs while they work. It's a thin adapter
+over existing internals — `search_docs` calls `retrieveRelevantChunks`
+directly (no LLM, cheap) and `ask_docs` calls the same `runChat` as the
+widget. The transport is Streamable HTTP in **stateless** mode (a fresh
+`Server`+transport per request, `sessionIdGenerator: undefined`): no
+per-client state fits the ephemeral, possibly multi-instance deployment and
+means the MCP endpoint inherits the exact same rate limits as `/chat`. The
+low-level `Server` (not `McpServer`) is used so tool schemas are declared as
+plain JSON Schema, sidestepping a Zod v3/v4 clash between the SDK's bundled
+Zod and ours.

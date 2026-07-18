@@ -172,6 +172,22 @@ https://github.com/mikeljc-dev/docsera/releases/tag/v0.2.0
 (incluye GIF v3 grabado contra producción con el widget animado).
 Regla de trabajo: preguntar a Mikel antes de cada push.
 
+Entregado también (2026-07-18, inspirado en codebase-memory-mcp):
+- [x] **Búsqueda híbrida**: rama full-text de Postgres (columna `tsv`
+      generada, config 'simple', `websearch_to_tsquery` + `ts_rank_cd`,
+      migración 0005) fusionada con la vectorial por Reciprocal Rank
+      Fusion (`fuseRankings`, k=60, 12 candidatos/rama). Caza términos
+      exactos (variables, códigos de error) donde el embedding flojea.
+      `retrieveRelevantChunks(pool, embedding, query, limit)`. Tests de
+      RRF (47 en total) + E2E local.
+- [x] **Servidor MCP** en `POST /mcp` (Streamable HTTP, stateless, Server
+      de bajo nivel para esquemas JSON Schema y evitar el choque zod
+      v3/v4): tools `search_docs` (retrieval puro, sin LLM) y `ask_docs`
+      (RAG con citas, mismo `runChat`). Comparte los rate limits de
+      `/chat`. Verificado E2E con Client + StreamableHTTPClientTransport
+      del SDK. Documentado en docs (sección MCP + fila API),
+      README/ES, ARCHITECTURE y fase-3-ideas (#6b y #12 marcados).
+
 Siguiente: resto de la Fase 3 tras publicar los posts.
 Primeras candidatas (ver roadmap del README): streaming de respuestas en
 el widget y conversaciones multi-turno (hoy cada pregunta va sin

@@ -59,7 +59,7 @@ Three pieces in one monorepo, all served by a single deployable service:
 
 | Package | What it does |
 |---|---|
-| `packages/server` | The API: `POST /chat` (RAG with citations), `POST /ingest` (markdown/URL/sitemap), and serves the widget and dashboard as static assets |
+| `packages/server` | The API: `POST /chat` (RAG with citations), `POST /ingest` (markdown/URL/sitemap/GitHub), `POST /mcp` (MCP server for AI agents), and serves the widget and dashboard as static assets |
 | `packages/widget` | The embeddable web component (the floating chat), bundled into a single `widget.js` |
 | `packages/dashboard` | Admin panel: coverage analytics (answer rate, top unanswered questions, most cited sections, feedback) and conversation history |
 | `packages/web` | The [docsera.dev](https://docsera.dev) landing page (not part of the deployable product) |
@@ -205,7 +205,7 @@ pnpm dev            # all packages in parallel, in watch mode
 
 - [x] **Phase 1 — Core:** server, DB schema, ingestion (markdown/URL/sitemap), LLM adapters (Anthropic/OpenAI/Ollama), RAG chat with citations, embeddable widget, Docker.
 - [x] **Phase 2 — Launch:** dashboard, real installation guide (this document), code polish (rate limiting, similarity threshold, sitemap indexes, ingestion dedupe), CI, [landing](https://docsera.dev) and [docs site](https://docs.docsera.dev) with the widget running live on both, customizable widget, demo GIF, v0.1.0 release.
-- [ ] **Phase 3 — Traction** *(in progress)*: shipped so far — 👍/👎 answer feedback · GitHub repo ingestion · coverage analytics in the dashboard (answer rate, top unanswered questions, most cited sections) with opt-in public demo stats. On the radar: answer streaming · multi-turn conversations · hybrid retrieval (BM25 + embeddings) and re-ranking · more connectors (Notion, PDF, Docusaurus/VitePress) · multi-project instances · cloud version prototype (multi-tenant, usage-based billing).
+- [ ] **Phase 3 — Traction** *(in progress)*: shipped so far — 👍/👎 answer feedback · GitHub repo ingestion · coverage analytics in the dashboard (answer rate, top unanswered questions, most cited sections) with opt-in public demo stats · hybrid retrieval (full-text + embeddings fused by Reciprocal Rank Fusion) · [MCP server](https://docs.docsera.dev/#mcp-server) so AI agents can query your docs. On the radar: answer streaming · multi-turn conversations · cross-encoder re-ranking · more connectors (Notion, PDF, Docusaurus/VitePress) · multi-project instances · cloud version prototype (multi-tenant, usage-based billing).
 
 ## Stack
 

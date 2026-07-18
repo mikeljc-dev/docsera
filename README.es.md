@@ -59,7 +59,7 @@ Tres piezas dentro de un monorepo, todas dentro de un único servicio desplegabl
 
 | Paquete | Qué hace |
 |---|---|
-| `packages/server` | La API: `POST /chat` (RAG con citas), `POST /ingest` (markdown/URL/sitemap), y sirve el widget y el dashboard como estáticos |
+| `packages/server` | La API: `POST /chat` (RAG con citas), `POST /ingest` (markdown/URL/sitemap/GitHub), `POST /mcp` (servidor MCP para agentes de IA), y sirve el widget y el dashboard como estáticos |
 | `packages/widget` | El web component embebible (el chat flotante), compilado a un único `widget.js` |
 | `packages/dashboard` | Panel de administración: analíticas de cobertura (tasa de respuesta, top preguntas sin responder, secciones más citadas, feedback) e historial de conversaciones |
 | `packages/web` | La landing de [docsera.dev](https://docsera.dev) (estática; no forma parte del producto desplegable) |
@@ -205,7 +205,7 @@ pnpm dev            # los tres paquetes en paralelo, en modo watch
 
 - [x] **Fase 1 — Núcleo:** server, esquema de BD, ingesta (markdown/URL/sitemap), adaptadores de LLM (Anthropic/OpenAI/Ollama), chat con RAG y citas, widget embebible, Docker.
 - [x] **Fase 2 — Lanzamiento:** dashboard, README con guía real (este documento), pulido de código (rate limiting, umbral de similitud, sitemaps índice, dedupe de ingesta), CI, [landing](https://docsera.dev) y [sitio de docs](https://docs.docsera.dev) con el widget funcionando en vivo en ambos, widget personalizable, GIF de demo, release v0.1.0.
-- [ ] **Fase 3 — Tracción** *(en marcha)*: entregado hasta ahora — feedback 👍/👎 en las respuestas · ingesta de repos de GitHub · analíticas de cobertura en el dashboard (tasa de respuesta, top preguntas sin responder, secciones más citadas) con stats públicas opcionales para demos. En el radar: streaming de respuestas · conversaciones multi-turno · búsqueda híbrida (BM25 + embeddings) y re-ranking · más conectores (Notion, PDF, Docusaurus/VitePress) · multi-proyecto por instancia · prototipo de versión cloud (multi-tenant, billing por uso).
+- [ ] **Fase 3 — Tracción** *(en marcha)*: entregado hasta ahora — feedback 👍/👎 en las respuestas · ingesta de repos de GitHub · analíticas de cobertura en el dashboard (tasa de respuesta, top preguntas sin responder, secciones más citadas) con stats públicas opcionales para demos · búsqueda híbrida (full-text + embeddings fusionados por Reciprocal Rank Fusion) · [servidor MCP](https://docs.docsera.dev/#mcp-server) para que agentes de IA consulten tus docs. En el radar: streaming de respuestas · conversaciones multi-turno · re-ranking con cross-encoder · más conectores (Notion, PDF, Docusaurus/VitePress) · multi-proyecto por instancia · prototipo de versión cloud (multi-tenant, billing por uso).
 
 ## Stack
 

@@ -38,6 +38,7 @@
       <a href="#dashboard">The dashboard</a>
       <div class="group">Reference</div>
       <a href="#http-api">HTTP API</a>
+      <a href="#mcp-server">MCP server</a>
       <a href="#local-development">Local development</a>
       <a href="#faq">FAQ</a>
     </aside>
@@ -57,7 +58,7 @@
           <li><strong>LLM-agnostic</strong>: Anthropic, OpenAI, or local models via Ollama — for chat and embeddings, configured independently.</li>
           <li><strong>Answers with sources</strong>: every answer deep-links to the doc section it came from. Before hallucinating, it says "I don't know."</li>
         </ul>
-        <p>Under the hood it's classic RAG: your docs are split into sections and stored as embeddings in Postgres with pgvector. Each question is matched by cosine similarity; if nothing relevant passes the threshold, Docsera answers "I don't know" without even calling the LLM.</p>
+        <p>Under the hood it's RAG with <strong>hybrid retrieval</strong>: your docs are split into sections and stored in Postgres — as pgvector embeddings <em>and</em> as a full-text index. Each question runs both searches (semantic similarity plus exact-term matching, so identifiers like <code>CHAT_MAX_DISTANCE</code> are found verbatim) and the results are fused by Reciprocal Rank Fusion. If neither branch finds anything relevant, Docsera answers "I don't know" without even calling the LLM.</p>
       </section>
 
       <section>
@@ -184,11 +185,24 @@ jobs:
             <tr><td><code>POST /chat</code></td><td>rate-limited</td><td><code>{question, sessionId?}</code> → <code>{answer, sources[], sessionId, conversationId, answered}</code></td></tr>
             <tr><td><code>POST /feedback</code></td><td>rate-limited</td><td><code>{conversationId, rating: "up"|"down"}</code> — 👍/👎 on an answer</td></tr>
             <tr><td><code>GET /stats/public</code></td><td>opt-in (<code>PUBLIC_STATS</code>)</td><td>Aggregates only: totals, daily activity, most cited sections</td></tr>
+            <tr><td><code>POST /mcp</code></td><td>rate-limited</td><td><a href="#mcp-server">MCP server</a> (Streamable HTTP): <code>search_docs</code> and <code>ask_docs</code> tools</td></tr>
             <tr><td><code>POST /ingest</code></td><td>Bearer <code>ADMIN_TOKEN</code></td><td><code>{type, source, url?, title?}</code> → per-document results</td></tr>
             <tr><td><code>GET /admin/conversations</code></td><td>Bearer <code>ADMIN_TOKEN</code></td><td>History with <code>answered</code>, <code>limit</code>, <code>offset</code> filters</td></tr>
             <tr><td><code>GET /widget.js</code></td><td>—</td><td>The embeddable widget bundle</td></tr>
           </tbody>
         </table>
+      </section>
+
+      <section>
+        <h2 id="mcp-server">MCP server</h2>
+        <p>Your Docsera instance is also an <a href="https://modelcontextprotocol.io">MCP</a> server: AI coding agents (Claude Code, Cursor, Windsurf…) can connect to it and query your documentation directly while they work. The endpoint is <code>POST /mcp</code> (Streamable HTTP, stateless) and exposes two tools:</p>
+        <ul>
+          <li><code>search_docs</code> — hybrid retrieval over your indexed docs, returns the most relevant sections with their source links. No LLM call, so it's fast and free.</li>
+          <li><code>ask_docs</code> — full RAG answer with source citations, same pipeline as the widget. Uses one LLM call.</li>
+        </ul>
+        <p>For example, to add it to Claude Code:</p>
+        <pre><code>claude mcp add --transport http docsera https://your-server.example.com/mcp</code></pre>
+        <p>The endpoint shares the chat rate limits (<code>CHAT_RATE_LIMIT</code> and the daily caps), so exposing it publicly is as safe as exposing <code>/chat</code>. Try it against this demo: <code>https://docseraserver-production.up.railway.app/mcp</code>.</p>
       </section>
 
       <section>
