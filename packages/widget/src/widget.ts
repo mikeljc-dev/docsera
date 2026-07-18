@@ -395,6 +395,128 @@ export class DocseraWidget extends LitElement {
       opacity: 0.6;
       cursor: default;
     }
+
+    /* ─── Animaciones ─── */
+
+    @keyframes fab-in {
+      from { opacity: 0; transform: scale(0.4); }
+      60% { transform: scale(1.08); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .fab {
+      position: relative;
+      animation: fab-in 0.45s cubic-bezier(0.22, 0.9, 0.3, 1.15) 0.25s backwards;
+      transition: transform 0.18s ease, filter 0.18s ease;
+    }
+
+    .fab:hover {
+      transform: scale(1.07);
+    }
+
+    .fab:active {
+      transform: scale(0.95);
+    }
+
+    /* Anillo de atención sutil hasta que se abre por primera vez */
+    .fab::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid var(--docsera-primary);
+      opacity: 0;
+      animation: fab-ping 3.4s ease-out 1.4s infinite;
+      pointer-events: none;
+    }
+
+    :host([opened]) .fab::after {
+      display: none;
+    }
+
+    @keyframes fab-ping {
+      0% { transform: scale(1); opacity: 0.45; }
+      55% { transform: scale(1.5); opacity: 0; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+
+    @keyframes icon-in {
+      from { transform: rotate(-90deg) scale(0.5); opacity: 0; }
+      to { transform: none; opacity: 1; }
+    }
+
+    .fab svg {
+      animation: icon-in 0.22s ease;
+    }
+
+    @keyframes panel-in {
+      from { opacity: 0; transform: translateY(14px) scale(0.96); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .panel {
+      animation: panel-in 0.26s cubic-bezier(0.22, 0.9, 0.3, 1.05);
+      transform-origin: bottom right;
+    }
+
+    :host([position="left"]) .panel {
+      transform-origin: bottom left;
+    }
+
+    @keyframes rise-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .message {
+      animation: rise-in 0.28s ease;
+    }
+
+    .chip {
+      animation: rise-in 0.32s ease backwards;
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .chips .chip:nth-child(2) { animation-delay: 80ms; }
+    .chips .chip:nth-child(3) { animation-delay: 160ms; }
+    .chips .chip:nth-child(4) { animation-delay: 240ms; }
+
+    .chip:hover {
+      transform: translateY(-1px);
+    }
+
+    .typing-dots {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+      height: 1.1em;
+    }
+
+    .typing-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--docsera-muted);
+      animation: dot-bounce 1.15s infinite ease-in-out;
+    }
+
+    .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes dot-bounce {
+      0%, 60%, 100% { transform: none; opacity: 0.45; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fab, .fab svg, .panel, .message, .chip {
+        animation: none;
+        transition: none;
+      }
+      .fab::after { display: none; }
+      .typing-dots span { animation: none; }
+      .fab:hover, .chip:hover { transform: none; }
+    }
   `;
 
   declare server: string;
@@ -465,6 +587,7 @@ export class DocseraWidget extends LitElement {
 
   private toggleOpen(): void {
     this.open = !this.open;
+    if (this.open) this.setAttribute("opened", "");
   }
 
   private onInput(event: Event): void {
@@ -573,7 +696,11 @@ export class DocseraWidget extends LitElement {
               `
             : this.messages.map((message) => this.renderMessage(message))}
           ${this.pending
-            ? html`<div class="message assistant pending"><div class="bubble">${strings.typing}</div></div>`
+            ? html`<div class="message assistant pending">
+                <div class="bubble" role="status" aria-label=${strings.typing}>
+                  <span class="typing-dots"><span></span><span></span><span></span></span>
+                </div>
+              </div>`
             : null}
         </div>
         <form @submit=${this.onSubmit}>
