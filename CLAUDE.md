@@ -159,7 +159,13 @@ conversación del 2026-07-16/17). Lo que se hizo:
       data-position), receta de reindexado desde CI, roadmap Fase 3
       detallado y ARCHITECTURE.md con las decisiones de diseño.
 
-Siguiente: Fase 3 — iterar con feedback real tras publicar los posts.
+**Fase 3 en marcha (2026-07-17):** primer lote entregado — widget v2
+(feedback 👍/👎 con columna en dashboard y endpoint /feedback, Markdown
+renderizado con código copiable, data-suggestions, data-contact), quick
+wins 1-4 de docs/fase-3-ideas.md. Regla de trabajo nueva: preguntar a
+Mikel antes de cada push.
+
+Siguiente: resto de la Fase 3 tras publicar los posts.
 Primeras candidatas (ver roadmap del README): streaming de respuestas en
 el widget y conversaciones multi-turno (hoy cada pregunta va sin
 historial al LLM). Hay un análisis de la competencia (Fin, Mintlify,
