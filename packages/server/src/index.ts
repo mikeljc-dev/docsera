@@ -8,6 +8,7 @@ import { chatRoute } from "./routes/chat.js";
 import { dashboardRoute } from "./routes/dashboard.js";
 import { feedbackRoute } from "./routes/feedback.js";
 import { ingestRoute } from "./routes/ingest.js";
+import { publicStatsRoute } from "./routes/publicStats.js";
 import { widgetRoute } from "./routes/widget.js";
 
 loadEnv();
@@ -33,6 +34,7 @@ app.get("/health", (c) => c.json({ status: "ok", version: VERSION }));
 app.route("/", ingestRoute);
 app.route("/", chatRoute);
 app.route("/", feedbackRoute);
+app.route("/", publicStatsRoute);
 app.route("/", widgetRoute);
 app.route("/", adminRoute);
 app.route("/", dashboardRoute);
