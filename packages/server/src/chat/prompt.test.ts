@@ -72,3 +72,12 @@ test("el system prompt instruye a no repetir las etiquetas numeradas", () => {
   const [system] = buildChatMessages("x", []);
   assert.match(system?.content ?? "", /never write those\s+bracketed numbers/i);
 });
+
+test("isNoAnswer reconoce el centinela decorado por modelos pequeños", () => {
+  delete process.env.CHAT_NO_ANSWER_TEXT;
+  assert.equal(isNoAnswer("-NO_ANSWER-"), true);
+  assert.equal(isNoAnswer("**NO_ANSWER**"), true);
+  assert.equal(isNoAnswer("`NO_ANSWER`"), true);
+  assert.equal(isNoAnswer("— NO_ANSWER —"), true);
+  assert.equal(isNoAnswer("NO_ANSWER but here is more text"), false);
+});

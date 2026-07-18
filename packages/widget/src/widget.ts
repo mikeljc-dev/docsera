@@ -696,11 +696,11 @@ export class DocseraWidget extends LitElement {
               `
             : this.messages.map((message) => this.renderMessage(message))}
           ${this.pending
-            ? html`<div class="message assistant pending">
-                <div class="bubble" role="status" aria-label=${strings.typing}>
-                  <span class="typing-dots"><span></span><span></span><span></span></span>
-                </div>
-              </div>`
+            ? html`<div class="message assistant pending"><div
+                class="bubble"
+                role="status"
+                aria-label=${strings.typing}
+              ><span class="typing-dots"><span></span><span></span><span></span></span></div></div>`
             : null}
         </div>
         <form @submit=${this.onSubmit}>

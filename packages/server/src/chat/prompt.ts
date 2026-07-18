@@ -49,9 +49,11 @@ export function buildChatMessages(question: string, chunks: RetrievedChunk[]): C
 }
 
 function normalize(text: string): string {
+  // Recorta tambien guiones, asteriscos, backticks, etc. en los bordes:
+  // los modelos pequenos decoran el centinela ("-NO_ANSWER-", "**NO_ANSWER**").
   return stripDiacritics(text.trim().toLowerCase())
-    .replace(/["'.!¡¿?]+$/g, "")
-    .replace(/^["'.!¡¿?]+/g, "");
+    .replace(/[\s"'`*_\-\u2013\u2014.!¡¿?:;]+$/g, "")
+    .replace(/^[\s"'`*_\-\u2013\u2014.!¡¿?:;]+/g, "");
 }
 
 export function isNoAnswer(answer: string): boolean {
