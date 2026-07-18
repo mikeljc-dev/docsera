@@ -26,7 +26,7 @@ webs y docs oficiales de cada producto a fecha del análisis.
 
 ## Medio plazo (corazón de la Fase 3)
 
-6. **Analíticas de cobertura** *(kapa "coverage analytics", Mintlify
+6. ✅ **Analíticas de cobertura** *(2026-07-18)* *(kapa "coverage analytics", Mintlify
    "categories")* — top preguntas repetidas (clustering con los embeddings
    que ya tenemos), fuentes más citadas, tasa respondidas/no respondidas,
    CSAT del feedback. Con `conversations` + `conversation_sources` es

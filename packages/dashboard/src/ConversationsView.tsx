@@ -57,7 +57,7 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <div class="dashboard">
+    <div>
       <header>
         <h1>Conversations</h1>
         <div class="filters">

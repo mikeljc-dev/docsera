@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { listConversations } from "../admin/conversations.js";
+import { getStats } from "../admin/stats.js";
 import { getPool } from "../lib/db.js";
 import { requireAdminToken } from "../lib/adminAuth.js";
 
@@ -27,4 +28,9 @@ adminRoute.get("/admin/conversations", requireAdminToken, async (c) => {
 
   const result = await listConversations(getPool(), { answered, limit, offset });
   return c.json(result);
+});
+
+adminRoute.get("/admin/stats", requireAdminToken, async (c) => {
+  const stats = await getStats(getPool());
+  return c.json(stats);
 });

@@ -1,10 +1,14 @@
 import { useState } from "preact/hooks";
+import { AnalyticsView } from "./AnalyticsView.js";
 import { clearToken, getStoredToken, storeToken } from "./api.js";
 import { ConversationsView } from "./ConversationsView.js";
+
+type Tab = "analytics" | "conversations";
 
 export function App() {
   const [token, setToken] = useState<string | null>(getStoredToken());
   const [inputValue, setInputValue] = useState("");
+  const [tab, setTab] = useState<Tab>("analytics");
 
   if (!token) {
     return (
@@ -35,13 +39,29 @@ export function App() {
     );
   }
 
+  const onUnauthorized = () => {
+    clearToken();
+    setToken(null);
+  };
+
   return (
-    <ConversationsView
-      token={token}
-      onUnauthorized={() => {
-        clearToken();
-        setToken(null);
-      }}
-    />
+    <div class="app">
+      <nav class="tabs">
+        <button class={tab === "analytics" ? "active" : ""} onClick={() => setTab("analytics")}>
+          Analytics
+        </button>
+        <button
+          class={tab === "conversations" ? "active" : ""}
+          onClick={() => setTab("conversations")}
+        >
+          Conversations
+        </button>
+      </nav>
+      {tab === "analytics" ? (
+        <AnalyticsView token={token} onUnauthorized={onUnauthorized} />
+      ) : (
+        <ConversationsView token={token} onUnauthorized={onUnauthorized} />
+      )}
+    </div>
   );
 }

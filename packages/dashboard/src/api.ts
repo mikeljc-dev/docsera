@@ -71,3 +71,32 @@ export async function fetchConversations(
 
   return (await response.json()) as ConversationsResponse;
 }
+
+export interface AdminStats {
+  totals: {
+    total: number;
+    answered: number;
+    unanswered: number;
+    feedbackUp: number;
+    feedbackDown: number;
+  };
+  topUnanswered: { question: string; times: number }[];
+  topSources: { title: string; url: string | null; anchor: string | null; times: number }[];
+  daily: { day: string; total: number; unanswered: number }[];
+}
+
+export async function fetchStats(token: string): Promise<AdminStats> {
+  const response = await fetch("/admin/stats", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (response.status === 401) {
+    throw new UnauthorizedError("Invalid token");
+  }
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+
+  return (await response.json()) as AdminStats;
+}

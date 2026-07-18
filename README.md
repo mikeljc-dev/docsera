@@ -61,7 +61,7 @@ Three pieces in one monorepo, all served by a single deployable service:
 |---|---|
 | `packages/server` | The API: `POST /chat` (RAG with citations), `POST /ingest` (markdown/URL/sitemap), and serves the widget and dashboard as static assets |
 | `packages/widget` | The embeddable web component (the floating chat), bundled into a single `widget.js` |
-| `packages/dashboard` | Admin panel to browse conversation history and detect unanswered questions |
+| `packages/dashboard` | Admin panel: coverage analytics (answer rate, top unanswered questions, most cited sections, feedback) and conversation history |
 | `packages/web` | The [docsera.dev](https://docsera.dev) landing page (not part of the deployable product) |
 | `packages/docs` | The docs site for docs.docsera.dev, with the Docsera widget embedded — Docsera answering questions about Docsera |
 
