@@ -6,7 +6,7 @@ webs y docs oficiales de cada producto a fecha del análisis.
 
 ## Quick wins (días, no semanas)
 
-*(1-4 implementados el 2026-07-17; queda el 5.)*
+*(1-5 implementados: 1-4 el 2026-07-17, el 5 el 2026-07-18. Lista completa.)*
 
 1. ✅ **Feedback 👍/👎 en cada respuesta** *(lo tienen todos)* — columna en
    `conversations`, dos botones en el widget, filtro en el dashboard. Base
@@ -20,7 +20,7 @@ webs y docs oficiales de cada producto a fecha del análisis.
    Convierte el fallo en derivación.
 4. ✅ **Preguntas sugeridas al abrir el chat** *(DocsBot, kapa)* — chips
    configurables (`data-suggestions`) que eliminan la página en blanco.
-5. **Ingesta de repos de GitHub** *(DocsBot, kapa)* — `type: "github"` que
+5. ✅ **Ingesta de repos de GitHub** *(DocsBot, kapa)* — `type: "github"` que
    trae los `.md` de un repo público; el conector más barato de construir
    y el más pedido por audiencia developer.
 

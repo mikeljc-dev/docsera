@@ -112,7 +112,7 @@ curl -X POST http://localhost:3000/ingest \
   }'
 ```
 
-`type` can be `"url"` (a single page), `"sitemap"` (every listed page, up to 200; sitemap indexes pointing to other sitemaps work too) or `"markdown"` (raw text — handy for CI or content that isn't published as HTML):
+`type` can be `"url"` (a single page), `"sitemap"` (every listed page, up to 200; sitemap indexes pointing to other sitemaps work too), `"github"` (every `.md`/`.mdx` of a public repo — `"source": "owner/repo"`, optional `"branch"` and `"path"` folder filter, citations deep-link to GitHub) or `"markdown"` (raw text — handy for CI or content that isn't published as HTML):
 
 ```bash
 curl -X POST http://localhost:3000/ingest \
@@ -172,6 +172,7 @@ All variables live in `.env` (template in `.env.example`).
 | `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` | Keys for the providers you use | — |
 | `OPENAI_BASE_URL` | Point the `openai` adapter at any OpenAI-compatible API (Gemini compat mode, Groq, Mistral, LM Studio, vLLM…) | OpenAI's API |
 | `OLLAMA_BASE_URL` | Ollama server URL | `http://localhost:11434` |
+| `GITHUB_TOKEN` | Optional token for `type: "github"` ingestion (raises API rate limits) | — |
 | `PORT` | Server port | `3000` |
 | `ALLOWED_ORIGINS` | Comma-separated CORS origins for the widget | `http://localhost:5173` |
 | `ADMIN_TOKEN` | Token protecting `POST /ingest` and `GET /admin/*` (dashboard) | — |

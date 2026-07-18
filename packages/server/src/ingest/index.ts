@@ -57,12 +57,13 @@ export async function runIngest(input: IngestSourceInput): Promise<IngestResult>
         continue;
       }
 
+      const lastResort = rawDoc.fallbackTitle || rawDoc.url || "Sin título";
       const extracted =
         rawDoc.format === "markdown"
-          ? extractFromMarkdown(rawDoc.rawContent, rawDoc.title || rawDoc.url || "Sin título")
+          ? extractFromMarkdown(rawDoc.rawContent, rawDoc.title || lastResort)
           : extractFromHtml(rawDoc.rawContent);
 
-      const title = rawDoc.title || extracted.title || rawDoc.url || "Sin título";
+      const title = rawDoc.title || extracted.title || lastResort;
       const chunks = chunkBlocks(extracted.blocks);
 
       if (chunks.length === 0) {

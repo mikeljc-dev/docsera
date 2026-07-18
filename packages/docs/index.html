@@ -89,6 +89,7 @@ docker compose up -d --build</code></pre>
             <tr><td><code>EMBEDDING_PROVIDER</code></td><td>Embeddings provider: <code>openai</code> | <code>ollama</code> (Anthropic has none)</td><td><code>openai</code></td></tr>
             <tr><td><code>EMBEDDING_MODEL</code></td><td>Embeddings model (optional)</td><td>—</td></tr>
             <tr><td><code>ANTHROPIC_API_KEY</code> / <code>OPENAI_API_KEY</code></td><td>Keys for the providers you use</td><td>—</td></tr>
+            <tr><td><code>GITHUB_TOKEN</code></td><td>Optional token for <code>type: "github"</code> ingestion (raises GitHub API rate limits)</td><td>—</td></tr>
             <tr><td><code>OLLAMA_BASE_URL</code></td><td>Ollama server URL</td><td><code>http://localhost:11434</code></td></tr>
             <tr><td><code>PORT</code></td><td>Server port</td><td><code>3000</code></td></tr>
             <tr><td><code>ALLOWED_ORIGINS</code></td><td>Comma-separated CORS origins for the widget</td><td>—</td></tr>
@@ -116,6 +117,7 @@ docker compose up -d --build</code></pre>
         <ul>
           <li><code>"sitemap"</code> — every listed page, up to 200. Sitemap indexes pointing to other sitemaps work too.</li>
           <li><code>"url"</code> — a single page.</li>
+          <li><code>"github"</code> — every <code>.md</code>/<code>.mdx</code> file of a public GitHub repo (<code>"source": "owner/repo"</code>), with optional <code>"branch"</code> and <code>"path"</code> folder filter. Citations deep-link to the files on GitHub. Set <code>GITHUB_TOKEN</code> to raise the API rate limit.</li>
           <li><code>"markdown"</code> — raw text, handy for CI or unpublished content. Pass a <code>url</code>: it's the document's identity for updates and the link answers will cite.</li>
         </ul>
         <p>Re-ingesting an unchanged document costs nothing in embeddings (content-hash deduplication). Headings become anchors, so citations deep-link to the exact section.</p>
