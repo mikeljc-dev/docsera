@@ -604,11 +604,11 @@ export class DocseraWidget extends LitElement {
     const isMarkdown = message.role === "assistant" && !message.error;
     return html`
       <div class="message ${message.role}">
-        <div class="bubble ${message.error ? "error" : ""} ${isMarkdown ? "md" : ""}">
-          ${isMarkdown
-            ? renderMarkdown(message.content, { copy: strings.copy, copied: strings.copied })
-            : message.content}
-        </div>
+        <div
+          class="bubble ${message.error ? "error" : ""} ${isMarkdown ? "md" : ""}"
+        >${isMarkdown
+          ? renderMarkdown(message.content, { copy: strings.copy, copied: strings.copied })
+          : message.content}</div>
         ${message.sources && message.sources.length > 0
           ? html`
               <div class="sources">
