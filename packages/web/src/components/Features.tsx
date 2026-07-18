@@ -28,7 +28,7 @@ const FEATURES: Feature[] = [
   {
     icon: "📊",
     title: "Find your docs' gaps",
-    body: "The dashboard shows every conversation and filters unanswered questions — the most direct signal of what's missing in your documentation.",
+    body: "The dashboard shows your answer rate, top unanswered questions, most cited sections and 👍/👎 feedback — the most direct signal of what's missing in your documentation.",
   },
   {
     icon: "⚖️",

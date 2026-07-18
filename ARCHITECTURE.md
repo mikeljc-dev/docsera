@@ -33,7 +33,7 @@ embedded, the top 6 chunks within a **distance threshold**
 server answers the configured no-answer phrase **without calling the LLM** —
 irrelevant questions cost retrieval, not generation. Hybrid retrieval
 (BM25 + embeddings) and re-ranking are on the roadmap; they're deliberately
-not in v0.1 because plain vector search with a threshold covers the core
+not in yet because plain vector search with a threshold covers the core
 use case well and keeps the mental model simple.
 
 ## How does the "I don't know" detection work?
@@ -76,18 +76,22 @@ Chat and embeddings are configured independently because they're different
 markets: Anthropic has no embeddings API, and embedding models are where
 local (Ollama) is most practical.
 
-## How is the public endpoint protected?
+## How are the public endpoints protected?
 
-`/chat` is the only public endpoint: CORS restricted to `ALLOWED_ORIGINS`,
-per-IP rate limiting (in-memory token bucket — per instance, which is why
-the deployment docs cap instances), and internal errors are logged
-server-side but never returned to the client. `x-forwarded-for` is only
+The public surface is `/chat`, `/feedback` and (opt-in, aggregates only)
+`/stats/public`: CORS restricted to `ALLOWED_ORIGINS`, per-IP rate limiting
+(in-memory token bucket — per instance, which is why the deployment docs
+cap instances) plus optional per-IP-daily and instance-daily question caps
+for public demos, and internal errors are logged server-side but never
+returned to the client. `x-forwarded-for` is only
 trusted behind a proxy you control (`TRUST_PROXY`). Admin endpoints
 (`/ingest`, `/admin/*`) require a bearer token compared in constant time.
 
-## What was deliberately left out of v0.1?
+## What's deliberately left out (for now)?
 
-Answer streaming, hybrid search, re-ranking, answer feedback, multi-project
-and connectors beyond sitemap/URL/Markdown. See the
-[roadmap](./README.md#roadmap) — each is planned, but v0.1 optimizes for a
-complete, verifiable end-to-end product over feature breadth.
+Answer streaming, hybrid search + re-ranking, multi-turn conversations,
+multi-project instances and connectors beyond sitemap/URL/Markdown/GitHub.
+See the [roadmap](./README.md#roadmap) — each is planned; the project
+optimizes for a complete, verifiable end-to-end product over feature
+breadth. (Answer feedback, coverage analytics and GitHub repo ingestion
+started on that list and have since shipped.)

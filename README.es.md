@@ -153,9 +153,9 @@ En producción, sustituye `localhost:3000` por el dominio donde tengas desplegad
         data-heading="¿Dudas? Pregúntame"></script>
 ```
 
-### 3. Revisa el historial en el dashboard
+### 3. Revisa las analíticas en el dashboard
 
-Abre `http://localhost:3000/dashboard`, pega tu `ADMIN_TOKEN`, y verás el historial de conversaciones con un filtro para aislar las preguntas sin respuesta — la señal más directa de qué le falta a tu documentación.
+Abre `http://localhost:3000/dashboard` y pega tu `ADMIN_TOKEN`. La pestaña Analytics muestra tu tasa de respuesta, preguntas por día, el feedback 👍/👎 y el top de preguntas sin responder — la señal más directa de qué le falta a tu documentación — más el historial completo en su propia pestaña.
 
 ## Configuración
 
@@ -205,7 +205,7 @@ pnpm dev            # los tres paquetes en paralelo, en modo watch
 
 - [x] **Fase 1 — Núcleo:** server, esquema de BD, ingesta (markdown/URL/sitemap), adaptadores de LLM (Anthropic/OpenAI/Ollama), chat con RAG y citas, widget embebible, Docker.
 - [x] **Fase 2 — Lanzamiento:** dashboard, README con guía real (este documento), pulido de código (rate limiting, umbral de similitud, sitemaps índice, dedupe de ingesta), CI, [landing](https://docsera.dev) y [sitio de docs](https://docs.docsera.dev) con el widget funcionando en vivo en ambos, widget personalizable, GIF de demo, release v0.1.0.
-- [ ] **Fase 3 — Tracción:** iterar con feedback real. En el radar: streaming de respuestas en el widget · búsqueda híbrida (BM25 + embeddings) y re-ranking · feedback 👍/👎 en las respuestas · más conectores de ingesta (repos de GitHub, Notion, PDF, Docusaurus/VitePress) · analíticas más ricas (top preguntas, fuentes más citadas, consumo de tokens) · multi-proyecto por instancia · prototipo de versión cloud (multi-tenant, billing por uso).
+- [ ] **Fase 3 — Tracción** *(en marcha)*: entregado hasta ahora — feedback 👍/👎 en las respuestas · ingesta de repos de GitHub · analíticas de cobertura en el dashboard (tasa de respuesta, top preguntas sin responder, secciones más citadas) con stats públicas opcionales para demos. En el radar: streaming de respuestas · conversaciones multi-turno · búsqueda híbrida (BM25 + embeddings) y re-ranking · más conectores (Notion, PDF, Docusaurus/VitePress) · multi-proyecto por instancia · prototipo de versión cloud (multi-tenant, billing por uso).
 
 ## Stack
 

@@ -153,9 +153,9 @@ In production, replace `localhost:3000` with the domain where your server is dep
         data-heading="¿Dudas? Pregúntame"></script>
 ```
 
-### 3. Review the history in the dashboard
+### 3. Review the analytics in the dashboard
 
-Open `http://localhost:3000/dashboard`, paste your `ADMIN_TOKEN`, and you'll see the conversation history with a filter to isolate unanswered questions — the most direct signal of what's missing in your documentation.
+Open `http://localhost:3000/dashboard` and paste your `ADMIN_TOKEN`. The Analytics tab shows your answer rate, questions per day, 👍/👎 feedback and the top unanswered questions — the most direct signal of what's missing in your documentation — plus the full conversation history in its own tab.
 
 ## Configuration
 
@@ -205,7 +205,7 @@ pnpm dev            # all packages in parallel, in watch mode
 
 - [x] **Phase 1 — Core:** server, DB schema, ingestion (markdown/URL/sitemap), LLM adapters (Anthropic/OpenAI/Ollama), RAG chat with citations, embeddable widget, Docker.
 - [x] **Phase 2 — Launch:** dashboard, real installation guide (this document), code polish (rate limiting, similarity threshold, sitemap indexes, ingestion dedupe), CI, [landing](https://docsera.dev) and [docs site](https://docs.docsera.dev) with the widget running live on both, customizable widget, demo GIF, v0.1.0 release.
-- [ ] **Phase 3 — Traction:** iterate on real feedback. On the radar: answer streaming in the widget · hybrid retrieval (BM25 + embeddings) and re-ranking · 👍/👎 feedback on answers · more ingestion connectors (GitHub repos, Notion, PDF, Docusaurus/VitePress) · richer analytics (top questions, most-cited sources, token usage) · multi-project instances · cloud version prototype (multi-tenant, usage-based billing).
+- [ ] **Phase 3 — Traction** *(in progress)*: shipped so far — 👍/👎 answer feedback · GitHub repo ingestion · coverage analytics in the dashboard (answer rate, top unanswered questions, most cited sections) with opt-in public demo stats. On the radar: answer streaming · multi-turn conversations · hybrid retrieval (BM25 + embeddings) and re-ranking · more connectors (Notion, PDF, Docusaurus/VitePress) · multi-project instances · cloud version prototype (multi-tenant, usage-based billing).
 
 ## Stack
 

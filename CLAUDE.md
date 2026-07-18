@@ -159,10 +159,15 @@ conversación del 2026-07-16/17). Lo que se hizo:
       data-position), receta de reindexado desde CI, roadmap Fase 3
       detallado y ARCHITECTURE.md con las decisiones de diseño.
 
-**Fase 3 en marcha (2026-07-17):** primer lote entregado — widget v2
-(feedback 👍/👎 con columna en dashboard y endpoint /feedback, Markdown
-renderizado con código copiable, data-suggestions, data-contact), quick
-wins 1-4 de docs/fase-3-ideas.md. Regla de trabajo nueva: preguntar a
+**Fase 3 en marcha:** entregado hasta ahora (2026-07-17/18) — widget v2
+(feedback 👍/👎, Markdown con código copiable, data-suggestions,
+data-contact), límites anti-abuso en 3 capas (minuto/día-IP/día-global),
+ingesta de repos de GitHub (type "github"), analíticas de cobertura en el
+dashboard (endpoint /admin/stats + pestaña Analytics) con stats públicas
+opcionales (/stats/public, PUBLIC_STATS) mostradas en vivo en la sección
+del dashboard de las docs, modo claro/oscuro en landing y docs, y GIF v2.
+Quick wins 1-5 y punto 6 de docs/fase-3-ideas.md completos. Versión
+0.2.0 preparada (pendiente tag+release). Regla de trabajo: preguntar a
 Mikel antes de cada push.
 
 Siguiente: resto de la Fase 3 tras publicar los posts.
