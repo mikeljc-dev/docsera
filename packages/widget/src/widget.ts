@@ -210,7 +210,10 @@ export class DocseraWidget extends LitElement {
       margin-bottom: 0.15rem;
     }
 
-    .bubble.md code {
+    /* Solo el código inline de párrafos y listas lleva "píldora" clara;
+       dentro de los bloques oscuros el código va limpio. */
+    .bubble.md p code,
+    .bubble.md li code {
       background: #e5e7eb;
       border-radius: 4px;
       padding: 0.05em 0.3em;
@@ -220,38 +223,38 @@ export class DocseraWidget extends LitElement {
 
     .codeblock {
       position: relative;
-      margin: 0 0 0.5rem;
+      margin: 0.4rem 0 0.5rem;
     }
 
     .codeblock pre {
       background: #0f172a;
       color: #e2e8f0;
       border-radius: 8px;
-      padding: 0.6rem 0.75rem;
-      padding-top: 1.6rem;
+      padding: 0.55rem 0.7rem;
+      padding-right: 3.4rem;
       overflow-x: auto;
       font-family: ui-monospace, Menlo, Consolas, monospace;
-      font-size: 0.8rem;
-      line-height: 1.5;
+      font-size: 0.78rem;
+      line-height: 1.55;
     }
 
     .codeblock pre code {
-      background: none;
-      padding: 0;
-      color: inherit;
+      font-family: inherit;
       font-size: inherit;
+      color: inherit;
     }
 
     .codeblock .copy {
       position: absolute;
-      top: 0.35rem;
-      right: 0.4rem;
-      background: rgba(255, 255, 255, 0.12);
+      top: 0.3rem;
+      right: 0.35rem;
+      background: rgba(255, 255, 255, 0.14);
       color: #cbd5e1;
       border: none;
       border-radius: 5px;
-      padding: 0.15rem 0.5rem;
-      font-size: 0.7rem;
+      padding: 0.18rem 0.5rem;
+      font-size: 0.68rem;
+      font-family: inherit;
       cursor: pointer;
     }
 
