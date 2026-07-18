@@ -1,3 +1,4 @@
+import { Demo } from "./components/Demo.js";
 import { Features } from "./components/Features.js";
 import { Footer } from "./components/Footer.js";
 import { Hero } from "./components/Hero.js";
@@ -10,6 +11,7 @@ export function App() {
       <Nav />
       <Hero />
       <Features />
+      <Demo />
       <HowItWorks />
       <Footer />
     </div>

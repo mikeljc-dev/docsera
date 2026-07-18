@@ -28,11 +28,11 @@ const STEPS: Step[] = [
 export function HowItWorks() {
   return (
     <section id="how">
-      <h2>How it works</h2>
-      <p class="lead">Classic RAG, engineered to be boring and reliable.</p>
+      <h2 class="reveal">How it works</h2>
+      <p class="lead reveal">Classic RAG, engineered to be boring and reliable.</p>
       <div class="steps">
         {STEPS.map((step) => (
-          <div class="step" key={step.title}>
+          <div class="step reveal" key={step.title}>
             <div>
               <h3>{step.title}</h3>
               <p>{step.body}</p>

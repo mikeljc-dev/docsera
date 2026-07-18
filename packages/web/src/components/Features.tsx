@@ -40,11 +40,11 @@ const FEATURES: Feature[] = [
 export function Features() {
   return (
     <section id="features">
-      <h2>Like Intercom for your docs — but yours</h2>
-      <p class="lead">Everything runs on your infrastructure with the LLM provider you choose.</p>
+      <h2 class="reveal">Like Intercom for your docs — but yours</h2>
+      <p class="lead reveal">Everything runs on your infrastructure with the LLM provider you choose.</p>
       <div class="grid">
         {FEATURES.map((feature) => (
-          <div class="card" key={feature.title}>
+          <div class="card reveal" key={feature.title}>
             <div class="icon">{feature.icon}</div>
             <h3>{feature.title}</h3>
             <p>{feature.body}</p>
