@@ -166,9 +166,11 @@ ingesta de repos de GitHub (type "github"), analíticas de cobertura en el
 dashboard (endpoint /admin/stats + pestaña Analytics) con stats públicas
 opcionales (/stats/public, PUBLIC_STATS) mostradas en vivo en la sección
 del dashboard de las docs, modo claro/oscuro en landing y docs, y GIF v2.
-Quick wins 1-5 y punto 6 de docs/fase-3-ideas.md completos. Versión
-0.2.0 preparada (pendiente tag+release). Regla de trabajo: preguntar a
-Mikel antes de cada push.
+Quick wins 1-5 y punto 6 de docs/fase-3-ideas.md completos. Release
+v0.2.0 publicada el 2026-07-18 con tag y notas:
+https://github.com/mikeljc-dev/docsera/releases/tag/v0.2.0
+(incluye GIF v3 grabado contra producción con el widget animado).
+Regla de trabajo: preguntar a Mikel antes de cada push.
 
 Siguiente: resto de la Fase 3 tras publicar los posts.
 Primeras candidatas (ver roadmap del README): streaming de respuestas en
