@@ -42,7 +42,7 @@ export async function runChat(input: ChatInput): Promise<ChatResult> {
     throw new Error("No se pudo generar el embedding de la pregunta");
   }
 
-  const chunks = await retrieveRelevantChunks(pool, questionEmbedding);
+  const chunks = await retrieveRelevantChunks(pool, questionEmbedding, input.question);
 
   if (chunks.length === 0) {
     const answer = noAnswerText();
