@@ -490,6 +490,14 @@ export class DocseraWidget extends LitElement {
         body: JSON.stringify({ question, sessionId: this.sessionId }),
       });
 
+      if (response.status === 429) {
+        this.messages = [
+          ...this.messages,
+          { role: "assistant", content: this.strings.rateLimited, error: true },
+        ];
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }

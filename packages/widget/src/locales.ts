@@ -13,6 +13,7 @@ export interface WidgetStrings {
   helpful: string;
   notHelpful: string;
   feedbackThanks: string;
+  rateLimited: string;
 }
 
 export const DEFAULT_LOCALE = "en";
@@ -33,6 +34,7 @@ export const LOCALES: Record<string, WidgetStrings> = {
     helpful: "Helpful answer",
     notHelpful: "Not helpful",
     feedbackThanks: "Thanks for the feedback!",
+    rateLimited: "You've reached the question limit for now — please try again later.",
   },
   es: {
     heading: "Pregúntame sobre la documentación",
@@ -49,6 +51,7 @@ export const LOCALES: Record<string, WidgetStrings> = {
     helpful: "Respuesta útil",
     notHelpful: "No me ha servido",
     feedbackThanks: "¡Gracias por el feedback!",
+    rateLimited: "Has alcanzado el límite de preguntas por ahora — inténtalo más tarde.",
   },
   fr: {
     heading: "Posez-moi vos questions sur la doc",
@@ -65,6 +68,7 @@ export const LOCALES: Record<string, WidgetStrings> = {
     helpful: "Réponse utile",
     notHelpful: "Pas utile",
     feedbackThanks: "Merci pour votre retour !",
+    rateLimited: "Vous avez atteint la limite de questions pour le moment — réessayez plus tard.",
   },
   de: {
     heading: "Frag mich zur Dokumentation",
@@ -81,6 +85,7 @@ export const LOCALES: Record<string, WidgetStrings> = {
     helpful: "Hilfreiche Antwort",
     notHelpful: "Nicht hilfreich",
     feedbackThanks: "Danke für dein Feedback!",
+    rateLimited: "Du hast das Fragenlimit vorerst erreicht — bitte versuche es später erneut.",
   },
   pt: {
     heading: "Pergunte-me sobre a documentação",
@@ -97,6 +102,7 @@ export const LOCALES: Record<string, WidgetStrings> = {
     helpful: "Resposta útil",
     notHelpful: "Não ajudou",
     feedbackThanks: "Obrigado pelo feedback!",
+    rateLimited: "Atingiste o limite de perguntas por agora — tenta novamente mais tarde.",
   },
 };
 

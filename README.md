@@ -176,6 +176,8 @@ All variables live in `.env` (template in `.env.example`).
 | `ALLOWED_ORIGINS` | Comma-separated CORS origins for the widget | `http://localhost:5173` |
 | `ADMIN_TOKEN` | Token protecting `POST /ingest` and `GET /admin/*` (dashboard) | — |
 | `CHAT_RATE_LIMIT` | Requests per IP per minute to `POST /chat` (public endpoint) | `20` |
+| `CHAT_DAILY_LIMIT` | Optional questions-per-IP-per-day cap (`0` disables) — for public demos | `0` |
+| `CHAT_GLOBAL_DAILY_LIMIT` | Optional instance-wide daily budget of questions (`0` disables) | `0` |
 | `CHAT_MAX_DISTANCE` | Max cosine distance for a chunk to count as relevant; if none pass, the no-answer phrase is returned without calling the LLM. `2` disables the filter | `0.8` |
 | `CHAT_NO_ANSWER_TEXT` | Exact phrase when the docs don't have the answer (set it in your users' language, e.g. `No lo sé.`) | `I don't know.` |
 | `TRUST_PROXY` | `true` only if a reverse proxy you control sits in front and overwrites `x-forwarded-for`; the rate limiter will use that header as the client IP | `false` |

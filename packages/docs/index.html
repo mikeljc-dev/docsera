@@ -94,6 +94,8 @@ docker compose up -d --build</code></pre>
             <tr><td><code>ALLOWED_ORIGINS</code></td><td>Comma-separated CORS origins for the widget</td><td>—</td></tr>
             <tr><td><code>ADMIN_TOKEN</code></td><td>Token protecting <code>POST /ingest</code> and the dashboard</td><td>—</td></tr>
             <tr><td><code>CHAT_RATE_LIMIT</code></td><td>Requests per IP per minute to <code>POST /chat</code></td><td><code>20</code></td></tr>
+            <tr><td><code>CHAT_DAILY_LIMIT</code></td><td>Optional questions-per-IP-per-day cap (<code>0</code> disables) — for public demos</td><td><code>0</code></td></tr>
+            <tr><td><code>CHAT_GLOBAL_DAILY_LIMIT</code></td><td>Optional instance-wide daily question budget (<code>0</code> disables)</td><td><code>0</code></td></tr>
             <tr><td><code>CHAT_MAX_DISTANCE</code></td><td>Max cosine distance for a chunk to count as relevant; <code>2</code> disables the filter</td><td><code>0.8</code></td></tr>
             <tr><td><code>CHAT_NO_ANSWER_TEXT</code></td><td>Exact phrase when the docs don't have the answer (set it in your users' language)</td><td><code>I don't know.</code></td></tr>
             <tr><td><code>TRUST_PROXY</code></td><td><code>true</code> only behind a reverse proxy you control that overwrites <code>x-forwarded-for</code></td><td><code>false</code></td></tr>
