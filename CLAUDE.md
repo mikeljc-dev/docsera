@@ -236,7 +236,20 @@ Entregado en local, **sin desplegar todavía** (2026-07-19):
       60 tests en verde. Verificado con Playwright contra el widget real:
       la burbuja crece 0→115→…→1184 caracteres, fuentes y feedback
       llegan con el `done`, y el centinela no se filtra.
-      **Falta commitear y desplegar.**
+      Desplegado y verificado en prod el 2026-07-19 (commit 8b9b4ed).
+      Ojo: Gemini manda fragmentos muy grandes (la respuesta entera en
+      2 deltas), así que el efecto máquina de escribir apenas se aprecia
+      en la demo pública; con Ollama o proveedores de pago sí. Si se
+      quiere suavizar, habría que trocear en el cliente.
+
+**Release v0.3.0 publicada el 2026-07-19** con tag y notas:
+https://github.com/mikeljc-dev/docsera/releases/tag/v0.3.0
+Incluye lo acumulado desde el tag v0.2.0: búsqueda híbrida, servidor MCP,
+multi-turno y streaming. Versión subida en los 6 package.json y en los
+sitios donde estaba hardcodeada (`ingest/fetchSource.ts` USER_AGENT,
+`routes/mcp.ts`, badge y ejemplo de `/health` en las docs) — conviene
+recordar que esos tres no leen el package.json y hay que tocarlos a mano
+en cada release.
 
 Siguiente (para retomar en otra sesión):
 - **Higiene urgente (Mikel):** (1) ROTAR el `ADMIN_TOKEN` — se compartió
