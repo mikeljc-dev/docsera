@@ -1,0 +1,39 @@
+{
+  "name": "docsera",
+  "version": "0.4.0",
+  "description": "One-command setup for Docsera: self-hosted AI chat for your docs",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "bin": {
+    "docsera": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mikeljc-dev/docsera.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://docsera.dev",
+  "keywords": [
+    "docsera",
+    "docs",
+    "chatbot",
+    "rag",
+    "self-hosted"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test $(find src -name '*.test.ts')"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.23.1"
+  }
+}

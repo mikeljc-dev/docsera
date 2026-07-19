@@ -1,0 +1,5 @@
+{
+  "//": "Igual que tsconfig.json pero sin los tests: el typecheck sí debe cubrirlos, el paquete que se publica en npm no debe llevarlos.",
+  "extends": "./tsconfig.json",
+  "exclude": ["src/**/*.test.ts"]
+}
