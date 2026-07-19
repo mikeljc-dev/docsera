@@ -147,6 +147,23 @@ antes de pintar.
 **Esfuerzo:** bajo. **Solo afecta a la demo pública**, no a quien se lo
 instale con Anthropic, OpenAI u Ollama.
 
+## 7. Los watch paths de Railway dejaban fuera al widget
+
+**Encontrado el 2026-07-19.** El commit `91a6345` (enlaces Markdown del
+widget) pasó CI y llegó a `main`, pero Railway no lo desplegó: el filtro de
+rutas configurado en su UI solo miraba `packages/server/**`. Como el server
+sirve el bundle del widget y el build del dashboard desde su propia imagen,
+**cualquier cambio solo-widget o solo-dashboard nunca llegaba a producción**,
+en silencio y con todo en verde.
+
+**Arreglado** declarando `build.watchPatterns` en `railway.json`, versionado,
+en vez de depender de la configuración de la UI. Queda pendiente que Mikel
+confirme que el filtro de la UI no lo pisa (Settings → Source → Watch Paths):
+si lo hace, hay que vaciarlo allí.
+
+**Lección:** cualquier configuración de despliegue que viva solo en un panel
+web es invisible desde el repo y no se puede revisar en un PR.
+
 ## Lo que NO está en esta lista
 
 - **Señal de confianza (punto 8 de `fase-3-ideas.md`)**: implementada y

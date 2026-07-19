@@ -2,7 +2,18 @@
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "DOCKERFILE",
-    "dockerfilePath": "packages/server/Dockerfile"
+    "dockerfilePath": "packages/server/Dockerfile",
+    "//": "La imagen del server compila TAMBIÉN el widget y el dashboard y los sirve como estáticos (ver packages/server/Dockerfile), así que un cambio en cualquiera de los tres tiene que desplegar. Filtrar solo por packages/server dejó fuera de producción un cambio del widget el 2026-07-19. Se declara aquí, versionado, en vez de en la UI de Railway.",
+    "watchPatterns": [
+      "packages/server/**",
+      "packages/widget/**",
+      "packages/dashboard/**",
+      "package.json",
+      "pnpm-lock.yaml",
+      "pnpm-workspace.yaml",
+      "tsconfig.base.json",
+      "railway.json"
+    ]
   },
   "deploy": {
     "healthcheckPath": "/health",
