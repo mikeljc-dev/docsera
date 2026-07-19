@@ -1,6 +1,6 @@
 {
   "name": "docsera",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "One-command setup for Docsera: self-hosted AI chat for your docs",
   "license": "AGPL-3.0-only",
   "type": "module",
