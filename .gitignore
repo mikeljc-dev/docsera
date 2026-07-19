@@ -28,3 +28,6 @@ pnpm-debug.log*
 
 # Datos de la BD en local (volumen docker)
 pgdata/
+
+# Notas internas de trabajo (contexto para IAs, no forma parte del producto)
+CLAUDE.md
