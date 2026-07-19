@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildLlmsTxt } from "./llms.js";
+import { buildLlmsTxt, publicOrigin } from "./llms.js";
 
 const ORIGIN = "https://api.example.com";
 
@@ -42,4 +42,18 @@ test("sin título usable cae a la URL, y sin ninguno de los dos a Untitled", () 
 
 test("termina en salto de línea, como cualquier fichero de texto", () => {
   assert.ok(buildLlmsTxt(ORIGIN, "Docs", []).endsWith("\n"));
+});
+
+test("detrás de un proxy que termina TLS, el origen publicado usa https", () => {
+  assert.equal(publicOrigin("http://api.example.com/llms.txt", "https"), "https://api.example.com");
+  // El proxy puede encadenar varios saltos; manda el primero.
+  assert.equal(
+    publicOrigin("http://api.example.com/llms.txt", "https, http"),
+    "https://api.example.com",
+  );
+});
+
+test("sin cabecera de proxy se respeta el esquema de la petición", () => {
+  assert.equal(publicOrigin("http://localhost:3000/llms.txt"), "http://localhost:3000");
+  assert.equal(publicOrigin("https://api.example.com/llms.txt"), "https://api.example.com");
 });

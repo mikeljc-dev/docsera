@@ -43,6 +43,18 @@ export function buildLlmsTxt(
   return `${lines.join("\n")}\n`;
 }
 
+// Detrás de un proxy que termina TLS (Railway, Fly, cualquier ingress) la
+// petición llega en claro y c.req.url dice "http://", así que los enlaces
+// publicados saldrían con el esquema equivocado. A diferencia de
+// x-forwarded-for —que sí va detrás de TRUST_PROXY porque falsearlo salta el
+// rate limit— falsear esto solo estropea los enlaces que ve quien lo falsea.
+export function publicOrigin(url: string, forwardedProto?: string): string {
+  const origin = new URL(url);
+  const proto = forwardedProto?.split(",")[0]?.trim();
+  if (proto) origin.protocol = `${proto}:`;
+  return origin.origin;
+}
+
 export const llmsRoute = new Hono();
 
 llmsRoute.get("/llms.txt", async (c) => {
@@ -51,7 +63,8 @@ llmsRoute.get("/llms.txt", async (c) => {
   );
 
   const title = process.env.LLMS_TXT_TITLE?.trim() || DEFAULT_TITLE;
-  const body = buildLlmsTxt(new URL(c.req.url).origin, title, rows);
+  const origin = publicOrigin(c.req.url, c.req.header("x-forwarded-proto"));
+  const body = buildLlmsTxt(origin, title, rows);
 
   return c.body(body, 200, { "Content-Type": "text/plain; charset=utf-8" });
 });
