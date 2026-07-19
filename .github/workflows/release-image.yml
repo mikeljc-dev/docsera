@@ -1,0 +1,54 @@
+# Publica la imagen del server en GHCR en cada tag vX.Y.Z. Es la imagen que
+# consume la CLI (`npx docsera`): su docker-compose generado hace `image:` de
+# ghcr.io/<owner>/docsera:<version> en vez de compilar el monorepo en la
+# maquina del usuario.
+name: release-image
+
+on:
+  push:
+    tags:
+      - "v*"
+  # Lanzable a mano desde Actions para publicar la version actual de main sin
+  # esperar a un tag (p.ej. la primera publicacion de una version ya taggeada).
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # arm64 se construye emulado con QEMU: lento, pero solo corre en
+      # releases y evita mantener un runner arm.
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # La version sale del package.json raiz (unica fuente, igual que en los
+      # releases), asi el mismo job vale para el push de tag y para el dispatch.
+      - id: version
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: packages/server/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/docsera:${{ steps.version.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/docsera:latest
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.licenses=AGPL-3.0-only
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
