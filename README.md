@@ -71,7 +71,19 @@ Curious about the design decisions (chunking, retrieval strategy, document inval
 
 ## Installation
 
-Prerequisites: [Docker](https://docs.docker.com/get-docker/) and Docker Compose (bundled with Docker Desktop). Node ≥ 20 and [pnpm](https://pnpm.io) only if you want to develop locally without Docker.
+### One command (recommended)
+
+Prerequisites: [Docker](https://docs.docker.com/get-docker/) (Compose is bundled with it) and Node ≥ 20.
+
+```bash
+npx docsera
+```
+
+That's it. A short wizard asks which LLM you want (it auto-detects a local [Ollama](https://ollama.com), so it can run 100% free and local), which docs to index, and where you'll embed the widget. It then generates the configuration (secrets included), starts everything with the prebuilt image from `ghcr.io/mikeljc-dev/docsera`, ingests your docs and prints the one-line `<script>` snippet ready to paste. Later: `npx docsera ingest` to re-index, `npx docsera up`/`down` to start and stop.
+
+### From source
+
+Prerequisites: [Docker](https://docs.docker.com/get-docker/) and Docker Compose. Node ≥ 20 and [pnpm](https://pnpm.io) only if you want to develop locally without Docker.
 
 ```bash
 git clone https://github.com/mikeljc-dev/docsera.git

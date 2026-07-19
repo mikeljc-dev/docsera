@@ -71,6 +71,18 @@ El `server` es el único servicio que despliegas tú (además de Postgres): sirv
 
 ## Instalación
 
+### Un solo comando (recomendado)
+
+Requisitos previos: [Docker](https://docs.docker.com/get-docker/) (Compose viene incluido) y Node ≥ 20.
+
+```bash
+npx docsera
+```
+
+Ya está. Un wizard corto te pregunta qué LLM quieres (detecta automáticamente un [Ollama](https://ollama.com) local, así que puede funcionar 100% gratis y en local), qué docs indexar y dónde vas a embeber el widget. Después genera la configuración (secretos incluidos), levanta todo con la imagen precompilada de `ghcr.io/mikeljc-dev/docsera`, ingiere tus docs e imprime el `<script>` de una línea listo para pegar. Más adelante: `npx docsera ingest` para re-indexar, `npx docsera up`/`down` para arrancar y parar.
+
+### Desde el código fuente
+
 Requisitos previos: [Docker](https://docs.docker.com/get-docker/) y Docker Compose (incluido en Docker Desktop). Node ≥ 20 y [pnpm](https://pnpm.io) solo si quieres desarrollar en local sin Docker.
 
 ```bash
