@@ -47,7 +47,7 @@ function textResult(text: string, isError = false): CallToolResult {
 
 function buildMcpServer(): Server {
   const server = new Server(
-    { name: "docsera", version: "0.2.0" },
+    { name: "docsera", version: "0.3.0" },
     { capabilities: { tools: {} } },
   );
 
