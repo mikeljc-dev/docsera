@@ -25,7 +25,13 @@ RUN pnpm --filter @docsera/dashboard build \
   && mkdir -p packages/server/public/dashboard \
   && cp -r packages/dashboard/dist/. packages/server/public/dashboard/
 
+RUN pnpm --filter @docsera/server build
+
 WORKDIR /app/packages/server
 EXPOSE 3000
 
-CMD ["sh", "-c", "pnpm exec tsx src/db/migrate.ts && pnpm exec tsx src/index.ts"]
+# Compilado, no transpilado en caliente: hasta la v0.3.0 esto arrancaba con
+# `tsx src/index.ts`, lo que dejaba TypeScript y su transpilador en la ruta
+# crítica de producción y hacía que un error de tipos apareciera al arrancar
+# en vez de al construir.
+CMD ["sh", "-c", "node dist/db/migrate.js && node dist/index.js"]

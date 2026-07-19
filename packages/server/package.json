@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "echo \"TODO: build del server\"",
+    "build": "tsc -p tsconfig.build.json && node -e \"require('fs').cpSync('src/db/migrations','dist/db/migrations',{recursive:true})\"",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test src/**/*.test.ts",

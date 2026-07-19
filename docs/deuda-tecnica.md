@@ -66,7 +66,7 @@ los adaptadores de LLM, que hoy se obtienen con `getPool()` y
 
 **Esfuerzo:** medio. **Es el mayor agujero del proyecto ahora mismo.**
 
-## 2. `packages/server` no se construye
+## 2. `packages/server` no se construye — ✅ hecho (2026-07-19)
 
 `"build": "echo \"TODO: build del server\""` en su `package.json`. CI corre
 `pnpm build` y pasa sin compilar el paquete más importante; en producción lo
@@ -74,7 +74,21 @@ transpila `tsx` en runtime. Funciona, pero la fase de build de CI es
 decorativa justo donde más haría falta. Compilar de verdad (tsc o esbuild)
 también quitaría `tsx` del arranque en producción.
 
-**Esfuerzo:** bajo-medio.
+**Hecho.** `build` pasa a `tsc -p tsconfig.build.json` + copia de los `.sql`
+de migraciones (que `tsc` no arrastra). `tsconfig.build.json` excluye tests y
+`src/testing`, que sí deben pasar por el typecheck pero no viajar en el
+artefacto. El `Dockerfile` compila y arranca con `node dist/...` en vez de
+`tsx src/...`: TypeScript sale de la ruta crítica de producción y un error de
+tipos aparece al construir, no al arrancar.
+
+Verificado construyendo la imagen real y arrancándola contra el Postgres
+local: migraciones aplicadas desde `dist`, `/health`, `/chat` con citas,
+`/llms.txt` y `widget.js` respondiendo, y **cero procesos `tsx`** dentro del
+contenedor.
+
+**Queda pendiente:** la imagen sigue instalando devDependencies (470 MB). Un
+`pnpm install --prod` en una segunda etapa, o un multi-stage, la bajaría
+bastante. No es urgente.
 
 ## 3. Enlaces Markdown sin renderizar en el widget — ✅ hecho (2026-07-19)
 

@@ -1,0 +1,5 @@
+{
+  "//": "Igual que tsconfig.json pero sin los tests ni sus dobles: el typecheck sí debe cubrirlos, el artefacto que se despliega no debe llevarlos.",
+  "extends": "./tsconfig.json",
+  "exclude": ["src/**/*.test.ts", "src/testing"]
+}
