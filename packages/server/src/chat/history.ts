@@ -15,10 +15,16 @@ const HISTORY_TURNS = 3;
 const HISTORY_MAX_AGE_MINUTES = 30;
 
 export async function loadRecentTurns(pool: Pool, sessionId: string): Promise<Turn[]> {
+  // Los turnos sin respuesta se saltan (no cortan la conversación): un "no lo
+  // sé" no aporta nada sobre la doc y su pregunta contamina la reescritura.
+  // Medido el 2026-07-19 con un turno sobre precios sin responder de por
+  // medio, "¿cómo lo configuro?" pasaba de "¿Cómo configurar Docsera para que
+  // soporte Ollama?" a "¿Cómo se configura la suscripción de Docsera...?".
   const result = await pool.query<{ question: string; answer: string | null }>(
     `SELECT question, answer
      FROM conversations
      WHERE session_id = $1
+       AND answered = true
        AND created_at > now() - make_interval(mins => $2)
      ORDER BY created_at DESC
      LIMIT $3`,

@@ -14,6 +14,7 @@ import { retrieveRelevantChunks, type RetrievedChunk } from "../chat/retrieve.js
 import { chatRateLimit } from "../lib/chatRateLimit.js";
 import { getPool } from "../lib/db.js";
 import { getEmbeddingsAdapter } from "../llm/index.js";
+import { VERSION } from "../version.js";
 
 // Se usa el Server de bajo nivel (no McpServer) para declarar los esquemas
 // de las tools como JSON Schema plano: el SDK arrastra su propio zod y el
@@ -47,7 +48,7 @@ function textResult(text: string, isError = false): CallToolResult {
 
 function buildMcpServer(): Server {
   const server = new Server(
-    { name: "docsera", version: "0.3.0" },
+    { name: "docsera", version: VERSION },
     { capabilities: { tools: {} } },
   );
 

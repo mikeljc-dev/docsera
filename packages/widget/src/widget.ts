@@ -1,7 +1,7 @@
 import { LitElement, html, css, type PropertyValues } from "lit";
 import { resolveStrings, type WidgetStrings } from "./locales.js";
 import { renderMarkdown } from "./markdown.js";
-import { readSse } from "./sse.js";
+import { readSse, smooth } from "./sse.js";
 import type { ChatDone, ChatMessage, Source } from "./types.js";
 
 const SESSION_STORAGE_KEY = "docsera-session-id";
@@ -652,9 +652,11 @@ export class DocseraWidget extends LitElement {
         if (event.event === "error") throw new Error(event.data);
 
         if (event.event === "delta") {
-          answer += event.data;
           this.pending = false;
-          patch({ content: answer });
+          await smooth(event.data, (chunk) => {
+            answer += chunk;
+            patch({ content: answer });
+          });
         } else if (event.event === "done") {
           const done = JSON.parse(event.data) as ChatDone;
           this.sessionId = done.sessionId;

@@ -24,6 +24,34 @@ function parseEvent(block: string): SseEvent | null {
   return data.length > 0 ? { event, data: data.join("\n") } : null;
 }
 
+// Algunos proveedores (Gemini, entre otros) mandan la respuesta entera en dos
+// fragmentos: el texto aparece a saltos en vez de escribirse. Esto reparte lo
+// que llega a lo largo de varios frames. Drena de forma proporcional a lo
+// pendiente, así que nunca se queda atrás respecto al stream: con fragmentos
+// pequeños —Ollama, Anthropic— no cambia nada porque ya llegan repartidos.
+export function smooth(
+  text: string,
+  emit: (chunk: string) => void,
+  onFrame: (cb: () => void) => void = (cb) => requestAnimationFrame(() => cb()),
+): Promise<void> {
+  if (text.length <= 8) {
+    emit(text);
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
+    let rest = text;
+    const step = (): void => {
+      const size = Math.max(2, Math.ceil(rest.length / 12));
+      emit(rest.slice(0, size));
+      rest = rest.slice(size);
+      if (rest) onFrame(step);
+      else resolve();
+    };
+    onFrame(step);
+  });
+}
+
 // No se usa EventSource porque solo habla GET y la pregunta viaja en el
 // cuerpo de un POST.
 export async function* readSse(response: Response): AsyncGenerator<SseEvent> {

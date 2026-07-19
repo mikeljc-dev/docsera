@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -13,14 +12,9 @@ import { llmsRoute } from "./routes/llms.js";
 import { mcpRoute } from "./routes/mcp.js";
 import { publicStatsRoute } from "./routes/publicStats.js";
 import { widgetRoute } from "./routes/widget.js";
+import { VERSION } from "./version.js";
 
 loadEnv();
-
-const VERSION = (
-  JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf-8")) as {
-    version: string;
-  }
-).version;
 
 const PORT = Number(process.env.PORT ?? 3000);
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? "")

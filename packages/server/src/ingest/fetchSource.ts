@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import { VERSION } from "../version.js";
 
 export const MAX_PAGES = 200;
 // Un sitemap índice puede apuntar a otros sitemaps; más de un nivel de
@@ -6,7 +7,7 @@ export const MAX_PAGES = 200;
 const MAX_SITEMAP_DEPTH = 2;
 const FETCH_CONCURRENCY = 3;
 const FETCH_TIMEOUT_MS = 15_000;
-const USER_AGENT = "DocseraBot/0.3.0";
+const USER_AGENT = `DocseraBot/${VERSION}`;
 
 export interface RawDocument {
   url: string | null;

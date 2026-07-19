@@ -9,12 +9,15 @@
     "dev": "esbuild src/entry.ts --bundle --format=iife --outfile=public/widget.js --watch --servedir=public",
     "build": "esbuild src/entry.ts --bundle --format=iife --outfile=dist/widget.js --minify",
     "lint": "eslint src",
+    "test": "tsx --test src/**/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "lit": "^3.3.3"
   },
   "devDependencies": {
-    "esbuild": "^0.28.1"
+    "@types/node": "^20.14.0",
+    "esbuild": "^0.28.1",
+    "tsx": "^4.23.1"
   }
 }
