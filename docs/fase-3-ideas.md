@@ -36,8 +36,11 @@ webs y docs oficiales de cada producto a fecha del análisis.
     la vectorial por Reciprocal Rank Fusion. Caza términos exactos (nombres de
     variables, códigos de error) donde el embedding flojea; sin dependencias
     ni servicios nuevos. Re-ranking con cross-encoder queda para después.
-7. **Multi-turno con refinado de pregunta** *(Fin: refinar → recuperar →
-   responder)* — reescribir la pregunta con el historial antes de embeber.
+7. ✅ **Multi-turno con refinado de pregunta** *(2026-07-19)* *(Fin: refinar →
+   recuperar → responder)* — se reescribe la pregunta con los 3 últimos turnos
+   de la sesión (ventana de 30 min) antes de embeber, y los turnos previos van
+   al prompt como mensajes reales. Coste: una llamada extra al LLM, solo en las
+   preguntas de seguimiento.
 8. **Señal de confianza** *(kapa)* — marcar respuestas cerca del umbral
    como "posiblemente incompleta" en vez del binario sé/no sé.
 9. **Streaming de respuestas** *(todos)* — ya en roadmap.

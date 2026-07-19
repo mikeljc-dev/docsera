@@ -73,6 +73,29 @@ test("el system prompt instruye a no repetir las etiquetas numeradas", () => {
   assert.match(system?.content ?? "", /never write those\s+bracketed numbers/i);
 });
 
+test("buildChatMessages intercala los turnos previos entre system y pregunta", () => {
+  const messages = buildChatMessages(
+    "¿y eso cómo se configura?",
+    [{ id: "1", content: "Contenido A", anchor: null, url: null, title: "Doc A" }],
+    [{ question: "¿Qué es Docsera?", answer: "Un widget de chat." }],
+  );
+
+  assert.deepEqual(
+    messages.map((m) => m.role),
+    ["system", "user", "assistant", "user"],
+  );
+  assert.equal(messages[1]?.content, "¿Qué es Docsera?");
+  assert.equal(messages[2]?.content, "Un widget de chat.");
+  // El contexto recuperado solo va en el último mensaje, no en el historial.
+  assert.doesNotMatch(messages[1]?.content ?? "", /Contenido A/);
+  assert.match(messages[3]?.content ?? "", /Question: ¿y eso cómo se configura\?$/);
+});
+
+test("el system prompt marca el historial como no-fuente de hechos", () => {
+  const [system] = buildChatMessages("x", []);
+  assert.match(system?.content ?? "", /not a\s+source of facts/i);
+});
+
 test("isNoAnswer reconoce el centinela decorado por modelos pequeños", () => {
   delete process.env.CHAT_NO_ANSWER_TEXT;
   assert.equal(isNoAnswer("-NO_ANSWER-"), true);

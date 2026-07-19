@@ -201,6 +201,27 @@ CI verde):
       ARCHITECTURE y fase-3-ideas (#6b y #12 marcados). Docs re-ingeridas
       en prod: el asistente ya responde sobre MCP citando `#mcp-server`.
 
+Entregado en local, **sin desplegar todavía** (2026-07-19):
+- [x] **Skill `docsera-standards`** (`.claude/skills/`): estándares mínimos
+      para lo que genere cualquier IA en el repo (convenciones TS/ESM,
+      reglas por paquete, puerta de calidad, reglas de producto).
+      Commit ebfa489, ya en `main`.
+- [x] **Multi-turno con refinado de pregunta** (punto 7 de fase-3-ideas):
+      `chat/history.ts` (últimos 3 turnos de la sesión, ventana de 30 min
+      porque el sessionId del widget vive para siempre en localStorage) y
+      `chat/condense.ts` (reescribe la pregunta a una autocontenida antes
+      de embeber; `buildCondenseMessages`/`resolveStandaloneQuestion`
+      puros y testeados). `buildChatMessages` acepta los turnos previos y
+      los mete como mensajes reales; el system prompt marca el historial
+      como no-fuente de hechos. Coste: una llamada extra al LLM solo en
+      seguimientos, con degradación a la pregunta original si falla.
+      `ask_docs` del MCP usa sessionId aleatorio, así que no paga nada.
+      Verificado E2E con Ollama: "Does Docsera support Ollama?" →
+      "¿Cómo lo configuro?" responde la config real de Ollama, mientras
+      que la misma pregunta en sesión nueva responde genéricamente.
+      54 tests en verde (47 antes, +7 de condense/prompt).
+      **Falta commitear y desplegar.**
+
 Siguiente (para retomar en otra sesión):
 - **Higiene urgente (Mikel):** (1) ROTAR el `ADMIN_TOKEN` — se compartió
   en el chat el 2026-07-18 para la re-ingesta, queda expuesto (nuevo
@@ -210,9 +231,9 @@ Siguiente (para retomar en otra sesión):
   `curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash`
   (script ya revisado y limpio; sus tools MCP solo aparecerán en la
   PRÓXIMA sesión).
-- **Producto (siguientes candidatas del roadmap):** streaming de
-  respuestas en el widget y conversaciones multi-turno (hoy cada pregunta
-  va sin historial al LLM). Ideas priorizadas y análisis de la
+- **Producto (siguiente candidata del roadmap):** streaming de respuestas
+  en el widget (punto 9); luego señal de confianza (8) y el `llms.txt`
+  estático que quedó pendiente del MCP. Ideas priorizadas y análisis de la
   competencia (Fin, Mintlify, DocsBot, kapa.ai) en `docs/fase-3-ideas.md`.
 - **Lanzamiento (Mikel):** publicar los posts (Show HN y r/selfhosted,
   borradores listos con "Try it live: https://docs.docsera.dev/?demo=1").

@@ -1,5 +1,7 @@
 import { getPool } from "../lib/db.js";
 import { getChatAdapter, getEmbeddingsAdapter } from "../llm/index.js";
+import { condenseQuestion } from "./condense.js";
+import { loadRecentTurns } from "./history.js";
 import { buildChatMessages, isNoAnswer, noAnswerText } from "./prompt.js";
 import { retrieveRelevantChunks, type RetrievedChunk } from "./retrieve.js";
 import { saveConversation } from "./store.js";
@@ -37,12 +39,18 @@ function dedupeSources(chunks: RetrievedChunk[]): Source[] {
 
 export async function runChat(input: ChatInput): Promise<ChatResult> {
   const pool = getPool();
-  const [questionEmbedding] = await getEmbeddingsAdapter().embed([input.question]);
+
+  // La recuperación usa la pregunta resuelta contra el historial; lo que se
+  // guarda y se le muestra al modelo como pregunta sigue siendo la original.
+  const turns = await loadRecentTurns(pool, input.sessionId);
+  const searchQuery = await condenseQuestion(input.question, turns);
+
+  const [questionEmbedding] = await getEmbeddingsAdapter().embed([searchQuery]);
   if (!questionEmbedding) {
     throw new Error("No se pudo generar el embedding de la pregunta");
   }
 
-  const chunks = await retrieveRelevantChunks(pool, questionEmbedding, input.question);
+  const chunks = await retrieveRelevantChunks(pool, questionEmbedding, searchQuery);
 
   if (chunks.length === 0) {
     const answer = noAnswerText();
@@ -56,7 +64,7 @@ export async function runChat(input: ChatInput): Promise<ChatResult> {
     return { answer, sources: [], sessionId: input.sessionId, conversationId, answered: false };
   }
 
-  const messages = buildChatMessages(input.question, chunks);
+  const messages = buildChatMessages(input.question, chunks, turns);
   const rawAnswer = await getChatAdapter().chat(messages);
   const answered = !isNoAnswer(rawAnswer);
   // El LLM señala la falta de respuesta con un centinela; lo que se guarda

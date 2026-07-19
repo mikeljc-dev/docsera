@@ -1,5 +1,6 @@
 import { stripDiacritics } from "../lib/text.js";
 import type { ChatMessage } from "../llm/types.js";
+import type { Turn } from "./history.js";
 import type { RetrievedChunk } from "./retrieve.js";
 
 export const DEFAULT_NO_ANSWER_TEXT = "I don't know.";
@@ -25,6 +26,11 @@ the context. Answer in the same language the question is asked in. If the
 context does not contain enough information to answer the question, reply
 exactly and only with: ${NO_ANSWER_SENTINEL}
 
+Earlier turns of the conversation may be included before the latest message,
+so you can resolve references and avoid repeating yourself. They are not a
+source of facts: every factual claim must come from the Context given in the
+latest message.
+
 The context items are numbered (e.g. [1], [2]) only so you can relate them
 internally to their titles; those numbers mean nothing to the reader (the
 sources are shown separately, elsewhere in the interface). Never write those
@@ -37,13 +43,26 @@ lists. Do not use headers, tables or links. Keep answers short — a few
 sentences, plus a code block when it genuinely helps.`;
 }
 
-export function buildChatMessages(question: string, chunks: RetrievedChunk[]): ChatMessage[] {
+export function buildChatMessages(
+  question: string,
+  chunks: RetrievedChunk[],
+  turns: Turn[] = [],
+): ChatMessage[] {
   const context = chunks
     .map((chunk, i) => `[${i + 1}] (${chunk.title})\n${chunk.content}`)
     .join("\n\n");
 
+  // Los turnos previos van como mensajes de verdad, no embutidos en el texto
+  // del último: así el modelo los ve como conversación y el contexto
+  // recuperado sigue siendo lo único etiquetado como fuente.
+  const history: ChatMessage[] = turns.flatMap((turn) => [
+    { role: "user" as const, content: turn.question },
+    { role: "assistant" as const, content: turn.answer },
+  ]);
+
   return [
     { role: "system", content: buildSystemPrompt() },
+    ...history,
     { role: "user", content: `Context:\n\n${context}\n\nQuestion: ${question}` },
   ];
 }

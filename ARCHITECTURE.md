@@ -42,6 +42,23 @@ generation. FTS was chosen over a second embedding model or an external
 re-ranker because it adds one generated column and no new dependency or
 network call. Cross-encoder re-ranking is still on the roadmap.
 
+## How do follow-up questions work?
+
+Retrieval happens on a **standalone rewrite** of the question, not on the raw
+text. "How do I configure it?" embeds to nothing useful, so before retrieving,
+the last 3 turns of the session are used to rewrite it into a self-contained
+query ("How do I configure Ollama in Docsera?"); the model still receives the
+*original* question, with the previous turns as real chat messages, so the
+answer reads as a conversation. Facts must still come from the retrieved
+context — history is explicitly marked as not a source.
+
+Two deliberate limits. The rewrite costs **one extra LLM call, and only on
+follow-ups** — the first question of a session skips it entirely; if that call
+fails, retrieval degrades to the raw question instead of failing the request.
+And history expires after **30 minutes**: the widget keeps its session id in
+`localStorage` forever, so without a window a question today would be rewritten
+against a visit from last week.
+
 ## How does the "I don't know" detection work?
 
 The system prompt instructs the model to reply with a stable ASCII sentinel
