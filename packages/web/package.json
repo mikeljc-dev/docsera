@@ -1,6 +1,6 @@
 {
   "name": "@docsera/web",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "Landing de docsera.dev (Preact + Vite)",
   "license": "AGPL-3.0-only",

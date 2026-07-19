@@ -15,7 +15,7 @@ Tus datos no salen de tu servidor. Funciona con Anthropic, OpenAI o modelos loca
 
 </div>
 
-> **Estado: v0.3.0.** Server, ingesta, chat con RAG y citas, widget,
+> **Estado: v0.4.0.** Server, ingesta, chat con RAG y citas, widget,
 > dashboard y Docker funcionan de extremo a extremo. Proyecto joven —
 > feedback e issues muy bienvenidos (ver [Roadmap](#roadmap)).
 
@@ -95,7 +95,7 @@ Esto levanta Postgres+pgvector, aplica las migraciones automáticamente y arranc
 
 ```bash
 curl http://localhost:3000/health
-# {"status":"ok","version":"0.3.0"}
+# {"status":"ok","version":"0.4.0"}
 ```
 
 ## Uso
