@@ -37,6 +37,7 @@
       <a href="#ingestion">Ingest your docs</a>
       <a href="#widget">Add the widget</a>
       <a href="#dashboard">The dashboard</a>
+      <a href="#discord-bot">Discord bot</a>
       <div class="group">Reference</div>
       <a href="#http-api">HTTP API</a>
       <a href="#mcp-server">MCP server</a>
@@ -215,6 +216,7 @@ jobs:
             <tr><td><code>GET /stats/public</code></td><td>opt-in (<code>PUBLIC_STATS</code>)</td><td>Aggregates only: totals, daily activity, most cited sections</td></tr>
             <tr><td><code>GET /llms.txt</code></td><td>public</td><td><a href="https://llmstxt.org/">llms.txt</a> for your docs, generated from what's actually indexed: how to query them plus the list of pages.</td></tr>
             <tr><td><code>POST /mcp</code></td><td>rate-limited</td><td><a href="#mcp-server">MCP server</a> (Streamable HTTP): <code>search_docs</code> and <code>ask_docs</code> tools</td></tr>
+            <tr><td><code>POST /discord/interactions</code></td><td>Ed25519 signature</td><td>Interactions endpoint for the <a href="#discord-bot">Discord bot</a> (<code>/ask</code>). Only exists when <code>DISCORD_PUBLIC_KEY</code> is set.</td></tr>
             <tr><td><code>POST /ingest</code></td><td>Bearer <code>ADMIN_TOKEN</code></td><td><code>{type, source, url?, title?}</code> → per-document results</td></tr>
             <tr><td><code>GET /admin/conversations</code></td><td>Bearer <code>ADMIN_TOKEN</code></td><td>History with <code>answered</code>, <code>limit</code>, <code>offset</code> filters</td></tr>
             <tr><td><code>GET /widget.js</code></td><td>—</td><td>The embeddable widget bundle</td></tr>
@@ -232,6 +234,20 @@ jobs:
         <p>For example, to add it to Claude Code:</p>
         <pre><code>claude mcp add --transport http docsera https://your-server.example.com/mcp</code></pre>
         <p>The endpoint shares the chat rate limits (<code>CHAT_RATE_LIMIT</code> and the daily caps), so exposing it publicly is as safe as exposing <code>/chat</code>. Try it against this demo: <code>https://docseraserver-production.up.railway.app/mcp</code>.</p>
+      </section>
+
+      <section>
+        <h2 id="discord-bot">Discord bot</h2>
+        <p>Your community can ask the docs without leaving Discord: a <code>/ask</code> slash command that answers with the same RAG pipeline as the widget, citing its sources. It runs inside the Docsera server you already deploy — no separate bot process, no new dependencies — and it shares the same rate limits as <code>/chat</code>, keyed by Discord user.</p>
+        <h3 id="discord-setup">Setup</h3>
+        <ol>
+          <li>Create an application in the <a href="https://discord.com/developers/applications">Discord Developer Portal</a> (dedicate it to Docsera: the server manages its commands).</li>
+          <li>Copy three values into your <code>.env</code>: <code>DISCORD_PUBLIC_KEY</code> and <code>DISCORD_APPLICATION_ID</code> from <em>General Information</em>, and <code>DISCORD_BOT_TOKEN</code> from <em>Bot → Reset Token</em>. Restart the server — it registers the <code>/ask</code> command by itself on boot.</li>
+          <li>Back in <em>General Information</em>, set <strong>Interactions Endpoint URL</strong> to <code>https://your-server.example.com/discord/interactions</code>. Discord validates the endpoint on save (your server must be publicly reachable and already restarted with the key).</li>
+          <li>Invite it to your Discord server: <em>Installation → Guild Install</em> with the <code>applications.commands</code> scope (an install link appears on that page).</li>
+        </ol>
+        <p>Then, in any channel: <code>/ask question: How do I configure Ollama?</code> The bot replies with an embed — the answer plus a <strong>Sources</strong> list linking to the exact doc sections. Questions and answers land in the dashboard like any other conversation, so unanswered Discord questions show up in your coverage analytics too.</p>
+        <p class="fine-print">Security notes: every interaction is verified with Discord's Ed25519 signature (invalid signatures are rejected), the endpoint doesn't exist unless <code>DISCORD_PUBLIC_KEY</code> is set, and the bot token is only used to register the command — answers are delivered through the interaction's own webhook.</p>
       </section>
 
       <section>

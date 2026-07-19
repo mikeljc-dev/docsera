@@ -131,6 +131,28 @@ returned to the client. `x-forwarded-for` is only
 trusted behind a proxy you control (`TRUST_PROXY`). Admin endpoints
 (`/ingest`, `/admin/*`) require a bearer token compared in constant time.
 
+## Why is the Discord bot an HTTP endpoint and not a gateway bot?
+
+The `/ask` command lives at `POST /discord/interactions` — Discord's HTTP
+interactions model — instead of a `discord.js` gateway bot with a persistent
+WebSocket. Three reasons. It keeps the **one container** promise: no second
+process to run, supervise or document, and it works on platforms that only
+speak request/response. It needs **zero new dependencies**: the Ed25519
+signature check Discord requires ships in `node:crypto` (the only subtlety
+is wrapping Discord's raw 32-byte key in a DER/SPKI header), and command
+registration and answer delivery are plain `fetch` calls. And it's
+**stateless**, like the MCP endpoint — nothing per-guild or per-connection
+to lose on restart.
+
+The trade-off is scope: slash commands only, no listening to mentions or
+auto-threading (those need the gateway). For "let my community query the
+docs", the slash command is the product; the gateway can come later without
+touching this design. Because every interaction arrives from Discord's own
+IPs, the `/chat` rate-limit layers are reused with the **Discord user id**
+as the key instead of the IP — same buckets, same env knobs. Answers are
+delivered by editing the deferred message through the interaction's webhook
+token, so the bot token is used only once at boot to register the command.
+
 ## How does the one-command install work?
 
 `npx docsera` (the `packages/cli` package, published to npm as `docsera`)

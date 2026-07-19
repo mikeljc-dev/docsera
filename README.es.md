@@ -59,7 +59,7 @@ Tres piezas dentro de un monorepo, todas dentro de un único servicio desplegabl
 
 | Paquete | Qué hace |
 |---|---|
-| `packages/server` | La API: `POST /chat` (RAG con citas), `POST /chat/stream` (lo mismo, en streaming por SSE — es lo que usa el widget), `POST /ingest` (markdown/URL/sitemap/GitHub), `POST /mcp` (servidor MCP para agentes de IA), `GET /llms.txt`, y sirve el widget y el dashboard como estáticos |
+| `packages/server` | La API: `POST /chat` (RAG con citas), `POST /chat/stream` (lo mismo, en streaming por SSE — es lo que usa el widget), `POST /ingest` (markdown/URL/sitemap/GitHub), `POST /mcp` (servidor MCP para agentes de IA), `GET /llms.txt`, un [bot de Discord](https://docs.docsera.dev/#discord-bot) opcional (`/ask`), y sirve el widget y el dashboard como estáticos |
 | `packages/widget` | El web component embebible (el chat flotante), compilado a un único `widget.js` |
 | `packages/dashboard` | Panel de administración: analíticas de cobertura (tasa de respuesta, top preguntas sin responder, secciones más citadas, feedback) e historial de conversaciones |
 | `packages/web` | La landing de [docsera.dev](https://docsera.dev) (estática; no forma parte del producto desplegable) |
@@ -194,6 +194,7 @@ Todas las variables viven en `.env` (plantilla en `.env.example`).
 | `PUBLIC_STATS` | Expone `GET /stats/public` solo con agregados (nunca las preguntas de los visitantes) — para demos públicas | `false` |
 | `CHAT_MAX_DISTANCE` | Distancia coseno máxima para considerar un chunk relevante; si ninguno pasa, se responde la frase de no-respuesta sin llamar al LLM. `2` desactiva el filtro | `0.8` |
 | `CHAT_NO_ANSWER_TEXT` | Frase exacta cuando la doc no tiene la respuesta (ponla en el idioma de tus usuarios, ej: `No lo sé.`) | `I don't know.` |
+| `DISCORD_PUBLIC_KEY` / `DISCORD_APPLICATION_ID` / `DISCORD_BOT_TOKEN` | [Bot de Discord](https://docs.docsera.dev/#discord-bot) opcional: un comando `/ask` que responde desde tus docs, con citas. Sin ellos, el endpoint no existe | — |
 | `TRUST_PROXY` | `true` solo si hay un reverse proxy propio delante que sobreescriba `x-forwarded-for`; el rate limit usará esa cabecera como IP del cliente | `false` |
 
 **Sobre embeddings y proveedor de LLM:** son configuraciones independientes a propósito. Puedes usar Anthropic para el chat y OpenAI (o Ollama) solo para generar los embeddings de la ingesta, ya que Anthropic no ofrece API de embeddings propia.
