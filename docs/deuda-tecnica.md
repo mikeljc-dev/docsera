@@ -4,7 +4,39 @@ Lista salida de revisar el repo tras publicar la v0.3.0. A diferencia de
 `fase-3-ideas.md` —que es producto y análisis de competencia— esto es lo que
 hay que arreglar dentro. Ordenado por lo que conviene hacer antes.
 
-## 1. Ningún test toca HTTP
+## 1. Ningún test toca HTTP — ✅ en marcha (2026-07-19)
+
+**Hecho.** Costuras `setPool()` (`lib/db.ts`) y `setChatAdapter()` /
+`setEmbeddingsAdapter()` (`llm/index.ts`), más dobles compartidos en
+`testing/doubles.ts` (pool falso que responde por regex sobre el SQL,
+adaptadores falsos, y un `fakeConnEnv` porque `getConnInfo()` revienta sin
+socket). Con eso, las rutas se ejercen con `route.fetch(new Request(...))`,
+sin Postgres ni Docker.
+
+Cubierto ya (78 tests, +11):
+- `POST /chat/stream`: orden `delta`* → `done`; el `done` con
+  `sources`/`conversationId`/`answered`/`sessionId`; el centinela nunca sale
+  por un `delta` y suprime fuentes; sin cobertura no se llama al LLM;
+  proveedor sin `chatStream`; el fallo del proveedor sale como evento `error`
+  **sin filtrar el mensaje interno**; body inválido → 400 JSON; `sessionId`
+  con formato inválido descartado.
+- Rate limit → 429 sin llegar al LLM (en `chatStreamRateLimit.test.ts`
+  aparte: el limitador es un singleton perezoso y `tsx --test` da un proceso
+  por fichero, que es la única forma limpia de fijar `CHAT_RATE_LIMIT` antes
+  de la primera petición).
+- `GET /llms.txt`: `text/plain`, H1, páginas, y `https` con
+  `x-forwarded-proto`.
+
+Verificado que no son decorativos: con `HOLD_CHARS = 0` caen 6 tests,
+incluido el de ruta.
+
+**Queda pendiente:** `POST /ingest` (401 sin token), `POST /chat` (el JSON
+clásico, aún sin cubrir) y `POST /mcp`. Y por encima de todo, **el SQL sigue
+sin probarse**: el pool falso no valida las consultas. Un Postgres con
+pgvector como service de GitHub Actions daría tests de integración de verdad
+—migraciones, `tsv`, distancias— y es el siguiente escalón natural.
+
+### Enunciado original
 
 **Qué pasa.** Los 67 tests son de funciones puras (`fuseRankings`,
 `buildChatMessages`, `streamAnswer`, `assessConfidence`, chunking, rate

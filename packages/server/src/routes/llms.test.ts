@@ -1,6 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildLlmsTxt, publicOrigin } from "./llms.js";
+import { buildLlmsTxt, llmsRoute, publicOrigin } from "./llms.js";
+import { setPool } from "../lib/db.js";
+import { fakePool } from "../testing/doubles.js";
 
 const ORIGIN = "https://api.example.com";
 
@@ -56,4 +58,47 @@ test("detrás de un proxy que termina TLS, el origen publicado usa https", () =>
 test("sin cabecera de proxy se respeta el esquema de la petición", () => {
   assert.equal(publicOrigin("http://localhost:3000/llms.txt"), "http://localhost:3000");
   assert.equal(publicOrigin("https://api.example.com/llms.txt"), "https://api.example.com");
+});
+
+test("GET /llms.txt sirve text/plain con el H1 y las páginas indexadas", async () => {
+  setPool(
+    fakePool([
+      {
+        match: /FROM documents/i,
+        rows: [{ title: "Installation", url: "https://docs.example.com/install" }],
+      },
+    ]),
+  );
+  process.env.LLMS_TXT_TITLE = "Acme Docs";
+
+  try {
+    const response = await llmsRoute.fetch(new Request("https://api.example.com/llms.txt"));
+
+    assert.equal(response.status, 200);
+    assert.match(response.headers.get("content-type") ?? "", /text\/plain/);
+    const body = await response.text();
+    assert.match(body, /^# Acme Docs\n/);
+    assert.match(body, /- \[Installation\]\(https:\/\/docs\.example\.com\/install\)/);
+  } finally {
+    delete process.env.LLMS_TXT_TITLE;
+    setPool(undefined);
+  }
+});
+
+test("detrás de proxy TLS, los enlaces publicados salen en https", async () => {
+  setPool(fakePool([{ match: /FROM documents/i, rows: [] }]));
+
+  try {
+    const response = await llmsRoute.fetch(
+      new Request("http://api.example.com/llms.txt", {
+        headers: { "x-forwarded-proto": "https" },
+      }),
+    );
+    const body = await response.text();
+
+    assert.match(body, /\(https:\/\/api\.example\.com\/mcp\)/);
+    assert.doesNotMatch(body, /\(http:\/\/api\.example\.com/);
+  } finally {
+    setPool(undefined);
+  }
 });
