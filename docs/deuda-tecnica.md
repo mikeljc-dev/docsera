@@ -207,6 +207,26 @@ si lo hace, hay que vaciarlo allí.
 **Lección:** cualquier configuración de despliegue que viva solo en un panel
 web es invisible desde el repo y no se puede revisar en un PR.
 
+## 8. El glob de los tests dependía del shell
+
+**Encontrado el 2026-07-19, en un CI rojo.** El script era
+`tsx --test src/**/*.test.ts`. En zsh (mi local) `**` expande recursivamente;
+en **bash sin `globstar` —lo que usa CI— `src/**/*.test.ts` equivale a
+`src/*/*.test.ts`**, es decir, exige un subdirectorio. El primer test del
+widget vivía en `src/sse.test.ts`, a un solo nivel, y CI no lo encontró.
+
+Lo grave no es el fallo, es lo que escondía: **en el server llevaba desde
+siempre igual y pasaba por casualidad**, porque todos sus tests están en
+subcarpetas. Un `src/foo.test.ts` en la raíz se habría saltado en silencio,
+con CI en verde.
+
+**Arreglado** en ambos paquetes con `tsx --test $(find src -name '*.test.ts')`,
+que no depende del shell. Verificado ejecutándolo con `bash` explícitamente,
+no con el zsh del portátil.
+
+**Lección:** comprobar los scripts de package.json con el mismo shell que CI.
+Un verde local con otro shell no dice nada.
+
 ## Lo que NO está en esta lista
 
 - **Señal de confianza (punto 8 de `fase-3-ideas.md`)**: implementada y
