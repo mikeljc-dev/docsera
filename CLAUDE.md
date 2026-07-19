@@ -266,17 +266,17 @@ Después de la v0.3.0 (2026-07-19), sin desplegar todavía:
       necesita calibrarse con preguntas reales, no con cuatro ejemplos.
 
 Siguiente (para retomar en otra sesión):
-- **Higiene urgente (Mikel):** (1) ROTAR el `ADMIN_TOKEN` — se compartió
-  en el chat el 2026-07-18 para la re-ingesta, queda expuesto (nuevo
-  `openssl rand -hex 32` → var `ADMIN_TOKEN` en Railway → Apply). (2)
-  Rotar la key de Gemini (expuesta en una captura durante el setup). (3)
-  Instalar codebase-memory-mcp para el flujo de trabajo:
+- **Higiene: HECHA el 2026-07-19.** `ADMIN_TOKEN` y key de Gemini rotados
+  por Mikel. Regla que deja: no volver a pegar el `ADMIN_TOKEN` en el chat
+  para re-ingestas — que las lance él, o por CI con el secreto de GitHub.
+  Pendiente aún: instalar codebase-memory-mcp para el flujo de trabajo:
   `curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash`
   (script ya revisado y limpio; sus tools MCP solo aparecerán en la
   PRÓXIMA sesión).
-- **Producto (siguientes candidatas del roadmap):** señal de confianza
-  (punto 8) y el `llms.txt` estático que quedó pendiente del MCP; después,
-  conectores PDF (10) o el bot de Discord (11). Ideas priorizadas y análisis
+- **Producto (siguientes candidatas del roadmap):** conector PDF (10) o el
+  bot de Discord (11) — el análisis competitivo señala Discord como lo que
+  más encaja con comunidades open source. La señal de confianza (8) queda
+  aparcada con el porqué documentado. Ideas priorizadas y análisis
   de la competencia (Fin, Mintlify, DocsBot, kapa.ai) en
   `docs/fase-3-ideas.md`.
 - **Lanzamiento (Mikel):** publicar los posts (Show HN y r/selfhosted,
