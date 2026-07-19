@@ -30,11 +30,30 @@ Cubierto ya (78 tests, +11):
 Verificado que no son decorativos: con `HOLD_CHARS = 0` caen 6 tests,
 incluido el de ruta.
 
+**Tests de integración con Postgres real — hecho (2026-07-19).** CI levanta
+un service `pgvector/pgvector:pg16` y define `TEST_DATABASE_URL`; los
+`*.integration.test.ts` aplican las migraciones de verdad y ejercen el SQL:
+las dos ramas de la búsqueda híbrida, el umbral de distancia, la columna
+`tsv` generada, el deduplicado del RRF, y el historial (filtro `answered`,
+ventana de 30 min, límite de 3 turnos, aislamiento entre sesiones). 90 tests
+en el server.
+
+Dos decisiones del arnés (`testing/db.ts`):
+- **Un esquema Postgres por fichero de test.** node:test corre los ficheros
+  en paralelo; compartir tablas significaba que el `TRUNCATE` de uno borraba
+  los fixtures de otro. Una carrera que solo habría aparecido en CI, de vez
+  en cuando. `public` sigue en el `search_path` porque ahí vive el tipo
+  `vector`.
+- **Se saltan sin `TEST_DATABASE_URL`**, así que un `pnpm test` en local sin
+  Postgres sigue pasando (avisa: `skipped 12`). En CI la variable está
+  siempre, así que allí no se saltan nunca.
+
+`migrate.ts` se partió en dos: la lógica reutilizable vive en
+`db/migrations.ts` (`applyMigrations`) y el fichero original queda como CLI.
+
 **Queda pendiente:** `POST /ingest` (401 sin token), `POST /chat` (el JSON
-clásico, aún sin cubrir) y `POST /mcp`. Y por encima de todo, **el SQL sigue
-sin probarse**: el pool falso no valida las consultas. Un Postgres con
-pgvector como service de GitHub Actions daría tests de integración de verdad
-—migraciones, `tsv`, distancias— y es el siguiente escalón natural.
+clásico) y `POST /mcp` a nivel HTTP; y los tests de `markdown.ts`, que
+necesitan renderizar plantillas de Lit.
 
 ### Enunciado original
 
