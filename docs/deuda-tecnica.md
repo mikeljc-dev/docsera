@@ -44,6 +44,14 @@ Dos decisiones del arnés (`testing/db.ts`):
   los fixtures de otro. Una carrera que solo habría aparecido en CI, de vez
   en cuando. `public` sigue en el `search_path` porque ahí vive el tipo
   `vector`.
+- **La extensión `vector` se crea explícitamente en `public`**, antes de
+  fijar el `search_path` del esquema. `CREATE EXTENSION IF NOT EXISTS vector`
+  la instala en el *primer esquema del search_path*, así que cada fichero de
+  test acababa con su propio tipo `vector` y el resto no lo veía. En local no
+  se notó porque la BD de pruebas ya tenía la extensión en `public` de una
+  ejecución anterior: **el fallo solo salió en CI, sobre una BD virgen**.
+  Lección: probar los tests de integración contra una base de datos recién
+  creada, no contra la que llevas usando toda la tarde.
 - **Se saltan sin `TEST_DATABASE_URL`**, así que un `pnpm test` en local sin
   Postgres sigue pasando (avisa: `skipped 12`). En CI la variable está
   siempre, así que allí no se saltan nunca.

@@ -24,6 +24,19 @@ export async function setupTestDb(schema: string): Promise<Pool> {
 
   const setup = new Pool({ connectionString });
   try {
+    // La extensión va explícitamente a `public`, y antes de fijar el
+    // search_path del esquema: `CREATE EXTENSION IF NOT EXISTS vector` la
+    // instalaría en el primer esquema del search_path, con lo que cada
+    // fichero de test tendría su propio tipo `vector` y no vería el de los
+    // demás. Dos ficheros arrancando a la vez pueden chocar aquí; como el
+    // resultado que importa es que exista, se ignora el choque.
+    try {
+      await setup.query("CREATE EXTENSION IF NOT EXISTS vector SCHEMA public");
+    } catch (error) {
+      const code = (error as { code?: string }).code;
+      if (code !== "42710" && code !== "23505") throw error;
+    }
+
     await setup.query(`DROP SCHEMA IF EXISTS ${schema} CASCADE`);
     await setup.query(`CREATE SCHEMA ${schema}`);
   } finally {
