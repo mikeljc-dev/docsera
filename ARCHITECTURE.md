@@ -131,6 +131,28 @@ returned to the client. `x-forwarded-for` is only
 trusted behind a proxy you control (`TRUST_PROXY`). Admin endpoints
 (`/ingest`, `/admin/*`) require a bearer token compared in constant time.
 
+## How does the one-command install work?
+
+`npx docsera` (the `packages/cli` package, published to npm as `docsera`)
+exists because the real installation friction was never `docker compose up`
+— it was everything around it: cloning a monorepo just to build an image,
+hand-editing a 90-line `.env`, generating tokens, crafting the first
+`/ingest` curl. The CLI moves all of that into a short wizard and generates
+three files: a `.env` with freshly minted secrets, a `docker-compose.yml`
+that pulls the **prebuilt multi-arch image** from `ghcr.io/mikeljc-dev/docsera`
+(published by CI on every release tag), and a `docsera.json` with the CLI's
+own state (the chosen docs source, whether the first ingestion ran).
+
+Deliberate choices: the CLI has **zero runtime dependencies** (Node's
+readline, crypto and fetch are enough), so `npx` starts fast and there's no
+supply-chain surface to audit. All server configuration stays in `.env` —
+the CLI writes it but the server contract doesn't change, so graduating
+from the CLI to hand-managed compose is just… editing the same files. The
+admin token is generated on the user's machine and never leaves it (the
+first ingestion is a localhost call). And the generated compose keeps
+Postgres unexposed to the host, which the repo's own developer compose
+can't do (local `pnpm dev` needs the port).
+
 ## What's deliberately left out (for now)?
 
 Answer streaming, cross-encoder re-ranking, multi-turn conversations,

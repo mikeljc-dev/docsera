@@ -30,7 +30,8 @@
     <aside>
       <div class="group">Getting started</div>
       <a href="#what-is-docsera">What is Docsera?</a>
-      <a href="#installation">Installation</a>
+      <a href="#quick-install">Quick install</a>
+      <a href="#installation">Installation from source</a>
       <a href="#configuration">Configuration</a>
       <div class="group">Guides</div>
       <a href="#ingestion">Ingest your docs</a>
@@ -53,7 +54,7 @@
         <h2 id="what-is-docsera">What is Docsera?</h2>
         <p>Docsera is an embeddable widget that answers questions about your documentation using AI, <strong>with citations to the sources</strong>. Think of Intercom's support chat — but open source (AGPL-3.0) and hosted by you.</p>
         <ul>
-          <li><strong>Installed in under 10 minutes</strong> with Docker Compose.</li>
+          <li><strong>Installed with one command</strong>: <code>npx docsera</code> asks a few questions and does the rest (or use Docker Compose directly).</li>
           <li><strong>Privacy-first</strong>: self-hosted, your data never leaves your server (except the calls to the LLM provider you choose — or none at all with Ollama).</li>
           <li><strong>LLM-agnostic</strong>: Anthropic, OpenAI, or local models via Ollama — for chat and embeddings, configured independently.</li>
           <li><strong>Answers with sources</strong>: every answer deep-links to the doc section it came from. Before hallucinating, it says "I don't know."</li>
@@ -62,7 +63,31 @@
       </section>
 
       <section>
-        <h2 id="installation">Installation</h2>
+        <h2 id="quick-install">Quick install</h2>
+        <p>The fastest way to get Docsera running is the CLI. Requirements: <a href="https://docs.docker.com/get-docker/">Docker</a> (Compose is bundled with it) and Node ≥ 20.</p>
+        <pre><code>npx docsera</code></pre>
+        <p>That single command does the whole setup:</p>
+        <ol>
+          <li><strong>A short wizard</strong> asks which LLM should answer (Anthropic, OpenAI or any compatible API, or Ollama — a locally running Ollama is auto-detected and offered as the default, which makes the whole stack free and 100% local), which docs to index (a URL, a <code>sitemap.xml</code> or a GitHub <code>owner/repo</code>), and which website will embed the widget.</li>
+          <li><strong>Everything else is generated:</strong> a <code>.env</code> with your keys and freshly generated secrets (<code>ADMIN_TOKEN</code>, database password), a <code>docker-compose.yml</code> that uses the prebuilt image from <code>ghcr.io/mikeljc-dev/docsera</code> (no cloning, no compiling), and a <code>docsera.json</code> with the CLI's own state. In an empty folder the files are written right there; anywhere else they go into <code>./docsera</code>. If port 3000 is taken, the next free one is picked automatically.</li>
+          <li><strong>It launches and indexes:</strong> starts Postgres+pgvector and the server, waits until it's healthy, runs the first ingestion of the docs you pointed it at, and prints the one-line <code>&lt;script&gt;</code> snippet ready to paste into your site, plus the dashboard URL.</li>
+        </ol>
+        <p>Day-to-day commands, from the same folder (or its parent):</p>
+        <table>
+          <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><code>npx docsera</code></td><td>First run: wizard + launch. Later runs: just launch.</td></tr>
+            <tr><td><code>npx docsera ingest [source]</code></td><td>Re-index your docs, or index a new source (URL, <code>sitemap.xml</code> or <code>owner/repo</code>). Unchanged pages cost nothing (content-hash dedupe).</td></tr>
+            <tr><td><code>npx docsera up</code></td><td>Start the stack again, e.g. after a reboot.</td></tr>
+            <tr><td><code>npx docsera down</code></td><td>Stop everything. Your data stays in <code>pgdata/</code>.</td></tr>
+          </tbody>
+        </table>
+        <p>To change the configuration later (provider, keys, <code>ALLOWED_ORIGINS</code>…), edit the generated <code>.env</code> — every variable is documented in <a href="#configuration">Configuration</a> — and run <code>npx docsera up</code> again. Scripted installs work too: the wizard reads answers from stdin, so you can pipe them in CI.</p>
+      </section>
+
+      <section>
+        <h2 id="installation">Installation from source</h2>
+        <p>Prefer to build it yourself, or want to hack on Docsera? This path clones the repo and builds the image locally instead of pulling it from GHCR.</p>
         <h3 id="requirements">Requirements</h3>
         <p>Docker and Docker Compose (bundled with Docker Desktop). That's it — Postgres with pgvector ships in the compose file.</p>
         <h3 id="quick-start">Quick start</h3>
@@ -111,6 +136,7 @@ docker compose up -d --build</code></pre>
 
       <section>
         <h2 id="ingestion">Ingest your docs</h2>
+        <p>Installed with the CLI? Then <code>npx docsera ingest &lt;source&gt;</code> already does everything on this page for you (it detects whether the source is a page, a sitemap or a GitHub repo). What follows is the underlying HTTP API — what you'll call from CI or from your own scripts.</p>
         <p>Point Docsera at your existing documentation:</p>
         <pre><code>curl -X POST http://localhost:3000/ingest \
   -H "Content-Type: application/json" \
@@ -230,7 +256,7 @@ pnpm dev            # all packages in parallel, in watch mode</code></pre>
         <p>Anthropic, OpenAI, or any OpenAI-compatible API (Gemini in compatibility mode, Groq, Mistral, LM Studio, vLLM…) via <code>OPENAI_BASE_URL</code> — plus fully local models via Ollama. Chat and embeddings are configured independently, so you can mix providers.</p>
 
         <h3 id="what-do-i-need-to-run-it">What do I need to run it?</h3>
-        <p>Just Docker and Docker Compose. Postgres with pgvector ships in the compose file, migrations run automatically, and the whole thing is up in under 10 minutes. Any small VPS or container platform works — this very demo runs on free-tier hosting.</p>
+        <p>Just Docker (and Node ≥ 20 if you use the <code>npx docsera</code> installer). Postgres with pgvector ships in the compose file, migrations run automatically, and a single wizard command takes care of configuration, launch and the first ingestion. Any small VPS or container platform works — this very demo runs on free-tier hosting.</p>
 
         <h3 id="can-it-hallucinate">Can it hallucinate?</h3>
         <p>It's designed not to. The assistant answers only from your documentation: if nothing relevant passes the similarity threshold, it answers "I don't know" without even calling the LLM, and every answer cites the exact sections it came from, so users can verify. The dashboard also surfaces every unanswered question.</p>
