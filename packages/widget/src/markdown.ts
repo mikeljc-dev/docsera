@@ -18,7 +18,7 @@ const INLINE_PATTERN = new RegExp(`(\`[^\`\\n]+\`|\\*\\*[^*\\n]+\\*\\*|${LINK})`
 // —que el modelo emite a menudo, porque la doc original vive en un repo—
 // apuntaría a la web anfitriona, no a la documentación. En ambos casos se
 // conserva el texto del enlace y se descarta el destino.
-function safeHref(url: string): string | null {
+export function safeHref(url: string): string | null {
   return /^https?:\/\/[^\s<>"]+$/i.test(url) ? url : null;
 }
 

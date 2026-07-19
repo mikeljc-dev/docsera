@@ -59,9 +59,22 @@ Dos decisiones del arnés (`testing/db.ts`):
 `migrate.ts` se partió en dos: la lógica reutilizable vive en
 `db/migrations.ts` (`applyMigrations`) y el fichero original queda como CLI.
 
-**Queda pendiente:** `POST /ingest` (401 sin token), `POST /chat` (el JSON
-clásico) y `POST /mcp` a nivel HTTP; y los tests de `markdown.ts`, que
-necesitan renderizar plantillas de Lit.
+**Rutas restantes — hecho (2026-07-19).** `/ingest` (401 sin token, con token
+erróneo, y **500 si no hay `ADMIN_TOKEN`: mal configurado se cierra, no se
+abre**), `/chat` (la forma exacta del contrato JSON, que consumen el MCP y las
+integraciones ajenas; no-respuesta sin fuentes; 500 sin filtrar el detalle) y
+`/mcp` (las dos tools, `search_docs` sin llamar al LLM, 405 en GET/DELETE).
+
+`/mcp` necesitó levantar un **servidor real** en un puerto libre: su transporte
+escribe sobre el `req`/`res` crudos de Node y devuelve `RESPONSE_ALREADY_SENT`,
+así que `route.fetch()` con un env falso no vale.
+
+De `markdown.ts` se cubre `safeHref`, que es lo que de verdad importa ahí: la
+frontera de seguridad. Renderizar las plantillas de Lit sigue sin cubrirse y
+requeriría Lit SSR (dependencia nueva); el resto del renderizador se verifica
+en navegador con Playwright.
+
+**Total: 117 tests** (107 server + 10 widget).
 
 ### Enunciado original
 
