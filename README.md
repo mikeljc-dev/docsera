@@ -15,7 +15,7 @@ Your data never leaves your server. Works with Anthropic, OpenAI or local models
 
 </div>
 
-> **Status: v0.2.0.** Server, ingestion, RAG chat with citations, widget,
+> **Status: v0.3.0.** Server, ingestion, RAG chat with citations, widget,
 > dashboard and Docker all work end to end. Young project — feedback and
 > issues are very welcome (see [Roadmap](#roadmap)).
 
@@ -59,7 +59,7 @@ Three pieces in one monorepo, all served by a single deployable service:
 
 | Package | What it does |
 |---|---|
-| `packages/server` | The API: `POST /chat` (RAG with citations), `POST /chat/stream` (same, streamed as SSE — what the widget uses), `POST /ingest` (markdown/URL/sitemap/GitHub), `POST /mcp` (MCP server for AI agents), and serves the widget and dashboard as static assets |
+| `packages/server` | The API: `POST /chat` (RAG with citations), `POST /chat/stream` (same, streamed as SSE — what the widget uses), `POST /ingest` (markdown/URL/sitemap/GitHub), `POST /mcp` (MCP server for AI agents), `GET /llms.txt`, and serves the widget and dashboard as static assets |
 | `packages/widget` | The embeddable web component (the floating chat), bundled into a single `widget.js` |
 | `packages/dashboard` | Admin panel: coverage analytics (answer rate, top unanswered questions, most cited sections, feedback) and conversation history |
 | `packages/web` | The [docsera.dev](https://docsera.dev) landing page (not part of the deployable product) |
@@ -95,7 +95,7 @@ This starts Postgres+pgvector, applies migrations automatically and runs the ser
 
 ```bash
 curl http://localhost:3000/health
-# {"status":"ok","version":"0.2.0"}
+# {"status":"ok","version":"0.3.0"}
 ```
 
 ## Usage

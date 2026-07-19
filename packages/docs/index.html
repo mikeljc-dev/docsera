@@ -98,6 +98,7 @@ docker compose up -d --build</code></pre>
             <tr><td><code>CHAT_RATE_LIMIT</code></td><td>Requests per IP per minute to <code>POST /chat</code></td><td><code>20</code></td></tr>
             <tr><td><code>CHAT_DAILY_LIMIT</code></td><td>Optional questions-per-IP-per-day cap (<code>0</code> disables) — for public demos</td><td><code>0</code></td></tr>
             <tr><td><code>CHAT_GLOBAL_DAILY_LIMIT</code></td><td>Optional instance-wide daily question budget (<code>0</code> disables)</td><td><code>0</code></td></tr>
+            <tr><td><code>LLMS_TXT_TITLE</code></td><td>Title used as the H1 of <code>GET /llms.txt</code></td><td><code>Documentation</code></td></tr>
             <tr><td><code>PUBLIC_STATS</code></td><td>Expose <code>GET /stats/public</code> with aggregates only (never visitor questions) — for public demos</td><td><code>false</code></td></tr>
             <tr><td><code>CHAT_MAX_DISTANCE</code></td><td>Max cosine distance for a chunk to count as relevant; <code>2</code> disables the filter</td><td><code>0.8</code></td></tr>
             <tr><td><code>CHAT_NO_ANSWER_TEXT</code></td><td>Exact phrase when the docs don't have the answer (set it in your users' language)</td><td><code>I don't know.</code></td></tr>
@@ -186,6 +187,7 @@ jobs:
             <tr><td><code>POST /chat/stream</code></td><td>rate-limited</td><td>Same body, streamed as SSE: <code>delta</code> events with text, then a <code>done</code> event with <code>{sources[], sessionId, conversationId, answered}</code>. This is what the widget uses.</td></tr>
             <tr><td><code>POST /feedback</code></td><td>rate-limited</td><td><code>{conversationId, rating: "up"|"down"}</code> — 👍/👎 on an answer</td></tr>
             <tr><td><code>GET /stats/public</code></td><td>opt-in (<code>PUBLIC_STATS</code>)</td><td>Aggregates only: totals, daily activity, most cited sections</td></tr>
+            <tr><td><code>GET /llms.txt</code></td><td>public</td><td><a href="https://llmstxt.org/">llms.txt</a> for your docs, generated from what's actually indexed: how to query them plus the list of pages.</td></tr>
             <tr><td><code>POST /mcp</code></td><td>rate-limited</td><td><a href="#mcp-server">MCP server</a> (Streamable HTTP): <code>search_docs</code> and <code>ask_docs</code> tools</td></tr>
             <tr><td><code>POST /ingest</code></td><td>Bearer <code>ADMIN_TOKEN</code></td><td><code>{type, source, url?, title?}</code> → per-document results</td></tr>
             <tr><td><code>GET /admin/conversations</code></td><td>Bearer <code>ADMIN_TOKEN</code></td><td>History with <code>answered</code>, <code>limit</code>, <code>offset</code> filters</td></tr>

@@ -15,7 +15,7 @@ Tus datos no salen de tu servidor. Funciona con Anthropic, OpenAI o modelos loca
 
 </div>
 
-> **Estado: v0.2.0.** Server, ingesta, chat con RAG y citas, widget,
+> **Estado: v0.3.0.** Server, ingesta, chat con RAG y citas, widget,
 > dashboard y Docker funcionan de extremo a extremo. Proyecto joven —
 > feedback e issues muy bienvenidos (ver [Roadmap](#roadmap)).
 
@@ -59,7 +59,7 @@ Tres piezas dentro de un monorepo, todas dentro de un único servicio desplegabl
 
 | Paquete | Qué hace |
 |---|---|
-| `packages/server` | La API: `POST /chat` (RAG con citas), `POST /chat/stream` (lo mismo, en streaming por SSE — es lo que usa el widget), `POST /ingest` (markdown/URL/sitemap/GitHub), `POST /mcp` (servidor MCP para agentes de IA), y sirve el widget y el dashboard como estáticos |
+| `packages/server` | La API: `POST /chat` (RAG con citas), `POST /chat/stream` (lo mismo, en streaming por SSE — es lo que usa el widget), `POST /ingest` (markdown/URL/sitemap/GitHub), `POST /mcp` (servidor MCP para agentes de IA), `GET /llms.txt`, y sirve el widget y el dashboard como estáticos |
 | `packages/widget` | El web component embebible (el chat flotante), compilado a un único `widget.js` |
 | `packages/dashboard` | Panel de administración: analíticas de cobertura (tasa de respuesta, top preguntas sin responder, secciones más citadas, feedback) e historial de conversaciones |
 | `packages/web` | La landing de [docsera.dev](https://docsera.dev) (estática; no forma parte del producto desplegable) |
@@ -95,7 +95,7 @@ Esto levanta Postgres+pgvector, aplica las migraciones automáticamente y arranc
 
 ```bash
 curl http://localhost:3000/health
-# {"status":"ok","version":"0.2.0"}
+# {"status":"ok","version":"0.3.0"}
 ```
 
 ## Uso

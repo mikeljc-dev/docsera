@@ -41,8 +41,21 @@ webs y docs oficiales de cada producto a fecha del análisis.
    de la sesión (ventana de 30 min) antes de embeber, y los turnos previos van
    al prompt como mensajes reales. Coste: una llamada extra al LLM, solo en las
    preguntas de seguimiento.
-8. **Señal de confianza** *(kapa)* — marcar respuestas cerca del umbral
+8. ⚠️ **Señal de confianza** *(kapa)* — marcar respuestas cerca del umbral
    como "posiblemente incompleta" en vez del binario sé/no sé.
+   **Implementado y revertido el 2026-07-19: por distancia NO funciona.**
+   Medido contra la doc real (nomic-embed-text, 768d): "Kubernetes ingress
+   controller" (no documentado) da 0.369, mejor que "ingest a GitHub repo"
+   (documentado) con 0.436; "Stripe billing" (no documentado) 0.426. No hay
+   umbral que separe respondible de no respondible: la distancia coseno mide
+   parentesco temático, no cobertura. Con el umbral puesto, una respuesta
+   inventada sobre Kubernetes salía marcada como confianza *alta* — peor que
+   no tener señal.
+   La vía que sí apunta bien es pedirle el marcador al propio LLM (coste
+   cero, misma llamada): en la prueba, Stripe pasó a `NO_ANSWER` y Kubernetes
+   a `PARTIAL`, pero `llama3.2` se pasó de prudente y marcó `PARTIAL` una
+   pregunta sí documentada. Retomarlo tras el lanzamiento, detrás de un flag
+   y calibrando con preguntas reales de usuarios, no con cuatro ejemplos.
 9. ✅ **Streaming de respuestas** *(2026-07-19)* *(todos)* — `POST /chat/stream`
    por SSE (eventos `delta` + `done`), `chatStream` opcional en los tres
    adaptadores, y el widget rellenando la burbuja fragmento a fragmento. El
@@ -58,7 +71,8 @@ webs y docs oficiales de cada producto a fecha del análisis.
 12. ✅ **Exponer las docs como servidor MCP** *(2026-07-18)* *(Mintlify)* —
     `POST /mcp` (Streamable HTTP, stateless) con tools `search_docs` (retrieval
     puro) y `ask_docs` (RAG con citas). "Tus docs, consumibles por agentes";
-    encaja con nuestra audiencia developer. Pendiente el `llms.txt` estático.
+    encaja con nuestra audiencia developer. El `llms.txt` se añadió el 2026-07-19 (`GET /llms.txt`), generado desde
+    los documentos indexados en vez de estático.
 13. **PII masking en la ingesta** *(kapa)* — argumento enterprise que casa
     con el "privacy-first".
 14. **Targeting por audiencia y acciones multi-paso** *(Fin

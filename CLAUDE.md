@@ -251,6 +251,20 @@ sitios donde estaba hardcodeada (`ingest/fetchSource.ts` USER_AGENT,
 recordar que esos tres no leen el package.json y hay que tocarlos a mano
 en cada release.
 
+Después de la v0.3.0 (2026-07-19), sin desplegar todavía:
+- [x] **`GET /llms.txt`** (`routes/llms.ts`): índice en Markdown según la
+      convención de llmstxt.org, **generado desde los documentos indexados**
+      (no estático, así no se desincroniza de la doc real). Incluye cómo
+      consultarla (MCP y HTTP API, con el origen sacado de la petición) y la
+      lista de páginas. Título configurable con `LLMS_TXT_TITLE`.
+      `buildLlmsTxt` es pura y tiene tests. Cierra el "pendiente" del punto
+      12 de fase-3-ideas.
+- [ ] **Señal de confianza (punto 8): implementada y REVERTIDA.** Por
+      distancia coseno no funciona — está medido y explicado en
+      `docs/fase-3-ideas.md`. No volver a intentarlo por esa vía. La
+      alternativa (marcador `PARTIAL` pedido al propio LLM) apunta bien pero
+      necesita calibrarse con preguntas reales, no con cuatro ejemplos.
+
 Siguiente (para retomar en otra sesión):
 - **Higiene urgente (Mikel):** (1) ROTAR el `ADMIN_TOKEN` — se compartió
   en el chat el 2026-07-18 para la re-ingesta, queda expuesto (nuevo
