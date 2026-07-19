@@ -59,6 +59,27 @@ And history expires after **30 minutes**: the widget keeps its session id in
 `localStorage` forever, so without a window a question today would be rewritten
 against a visit from last week.
 
+## How does streaming work?
+
+The widget talks to `POST /chat/stream`, which answers Server-Sent Events:
+`delta` events carrying text as the model produces it, then a single `done`
+event with the sources, `conversationId` and `answered` flag. Sources arrive
+at the end on purpose — until the answer is complete we don't know whether it
+is a non-answer, and citing sources for a non-answer misleads.
+
+It's a **separate route, not content negotiation on `/chat`**: `/chat` stays
+the stable JSON contract used by the MCP server and any custom integration.
+Streaming is an optional capability of the adapter (`chatStream`) — a provider
+that doesn't implement it still works, its full answer is emitted as a single
+delta.
+
+The subtle part is the **no-answer sentinel**. It arrives in pieces like any
+other text, so emitting the first delta blindly would paint `NO_ANS…` in the
+bubble before we could take it back. The first 32 characters are held — more
+than the sentinel needs even when a small model decorates it (`**NO_ANSWER**`)
+— and only then does text start flowing; past that threshold the answer can no
+longer *be* the sentinel, so the rest streams unbuffered.
+
 ## How does the "I don't know" detection work?
 
 The system prompt instructs the model to reply with a stable ASCII sentinel

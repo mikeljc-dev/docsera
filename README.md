@@ -59,7 +59,7 @@ Three pieces in one monorepo, all served by a single deployable service:
 
 | Package | What it does |
 |---|---|
-| `packages/server` | The API: `POST /chat` (RAG with citations), `POST /ingest` (markdown/URL/sitemap/GitHub), `POST /mcp` (MCP server for AI agents), and serves the widget and dashboard as static assets |
+| `packages/server` | The API: `POST /chat` (RAG with citations), `POST /chat/stream` (same, streamed as SSE — what the widget uses), `POST /ingest` (markdown/URL/sitemap/GitHub), `POST /mcp` (MCP server for AI agents), and serves the widget and dashboard as static assets |
 | `packages/widget` | The embeddable web component (the floating chat), bundled into a single `widget.js` |
 | `packages/dashboard` | Admin panel: coverage analytics (answer rate, top unanswered questions, most cited sections, feedback) and conversation history |
 | `packages/web` | The [docsera.dev](https://docsera.dev) landing page (not part of the deployable product) |

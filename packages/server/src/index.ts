@@ -5,6 +5,7 @@ import { cors } from "hono/cors";
 import { loadEnv } from "./env.js";
 import { adminRoute } from "./routes/admin.js";
 import { chatRoute } from "./routes/chat.js";
+import { chatStreamRoute } from "./routes/chatStream.js";
 import { dashboardRoute } from "./routes/dashboard.js";
 import { feedbackRoute } from "./routes/feedback.js";
 import { ingestRoute } from "./routes/ingest.js";
@@ -34,6 +35,7 @@ app.get("/health", (c) => c.json({ status: "ok", version: VERSION }));
 
 app.route("/", ingestRoute);
 app.route("/", chatRoute);
+app.route("/", chatStreamRoute);
 app.route("/", feedbackRoute);
 app.route("/", publicStatsRoute);
 app.route("/", mcpRoute);

@@ -14,8 +14,9 @@ export interface ChatMessage {
   feedback?: "up" | "down";
 }
 
-export interface ChatResponse {
-  answer: string;
+// Evento "done" de /chat/stream: todo lo de la respuesta menos el texto,
+// que ya ha llegado troceado en los eventos "delta".
+export interface ChatDone {
   sources: Source[];
   sessionId: string;
   conversationId: string;

@@ -1,3 +1,4 @@
+import { readSseData } from "./stream.js";
 import type { ChatAdapter, ChatMessage, EmbeddingsAdapter } from "./types.js";
 
 const DEFAULT_BASE_URL = "https://api.openai.com/v1";
@@ -14,6 +15,10 @@ function baseUrl(): string {
 
 interface OpenAiChatResponse {
   choices: { message: { content: string } }[];
+}
+
+interface OpenAiChatChunk {
+  choices: { delta?: { content?: string } }[];
 }
 
 interface OpenAiEmbeddingResponse {
@@ -49,6 +54,27 @@ export class OpenAiChatAdapter implements ChatAdapter {
       throw new Error("OpenAI no devolvió contenido en la respuesta");
     }
     return content;
+  }
+
+  async *chatStream(messages: ChatMessage[]): AsyncGenerator<string> {
+    const apiKey = requireApiKey();
+    const model = process.env.LLM_MODEL ?? DEFAULT_CHAT_MODEL;
+
+    const response = await fetch(`${baseUrl()}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({ model, messages, stream: true }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI chat API error (${response.status}): ${await response.text()}`);
+    }
+
+    for await (const data of readSseData(response)) {
+      const chunk = JSON.parse(data) as OpenAiChatChunk;
+      const delta = chunk.choices[0]?.delta?.content;
+      if (delta) yield delta;
+    }
   }
 }
 

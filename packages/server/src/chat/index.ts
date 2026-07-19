@@ -1,5 +1,6 @@
 import { getPool } from "../lib/db.js";
 import { getChatAdapter, getEmbeddingsAdapter } from "../llm/index.js";
+import type { ChatMessage } from "../llm/types.js";
 import { condenseQuestion } from "./condense.js";
 import { loadRecentTurns } from "./history.js";
 import { buildChatMessages, isNoAnswer, noAnswerText } from "./prompt.js";
@@ -25,6 +26,14 @@ export interface ChatResult {
   answered: boolean;
 }
 
+// Todo lo que ocurre antes de generar: historial, reescritura, recuperación
+// y montaje del prompt. Sin chunks no hay cobertura y no se llama al LLM;
+// el llamador cierra con finishChat() y la frase de no-respuesta.
+export interface PreparedChat {
+  chunks: RetrievedChunk[];
+  messages: ChatMessage[];
+}
+
 function dedupeSources(chunks: RetrievedChunk[]): Source[] {
   const seen = new Set<string>();
   const sources: Source[] = [];
@@ -37,7 +46,7 @@ function dedupeSources(chunks: RetrievedChunk[]): Source[] {
   return sources;
 }
 
-export async function runChat(input: ChatInput): Promise<ChatResult> {
+export async function prepareChat(input: ChatInput): Promise<PreparedChat> {
   const pool = getPool();
 
   // La recuperación usa la pregunta resuelta contra el historial; lo que se
@@ -51,27 +60,24 @@ export async function runChat(input: ChatInput): Promise<ChatResult> {
   }
 
   const chunks = await retrieveRelevantChunks(pool, questionEmbedding, searchQuery);
-
   if (chunks.length === 0) {
-    const answer = noAnswerText();
-    const conversationId = await saveConversation(pool, {
-      sessionId: input.sessionId,
-      question: input.question,
-      answer,
-      answered: false,
-      chunkIds: [],
-    });
-    return { answer, sources: [], sessionId: input.sessionId, conversationId, answered: false };
+    return { chunks, messages: [] };
   }
 
-  const messages = buildChatMessages(input.question, chunks, turns);
-  const rawAnswer = await getChatAdapter().chat(messages);
+  return { chunks, messages: buildChatMessages(input.question, chunks, turns) };
+}
+
+// El LLM señala la falta de respuesta con un centinela; lo que se guarda y
+// se devuelve es siempre la frase configurada para el usuario final.
+export async function finishChat(
+  input: ChatInput,
+  chunks: RetrievedChunk[],
+  rawAnswer: string,
+): Promise<ChatResult> {
   const answered = !isNoAnswer(rawAnswer);
-  // El LLM señala la falta de respuesta con un centinela; lo que se guarda
-  // y se devuelve es siempre la frase configurada para el usuario final.
   const answer = answered ? rawAnswer : noAnswerText();
 
-  const conversationId = await saveConversation(pool, {
+  const conversationId = await saveConversation(getPool(), {
     sessionId: input.sessionId,
     question: input.question,
     answer,
@@ -86,4 +92,14 @@ export async function runChat(input: ChatInput): Promise<ChatResult> {
     conversationId,
     answered,
   };
+}
+
+export async function runChat(input: ChatInput): Promise<ChatResult> {
+  const { chunks, messages } = await prepareChat(input);
+
+  if (chunks.length === 0) {
+    return finishChat(input, chunks, noAnswerText());
+  }
+
+  return finishChat(input, chunks, await getChatAdapter().chat(messages));
 }

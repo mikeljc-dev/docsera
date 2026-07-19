@@ -183,6 +183,7 @@ jobs:
           <tbody>
             <tr><td><code>GET /health</code></td><td>—</td><td>Status and version</td></tr>
             <tr><td><code>POST /chat</code></td><td>rate-limited</td><td><code>{question, sessionId?}</code> → <code>{answer, sources[], sessionId, conversationId, answered}</code></td></tr>
+            <tr><td><code>POST /chat/stream</code></td><td>rate-limited</td><td>Same body, streamed as SSE: <code>delta</code> events with text, then a <code>done</code> event with <code>{sources[], sessionId, conversationId, answered}</code>. This is what the widget uses.</td></tr>
             <tr><td><code>POST /feedback</code></td><td>rate-limited</td><td><code>{conversationId, rating: "up"|"down"}</code> — 👍/👎 on an answer</td></tr>
             <tr><td><code>GET /stats/public</code></td><td>opt-in (<code>PUBLIC_STATS</code>)</td><td>Aggregates only: totals, daily activity, most cited sections</td></tr>
             <tr><td><code>POST /mcp</code></td><td>rate-limited</td><td><a href="#mcp-server">MCP server</a> (Streamable HTTP): <code>search_docs</code> and <code>ask_docs</code> tools</td></tr>

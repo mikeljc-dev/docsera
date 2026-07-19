@@ -59,7 +59,7 @@ Tres piezas dentro de un monorepo, todas dentro de un único servicio desplegabl
 
 | Paquete | Qué hace |
 |---|---|
-| `packages/server` | La API: `POST /chat` (RAG con citas), `POST /ingest` (markdown/URL/sitemap/GitHub), `POST /mcp` (servidor MCP para agentes de IA), y sirve el widget y el dashboard como estáticos |
+| `packages/server` | La API: `POST /chat` (RAG con citas), `POST /chat/stream` (lo mismo, en streaming por SSE — es lo que usa el widget), `POST /ingest` (markdown/URL/sitemap/GitHub), `POST /mcp` (servidor MCP para agentes de IA), y sirve el widget y el dashboard como estáticos |
 | `packages/widget` | El web component embebible (el chat flotante), compilado a un único `widget.js` |
 | `packages/dashboard` | Panel de administración: analíticas de cobertura (tasa de respuesta, top preguntas sin responder, secciones más citadas, feedback) e historial de conversaciones |
 | `packages/web` | La landing de [docsera.dev](https://docsera.dev) (estática; no forma parte del producto desplegable) |

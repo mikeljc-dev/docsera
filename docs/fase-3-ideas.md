@@ -43,7 +43,11 @@ webs y docs oficiales de cada producto a fecha del análisis.
    preguntas de seguimiento.
 8. **Señal de confianza** *(kapa)* — marcar respuestas cerca del umbral
    como "posiblemente incompleta" en vez del binario sé/no sé.
-9. **Streaming de respuestas** *(todos)* — ya en roadmap.
+9. ✅ **Streaming de respuestas** *(2026-07-19)* *(todos)* — `POST /chat/stream`
+   por SSE (eventos `delta` + `done`), `chatStream` opcional en los tres
+   adaptadores, y el widget rellenando la burbuja fragmento a fragmento. El
+   centinela de no-respuesta se retiene los primeros 32 caracteres para que
+   nunca se pinte a medias.
 10. **Conectores PDF y Notion/Confluence** *(DocsBot 29+ fuentes, kapa
     30+)* — PDF primero (sin OAuth de por medio).
 

@@ -1,7 +1,8 @@
 import { LitElement, html, css, type PropertyValues } from "lit";
 import { resolveStrings, type WidgetStrings } from "./locales.js";
 import { renderMarkdown } from "./markdown.js";
-import type { ChatMessage, ChatResponse, Source } from "./types.js";
+import { readSse } from "./sse.js";
+import type { ChatDone, ChatMessage, Source } from "./types.js";
 
 const SESSION_STORAGE_KEY = "docsera-session-id";
 
@@ -606,8 +607,13 @@ export class DocseraWidget extends LitElement {
     this.inputValue = "";
     this.pending = true;
 
+    // Índice de la burbuja del asistente una vez creada, para poder
+    // rellenarla fragmento a fragmento y, si algo falla a media respuesta,
+    // sustituirla por el error en vez de dejarla a medias con otra debajo.
+    let index = -1;
+
     try {
-      const response = await fetch(`${this.server}/chat`, {
+      const response = await fetch(`${this.server}/chat/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question, sessionId: this.sessionId }),
@@ -625,27 +631,43 @@ export class DocseraWidget extends LitElement {
         throw new Error(`HTTP ${response.status}`);
       }
 
-      const data = (await response.json()) as ChatResponse;
-      this.sessionId = data.sessionId;
-      this.messages = [
-        ...this.messages,
-        {
-          role: "assistant",
-          content: data.answer,
-          sources: data.sources,
-          conversationId: data.conversationId,
-          answered: data.answered,
-        },
-      ];
+      // La burbuja aparece vacía y se va rellenando: en cuanto llega el
+      // primer fragmento deja de mostrarse el indicador de "escribiendo".
+      let answer = "";
+      index = this.messages.length;
+      this.messages = [...this.messages, { role: "assistant", content: "" }];
+
+      const patch = (fields: Partial<ChatMessage>): void => {
+        this.messages = this.messages.map((message, i) =>
+          i === index ? { ...message, ...fields } : message,
+        );
+      };
+
+      for await (const event of readSse(response)) {
+        if (event.event === "error") throw new Error(event.data);
+
+        if (event.event === "delta") {
+          answer += event.data;
+          this.pending = false;
+          patch({ content: answer });
+        } else if (event.event === "done") {
+          const done = JSON.parse(event.data) as ChatDone;
+          this.sessionId = done.sessionId;
+          patch({
+            sources: done.sources,
+            conversationId: done.conversationId,
+            answered: done.answered,
+          });
+        }
+      }
+
+      if (!answer) throw new Error("Empty stream");
     } catch {
-      this.messages = [
-        ...this.messages,
-        {
-          role: "assistant",
-          content: this.strings.error,
-          error: true,
-        },
-      ];
+      const failed: ChatMessage = { role: "assistant", content: this.strings.error, error: true };
+      this.messages =
+        index === -1
+          ? [...this.messages, failed]
+          : this.messages.map((message, i) => (i === index ? failed : message));
     } finally {
       this.pending = false;
     }

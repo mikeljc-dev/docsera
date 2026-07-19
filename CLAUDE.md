@@ -220,6 +220,22 @@ Entregado en local, **sin desplegar todavía** (2026-07-19):
       "¿Cómo lo configuro?" responde la config real de Ollama, mientras
       que la misma pregunta en sesión nueva responde genéricamente.
       54 tests en verde (47 antes, +7 de condense/prompt).
+      Desplegado y verificado en prod el 2026-07-19 (commit dd7486b).
+- [x] **Streaming de respuestas** (punto 9 de fase-3-ideas): `POST
+      /chat/stream` por SSE (`routes/chatStream.ts`, `streamSSE` de Hono,
+      eventos `delta` + `done` + `error`). Ruta aparte a propósito: `/chat`
+      sigue siendo el contrato JSON estable del MCP y de integraciones
+      propias. `chatStream` es opcional en `ChatAdapter` e implementado en
+      los tres proveedores (`llm/stream.ts` reensambla líneas: SSE en
+      OpenAI/Anthropic, NDJSON en Ollama); sin él se cae a `chat()` y se
+      emite todo de golpe. `chat/index.ts` se partió en `prepareChat` /
+      `finishChat` para que streaming y no-streaming compartan todo salvo
+      la generación. El centinela se retiene 32 caracteres
+      (`chat/stream.ts`) para que nunca se pinte "NO_ANS…". El widget
+      (`sse.ts` + `send()`) rellena la burbuja fragmento a fragmento.
+      60 tests en verde. Verificado con Playwright contra el widget real:
+      la burbuja crece 0→115→…→1184 caracteres, fuentes y feedback
+      llegan con el `done`, y el centinela no se filtra.
       **Falta commitear y desplegar.**
 
 Siguiente (para retomar en otra sesión):
@@ -231,10 +247,11 @@ Siguiente (para retomar en otra sesión):
   `curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash`
   (script ya revisado y limpio; sus tools MCP solo aparecerán en la
   PRÓXIMA sesión).
-- **Producto (siguiente candidata del roadmap):** streaming de respuestas
-  en el widget (punto 9); luego señal de confianza (8) y el `llms.txt`
-  estático que quedó pendiente del MCP. Ideas priorizadas y análisis de la
-  competencia (Fin, Mintlify, DocsBot, kapa.ai) en `docs/fase-3-ideas.md`.
+- **Producto (siguientes candidatas del roadmap):** señal de confianza
+  (punto 8) y el `llms.txt` estático que quedó pendiente del MCP; después,
+  conectores PDF (10) o el bot de Discord (11). Ideas priorizadas y análisis
+  de la competencia (Fin, Mintlify, DocsBot, kapa.ai) en
+  `docs/fase-3-ideas.md`.
 - **Lanzamiento (Mikel):** publicar los posts (Show HN y r/selfhosted,
   borradores listos con "Try it live: https://docs.docsera.dev/?demo=1").
 - **Infra:** decidir plan de Railway cuando se agote el crédito del trial
