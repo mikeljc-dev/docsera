@@ -10,8 +10,10 @@ estilo opcional: si algo de aquí no se cumple, la tarea **no está terminada**.
 
 ## 0. Antes de escribir
 
-- Lee `CLAUDE.md` (contexto, fase actual, decisiones cerradas). Las
-  "Decisiones ya tomadas" no se reabren sin permiso de Mikel.
+- Si existe `CLAUDE.md` en la raíz, léelo: lleva el contexto, la fase actual
+  y las decisiones cerradas, que no se reabren sin permiso. No está en el
+  repo (son notas internas, ver `.gitignore`), así que en un clon limpio no
+  aparecerá — entonces guíate por `README.md` y `ARCHITECTURE.md`.
 - Lee el archivo que vas a tocar entero antes de editarlo, y mira uno o dos
   vecinos: el código nuevo tiene que leerse como el que ya está.
 - Busca antes de crear. Este repo ya tiene utilidades para casi todo
