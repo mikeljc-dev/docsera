@@ -1,6 +1,6 @@
 {
   "name": "docsera",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "One-command setup for Docsera: self-hosted AI chat for your docs",
   "license": "AGPL-3.0-only",
   "type": "module",
@@ -16,12 +16,25 @@
     "directory": "packages/cli"
   },
   "homepage": "https://docsera.dev",
+  "bugs": {
+    "url": "https://github.com/mikeljc-dev/docsera/issues"
+  },
+  "author": "Miguel Jimenez",
   "keywords": [
     "docsera",
     "docs",
+    "documentation",
     "chatbot",
+    "ai",
     "rag",
-    "self-hosted"
+    "self-hosted",
+    "widget",
+    "ollama",
+    "anthropic",
+    "openai",
+    "pgvector",
+    "docker",
+    "mcp"
   ],
   "engines": {
     "node": ">=20"
