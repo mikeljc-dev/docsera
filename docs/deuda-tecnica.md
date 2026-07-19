@@ -76,7 +76,7 @@ también quitaría `tsx` del arranque en producción.
 
 **Esfuerzo:** bajo-medio.
 
-## 3. Enlaces Markdown sin renderizar en el widget
+## 3. Enlaces Markdown sin renderizar en el widget — ✅ hecho (2026-07-19)
 
 El system prompt le prohíbe enlaces al modelo, pero los emite igual: en la
 burbuja se ve `[AGPL-3.0](./LICENSE)` en crudo (visible en las capturas del
@@ -88,7 +88,25 @@ dejar solo el texto.
 **Por qué importa.** Es lo más feo que ve alguien que aterrice en la demo
 desde Hacker News.
 
-**Esfuerzo:** bajo.
+**Hecho.** `markdown.ts` renderiza `[texto](url)` como `<a>` con
+`target="_blank"` y `rel="noopener noreferrer"`. Solo destinos **http(s)
+absolutos**: Lit interpola el href como texto pero no valida el esquema, así
+que un `javascript:` seguiría siendo ejecutable; y un relativo como
+`./LICENSE` —que el modelo emite a menudo, porque la doc vive en un repo—
+apuntaría a la web anfitriona. En ambos casos se conserva el texto y se tira
+el destino. El patrón admite un nivel de paréntesis anidados, si no las URL
+de Wikipedia (`..._(bar)`) se cortaban y dejaban un `)` suelto.
+
+Verificado en Chromium contra un servidor falso que devuelve a propósito
+`javascript:`, `data:text/html,<script>`, un relativo y una URL con
+paréntesis: solo se convierten en enlace los dos legítimos, no salta ningún
+diálogo y no queda sintaxis cruda.
+
+**Nota:** el widget **no tiene tests**. `markdown.ts` es puro y merecería los
+suyos, pero el paquete no tiene ni script de `test`; `renderMarkdown` además
+devuelve plantillas de Lit, así que haría falta renderizarlas para
+comprobarlas. Esta verificación fue con Playwright, a mano. Es deuda nueva,
+hermana del punto 1.
 
 ## 4. La versión, a mano en tres sitios
 

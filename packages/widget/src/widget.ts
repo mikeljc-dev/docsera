@@ -222,6 +222,11 @@ export class DocseraWidget extends LitElement {
       font-size: 0.85em;
     }
 
+    .bubble.md a {
+      color: var(--docsera-primary);
+      text-decoration: underline;
+    }
+
     .codeblock {
       position: relative;
       margin: 0.4rem 0 0.5rem;

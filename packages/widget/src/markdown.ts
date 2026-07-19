@@ -7,7 +7,20 @@ import { html, type TemplateResult } from "lit";
 
 type Inline = string | TemplateResult;
 
-const INLINE_PATTERN = /(`[^`\n]+`|\*\*[^*\n]+\*\*)/g;
+// El destino admite un nivel de paréntesis anidados: sin eso, tanto una URL
+// legítima —Wikipedia usa "..._(desambiguación)"— como un "javascript:alert(1)"
+// se cortan en el primer ")" y dejan basura suelta en la burbuja.
+const LINK = String.raw`\[[^\]\n]+\]\((?:[^()\s]|\([^()\s]*\))*\)`;
+const INLINE_PATTERN = new RegExp(`(\`[^\`\\n]+\`|\\*\\*[^*\\n]+\\*\\*|${LINK})`, "g");
+
+// Lit interpola el href como texto pero NO valida el esquema: un
+// `javascript:` seguiría siendo ejecutable. Y un relativo como "./LICENSE"
+// —que el modelo emite a menudo, porque la doc original vive en un repo—
+// apuntaría a la web anfitriona, no a la documentación. En ambos casos se
+// conserva el texto del enlace y se descarta el destino.
+function safeHref(url: string): string | null {
+  return /^https?:\/\/[^\s<>"]+$/i.test(url) ? url : null;
+}
 
 function renderInline(text: string): Inline[] {
   const parts: Inline[] = [];
@@ -17,8 +30,17 @@ function renderInline(text: string): Inline[] {
     const token = match[0];
     if (token.startsWith("`")) {
       parts.push(html`<code>${token.slice(1, -1)}</code>`);
-    } else {
+    } else if (token.startsWith("**")) {
       parts.push(html`<strong>${token.slice(2, -2)}</strong>`);
+    } else {
+      const link = /^\[([^\]]+)\]\((.*)\)$/.exec(token);
+      const label = link?.[1] ?? token;
+      const href = safeHref(link?.[2] ?? "");
+      parts.push(
+        href
+          ? html`<a href=${href} target="_blank" rel="noopener noreferrer">${label}</a>`
+          : label,
+      );
     }
     last = match.index + token.length;
   }
