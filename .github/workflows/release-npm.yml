@@ -1,0 +1,44 @@
+# Publica packages/cli en npm (paquete `docsera`) via trusted publishing:
+# npm confia en el OIDC de GitHub Actions, asi que no hay NPM_TOKEN que
+# guardar ni rotar, y el paquete sale con provenance (badge en npmjs.com).
+# Requiere configurarlo una vez en npmjs.com: paquete docsera → Settings →
+# Trusted Publisher → GitHub Actions → repo mikeljc-dev/docsera, workflow
+# release-npm.yml.
+name: release-npm
+
+on:
+  push:
+    tags:
+      - "v*"
+  # Lanzable a mano para publicar la version actual de main (p.ej. cuando el
+  # tag se empujo antes de que existiera este workflow).
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      # El trusted publishing necesita npm >= 11.5.1; el que trae Node 22 es
+      # anterior.
+      - run: npm install -g npm@latest
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm --filter docsera build
+
+      - run: npm publish
+        working-directory: packages/cli
