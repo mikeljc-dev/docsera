@@ -6,6 +6,8 @@ import { adminRoute } from "./routes/admin.js";
 import { chatRoute } from "./routes/chat.js";
 import { chatStreamRoute } from "./routes/chatStream.js";
 import { dashboardRoute } from "./routes/dashboard.js";
+import { discordRoute } from "./routes/discord.js";
+import { registerDiscordCommands } from "./discord/register.js";
 import { feedbackRoute } from "./routes/feedback.js";
 import { ingestRoute } from "./routes/ingest.js";
 import { llmsRoute } from "./routes/llms.js";
@@ -38,7 +40,12 @@ app.route("/", llmsRoute);
 app.route("/", widgetRoute);
 app.route("/", adminRoute);
 app.route("/", dashboardRoute);
+app.route("/", discordRoute);
 
 serve({ fetch: app.fetch, port: PORT }, (info) => {
   console.log(`Docsera server listening on http://localhost:${info.port}`);
 });
+
+// Fire-and-forget: si Discord no está configurado no hace nada, y un fallo
+// de red no debe impedir servir el resto (ya loguea él el error).
+void registerDiscordCommands();

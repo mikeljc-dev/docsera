@@ -25,19 +25,21 @@ function clientKey(c: Parameters<MiddlewareHandler>[0]): string {
 // la de minuto para que una ráfaga denegada no consuma el cupo del día.
 // CHAT_DAILY_LIMIT y CHAT_GLOBAL_DAILY_LIMIT en 0 (default) = desactivadas;
 // pensadas para demos públicas donde hay que acotar el gasto total de LLM.
-export const chatRateLimit: MiddlewareHandler = async (c, next) => {
-  const key = clientKey(c);
-
+// Devuelve el mensaje de denegación, o null si la petición pasa. Expuesta
+// aparte del middleware para superficies donde la clave no es la IP (el bot
+// de Discord llega siempre desde IPs de Discord y se limita por usuario),
+// compartiendo los MISMOS cubos y configuración que /chat.
+export function allowChatRequest(key: string): string | null {
   allowMinute ??= createRateLimiter(Number(process.env.CHAT_RATE_LIMIT ?? 20), RATE_WINDOW_MS);
   if (!allowMinute(key)) {
-    return c.json({ error: "Too many requests — please try again in a moment" }, 429);
+    return "Too many requests — please try again in a moment";
   }
 
   const dailyLimit = Number(process.env.CHAT_DAILY_LIMIT ?? 0);
   if (dailyLimit > 0) {
     allowDaily ??= createRateLimiter(dailyLimit, DAY_MS);
     if (!allowDaily(key)) {
-      return c.json({ error: "Daily question limit reached — please come back tomorrow" }, 429);
+      return "Daily question limit reached — please come back tomorrow";
     }
   }
 
@@ -45,8 +47,17 @@ export const chatRateLimit: MiddlewareHandler = async (c, next) => {
   if (globalLimit > 0) {
     allowGlobal ??= createRateLimiter(globalLimit, DAY_MS);
     if (!allowGlobal("global")) {
-      return c.json({ error: "The demo has reached its daily budget — please come back tomorrow" }, 429);
+      return "The demo has reached its daily budget — please come back tomorrow";
     }
+  }
+
+  return null;
+}
+
+export const chatRateLimit: MiddlewareHandler = async (c, next) => {
+  const denial = allowChatRequest(clientKey(c));
+  if (denial !== null) {
+    return c.json({ error: denial }, 429);
   }
 
   await next();
