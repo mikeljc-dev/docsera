@@ -172,27 +172,48 @@ https://github.com/mikeljc-dev/docsera/releases/tag/v0.2.0
 (incluye GIF v3 grabado contra producción con el widget animado).
 Regla de trabajo: preguntar a Mikel antes de cada push.
 
-Entregado también (2026-07-18, inspirado en codebase-memory-mcp):
+Entregado y **desplegado en producción** (2026-07-18, inspirado en
+codebase-memory-mcp; commits 3f16167 / 1312aa7 / d2c189d en `main`,
+CI verde):
 - [x] **Búsqueda híbrida**: rama full-text de Postgres (columna `tsv`
       generada, config 'simple', `websearch_to_tsquery` + `ts_rank_cd`,
       migración 0005) fusionada con la vectorial por Reciprocal Rank
-      Fusion (`fuseRankings`, k=60, 12 candidatos/rama). Caza términos
-      exactos (variables, códigos de error) donde el embedding flojea.
+      Fusion (`fuseRankings` puro en `chat/retrieve.ts`, k=60, 12
+      candidatos/rama, top 6). Caza términos exactos (variables, códigos
+      de error) donde el embedding flojea; si ninguna rama aporta nada,
+      sigue respondiendo "no lo sé" sin llamar al LLM. Nueva firma
       `retrieveRelevantChunks(pool, embedding, query, limit)`. Tests de
-      RRF (47 en total) + E2E local.
-- [x] **Servidor MCP** en `POST /mcp` (Streamable HTTP, stateless, Server
-      de bajo nivel para esquemas JSON Schema y evitar el choque zod
-      v3/v4): tools `search_docs` (retrieval puro, sin LLM) y `ask_docs`
-      (RAG con citas, mismo `runChat`). Comparte los rate limits de
-      `/chat`. Verificado E2E con Client + StreamableHTTPClientTransport
-      del SDK. Documentado en docs (sección MCP + fila API),
-      README/ES, ARCHITECTURE y fase-3-ideas (#6b y #12 marcados).
+      RRF (`chat/retrieve.test.ts`, 47 en total) + E2E local y en prod.
+      Migración 0005 aplicada en Neon (la corre el CMD del Dockerfile al
+      arrancar).
+- [x] **Servidor MCP** en `POST /mcp` (`routes/mcp.ts`, Streamable HTTP,
+      stateless, Server de bajo nivel para esquemas JSON Schema y evitar
+      el choque zod v3/v4; dep `@modelcontextprotocol/sdk`): tools
+      `search_docs` (retrieval puro, sin LLM) y `ask_docs` (RAG con citas,
+      mismo `runChat`). Comparte los rate limits de `/chat` (`chatRateLimit`).
+      Verificado E2E con Client + StreamableHTTPClientTransport del SDK,
+      contra local y contra prod (`https://docseraserver-production.up.railway.app/mcp`).
+      Documentado en docs (sección `#mcp-server` + fila API), README/ES,
+      ARCHITECTURE y fase-3-ideas (#6b y #12 marcados). Docs re-ingeridas
+      en prod: el asistente ya responde sobre MCP citando `#mcp-server`.
 
-Siguiente: resto de la Fase 3 tras publicar los posts.
-Primeras candidatas (ver roadmap del README): streaming de respuestas en
-el widget y conversaciones multi-turno (hoy cada pregunta va sin
-historial al LLM). Hay un análisis de la competencia (Fin, Mintlify,
-DocsBot, kapa.ai) con ideas priorizadas en `docs/fase-3-ideas.md`. Higiene pendiente: rotar la key de Gemini (expuesta en
-una captura durante el setup) y decidir plan de Railway cuando se agote
-el crédito del trial (Hobby ~5 $/mes o migrar a Cloud Run + Neon con la
-misma imagen).
+Siguiente (para retomar en otra sesión):
+- **Higiene urgente (Mikel):** (1) ROTAR el `ADMIN_TOKEN` — se compartió
+  en el chat el 2026-07-18 para la re-ingesta, queda expuesto (nuevo
+  `openssl rand -hex 32` → var `ADMIN_TOKEN` en Railway → Apply). (2)
+  Rotar la key de Gemini (expuesta en una captura durante el setup). (3)
+  Instalar codebase-memory-mcp para el flujo de trabajo:
+  `curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash`
+  (script ya revisado y limpio; sus tools MCP solo aparecerán en la
+  PRÓXIMA sesión).
+- **Producto (siguientes candidatas del roadmap):** streaming de
+  respuestas en el widget y conversaciones multi-turno (hoy cada pregunta
+  va sin historial al LLM). Ideas priorizadas y análisis de la
+  competencia (Fin, Mintlify, DocsBot, kapa.ai) en `docs/fase-3-ideas.md`.
+- **Lanzamiento (Mikel):** publicar los posts (Show HN y r/selfhosted,
+  borradores listos con "Try it live: https://docs.docsera.dev/?demo=1").
+- **Infra:** decidir plan de Railway cuando se agote el crédito del trial
+  (Hobby ~5 $/mes o migrar a Cloud Run + Neon con la misma imagen).
+- **Nota codebase-memory-mcp:** se instaló como inspiración para dos
+  features (híbrida + MCP, ya hechas); la idea original "ambos" incluía
+  también usarlo como herramienta de desarrollo — pendiente de instalar.
