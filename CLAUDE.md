@@ -61,6 +61,10 @@ deben extender `../../tsconfig.base.json`.
 
 ## Convenciones de código
 
+> Los estándares completos y obligatorios (convenciones, reglas por paquete,
+> puerta de calidad, reglas de producto) están en la skill
+> `.claude/skills/docsera-standards/SKILL.md`. Léela antes de escribir código.
+
 - TypeScript estricto (ver `tsconfig.base.json`). Nada de `any` sin justificar.
 - ESM (`"type": "module"`).
 - Node >= 20. Usa `--env-file` o `dotenv` para cargar `.env`.
