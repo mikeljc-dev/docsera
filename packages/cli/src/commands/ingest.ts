@@ -4,14 +4,18 @@ import { bold, dim, green, red, yellow } from "../ui.js";
 import type { IngestSource } from "../detect.js";
 
 interface IngestResponse {
-  documents?: { url: string; title: string; status: string; chunks: number; error?: string }[];
+  documents?: { url: string; title: string; status: string; chunks: number; redactions?: number; error?: string }[];
   truncated?: boolean;
   error?: string;
 }
 
 // Lanza la ingesta contra el server local usando el ADMIN_TOKEN del .env que
 // generó la propia CLI: el token nunca sale de la máquina del usuario.
-export async function runIngestRequest(dir: string, source: IngestSource): Promise<void> {
+export async function runIngestRequest(
+  dir: string,
+  source: IngestSource,
+  redactSecrets = false,
+): Promise<void> {
   const env = readEnv(dir);
   const port = env.PORT ?? "3000";
   const adminToken = env.ADMIN_TOKEN;
@@ -27,7 +31,11 @@ export async function runIngestRequest(dir: string, source: IngestSource): Promi
       "Content-Type": "application/json",
       Authorization: `Bearer ${adminToken}`,
     },
-    body: JSON.stringify({ type: source.type, source: source.source }),
+    body: JSON.stringify({
+      type: source.type,
+      source: source.source,
+      ...(redactSecrets ? { redactSecrets: true } : {}),
+    }),
     // Sitemaps grandes tardan: el server responde cuando termina de embeber.
     signal: AbortSignal.timeout(30 * 60_000),
   });
@@ -40,12 +48,16 @@ export async function runIngestRequest(dir: string, source: IngestSource): Promi
   const documents = body.documents ?? [];
   const failed = documents.filter((doc) => doc.status === "failed");
   const chunks = documents.reduce((total, doc) => total + doc.chunks, 0);
+  const redactions = documents.reduce((total, doc) => total + (doc.redactions ?? 0), 0);
   const okCount = documents.length - failed.length;
 
   console.log(
     `${green("✓")} Indexed ${okCount}/${documents.length} document(s), ${chunks} chunk(s).` +
       (body.truncated ? yellow(" (sitemap truncated to the first 200 pages)") : ""),
   );
+  if (redactSecrets) {
+    console.log(dim(`  ${redactions} secret(s)/card(s) redacted before indexing.`));
+  }
   for (const doc of failed.slice(0, 5)) {
     console.log(red(`  ✗ ${doc.url}: ${doc.error ?? "failed"}`));
   }
@@ -60,7 +72,7 @@ export async function runIngestRequest(dir: string, source: IngestSource): Promi
   writeState(dir, { ...state, source, ingestedAt: new Date().toISOString() });
 }
 
-export async function ingest(dir: string, sourceArg?: string): Promise<void> {
+export async function ingest(dir: string, sourceArg?: string, redactSecrets = false): Promise<void> {
   let source: IngestSource | null;
   if (sourceArg !== undefined) {
     source = detectSource(sourceArg);
@@ -82,5 +94,5 @@ export async function ingest(dir: string, sourceArg?: string): Promise<void> {
     throw new Error("The server is not running. Start it first with `npx docsera up`.");
   }
 
-  await runIngestRequest(dir, source);
+  await runIngestRequest(dir, source, redactSecrets);
 }

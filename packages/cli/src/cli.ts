@@ -12,7 +12,12 @@ const HELP = `${bold("docsera")} — self-hosted AI chat for your docs ${dim(`(v
 Usage:
   npx docsera                     set everything up and launch it (wizard on first run)
   npx docsera up                  start the stack
-  npx docsera ingest [source]     (re-)index docs: URL, sitemap.xml, PDF or GitHub owner/repo
+  npx docsera ingest [source] [--redact-secrets]
+                                   (re-)index docs: URL, sitemap.xml, PDF or GitHub owner/repo.
+                                   --redact-secrets masks known API keys/tokens/cards before
+                                   indexing — use it for content you don't fully trust (an
+                                   internal wiki), not for docs that need a real example (a
+                                   payments tutorial with a known test card).
   npx docsera down                stop the stack (your data is kept)
   npx docsera --help | --version
 
@@ -28,7 +33,7 @@ function requireProjectDir(): string {
 }
 
 async function main(): Promise<void> {
-  const [command, arg] = process.argv.slice(2);
+  const [command, ...rest] = process.argv.slice(2);
 
   switch (command) {
     case undefined:
@@ -37,9 +42,12 @@ async function main(): Promise<void> {
     case "up":
       await up(requireProjectDir());
       return;
-    case "ingest":
-      await ingest(requireProjectDir(), arg);
+    case "ingest": {
+      const redactSecrets = rest.includes("--redact-secrets");
+      const sourceArg = rest.find((a) => !a.startsWith("--"));
+      await ingest(requireProjectDir(), sourceArg, redactSecrets);
       return;
+    }
     case "down":
       await composeDown(requireProjectDir());
       console.log("Docsera stopped. Your data is kept in pgdata/ — `npx docsera up` brings it back.");
