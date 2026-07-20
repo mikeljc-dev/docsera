@@ -25,6 +25,32 @@ page. Heading anchors are taken from the element's `id` when present, or
 generated with the same slugify used everywhere, so cited anchors always
 resolve.
 
+## How does the PDF connector work?
+
+PDF extraction uses [unpdf](https://github.com/unjs/unpdf), a serverless-friendly
+wrapper over pdf.js (the same engine Firefox and Chrome use to render PDFs
+in the browser) — it needs no worker process and no native dependencies
+outside Node, unlike using `pdfjs-dist` directly. There's no OCR: only the
+text layer already embedded in the PDF is extracted, so a scanned page with
+no selectable text yields nothing for that page (silently skipped, not an
+error — a PDF that mixes real and scanned pages still gets indexed
+partially).
+
+A PDF has no heading structure to derive citation anchors from, but pages
+are a citation unit everyone already understands, and `#page=N` is the
+fragment syntax browsers and PDF viewers use to jump straight to a page —
+so each non-empty page becomes its own section (one heading block per page,
+reusing the same `chunkBlocks` pipeline as HTML/Markdown), and a citation
+looks like `whitepaper.pdf#page=3`. The document title comes from the PDF's
+own `/Title` metadata when present, falling back to the URL like every
+other source type.
+
+Fetching enforces a 20 MB cap (checked against `Content-Length` first, then
+against the actual bytes downloaded, since the header can be missing or
+wrong) — parsing a PDF is far more CPU/memory-intensive than handling text,
+so an unbounded fetch is a real cost in a way `"url"`/`"sitemap"` ingestion
+isn't.
+
 ## What's the retrieval strategy?
 
 **Hybrid retrieval**: two branches run in parallel and are fused. The

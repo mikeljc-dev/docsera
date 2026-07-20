@@ -137,7 +137,7 @@ docker compose up -d --build</code></pre>
 
       <section>
         <h2 id="ingestion">Ingest your docs</h2>
-        <p>Installed with the CLI? Then <code>npx docsera ingest &lt;source&gt;</code> already does everything on this page for you (it detects whether the source is a page, a sitemap or a GitHub repo). What follows is the underlying HTTP API — what you'll call from CI or from your own scripts.</p>
+        <p>Installed with the CLI? Then <code>npx docsera ingest &lt;source&gt;</code> already does everything on this page for you (it detects whether the source is a page, a sitemap, a PDF or a GitHub repo). What follows is the underlying HTTP API — what you'll call from CI or from your own scripts.</p>
         <p>Point Docsera at your existing documentation:</p>
         <pre><code>curl -X POST http://localhost:3000/ingest \
   -H "Content-Type: application/json" \
@@ -148,9 +148,10 @@ docker compose up -d --build</code></pre>
           <li><code>"sitemap"</code> — every listed page, up to 200. Sitemap indexes pointing to other sitemaps work too.</li>
           <li><code>"url"</code> — a single page.</li>
           <li><code>"github"</code> — every <code>.md</code>/<code>.mdx</code> file of a public GitHub repo (<code>"source": "owner/repo"</code>), with optional <code>"branch"</code> and <code>"path"</code> folder filter. Citations deep-link to the files on GitHub. Set <code>GITHUB_TOKEN</code> to raise the API rate limit.</li>
+          <li><code>"pdf"</code> — a PDF at a public URL (max 20&nbsp;MB). No OCR: it extracts embedded text, so scanned pages with no text layer won't be indexed. One section per page; citations deep-link to the exact page (<code>whitepaper.pdf#page=3</code>, the fragment PDF viewers use to jump to a page) and the title comes from the PDF's own metadata when set.</li>
           <li><code>"markdown"</code> — raw text, handy for CI or unpublished content. Pass a <code>url</code>: it's the document's identity for updates and the link answers will cite.</li>
         </ul>
-        <p>Re-ingesting an unchanged document costs nothing in embeddings (content-hash deduplication). Headings become anchors, so citations deep-link to the exact section.</p>
+        <p>Re-ingesting an unchanged document costs nothing in embeddings (content-hash deduplication). Headings (or, for PDFs, pages) become anchors, so citations deep-link to the exact section.</p>
 
         <h3 id="reindex-from-ci">Reindex from CI</h3>
         <p>Keep the assistant in sync with your docs automatically: call <code>/ingest</code> from your pipeline on every deploy. Unchanged pages are skipped for free, so this is safe to run on every merge. Example GitHub Actions workflow:</p>

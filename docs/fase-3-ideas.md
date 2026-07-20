@@ -61,8 +61,15 @@ webs y docs oficiales de cada producto a fecha del análisis.
    adaptadores, y el widget rellenando la burbuja fragmento a fragmento. El
    centinela de no-respuesta se retiene los primeros 32 caracteres para que
    nunca se pinte a medias.
-10. **Conectores PDF y Notion/Confluence** *(DocsBot 29+ fuentes, kapa
-    30+)* — PDF primero (sin OAuth de por medio).
+10. ✅ **Conector PDF** *(2026-07-20)* *(DocsBot 29+ fuentes, kapa 30+)* —
+    `type: "pdf"` en `/ingest`: URL pública (máx 20 MB), sin OAuth de por
+    medio. Extracción con `unpdf` (envuelve pdf.js, sin worker ni deps
+    nativas). Sin OCR: solo el texto ya embebido en el PDF; una página
+    escaneada sin capa de texto se salta sola. Una sección por página
+    (`#page=N`, la sintaxis que usan los visores de PDF para saltar a una
+    página), título desde los metadatos `/Title` con fallback a la URL.
+    Notion/Confluence quedan para cuando alguien los pida (necesitan OAuth,
+    más esfuerzo de integración).
 
 ## Apuestas diferenciales (más esfuerzo, más titular)
 
