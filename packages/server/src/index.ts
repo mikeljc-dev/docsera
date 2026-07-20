@@ -8,6 +8,7 @@ import { chatStreamRoute } from "./routes/chatStream.js";
 import { dashboardRoute } from "./routes/dashboard.js";
 import { discordRoute } from "./routes/discord.js";
 import { registerDiscordCommands } from "./discord/register.js";
+import { slackRoute } from "./routes/slack.js";
 import { feedbackRoute } from "./routes/feedback.js";
 import { ingestRoute } from "./routes/ingest.js";
 import { llmsRoute } from "./routes/llms.js";
@@ -41,6 +42,7 @@ app.route("/", widgetRoute);
 app.route("/", adminRoute);
 app.route("/", dashboardRoute);
 app.route("/", discordRoute);
+app.route("/", slackRoute);
 
 serve({ fetch: app.fetch, port: PORT }, (info) => {
   console.log(`Docsera server listening on http://localhost:${info.port}`);
