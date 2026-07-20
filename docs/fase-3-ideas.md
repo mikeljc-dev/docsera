@@ -1,112 +1,89 @@
-# Ideas para la Fase 3 — análisis de la competencia (2026-07-17)
+# Roadmap de producto — Fase 3
 
-Investigación sobre Intercom Fin, Mintlify, DocsBot y kapa.ai: qué tienen
-ellos que Docsera puede implementar, ordenado por impacto/esfuerzo. Fuente:
-webs y docs oficiales de cada producto a fecha del análisis.
+Nació como análisis de la competencia (Intercom Fin, Mintlify, DocsBot,
+kapa.ai) el 2026-07-17: qué tienen ellos que Docsera podía implementar,
+ordenado por impacto/esfuerzo. Repasado y limpiado el 2026-07-20 — 12 de
+las 14 ideas originales están hechas, así que este documento pasa de
+"análisis" a "roadmap vivo": lo hecho queda en una línea (el detalle de
+diseño vive en `ARCHITECTURE.md`, las notas de sesión en `CLAUDE.md`, y el
+porqué de cada decisión en los mensajes de commit), y lo que sigue abierto
+queda arriba, no enterrado entre párrafos.
 
-## Quick wins (días, no semanas)
+## Próximos candidatos
 
-*(1-5 implementados: 1-4 el 2026-07-17, el 5 el 2026-07-18. Lista completa.)*
+Nada aquí está priorizado sobre lo demás; son las puertas abiertas que se
+identificaron trabajando en otras cosas, no una cola.
 
-1. ✅ **Feedback 👍/👎 en cada respuesta** *(lo tienen todos)* — columna en
-   `conversations`, dos botones en el widget, filtro en el dashboard. Base
-   del "CSAT" y alimenta la detección de huecos de contenido.
-2. ✅ **Markdown renderizado y código copiable en el widget** *(Mintlify)* —
-   la burbuja hoy es texto plano; para docs técnicas, bloques de código
-   copiables son oro. (En vez de prohibirle el Markdown al modelo,
-   renderizarlo.)
-3. ✅ **Botón de escape a humano** *(Fin)* — cuando responde "I don't know",
-   ofrecer un enlace configurable (`data-contact` → mailto/URL de soporte).
-   Convierte el fallo en derivación.
-4. ✅ **Preguntas sugeridas al abrir el chat** *(DocsBot, kapa)* — chips
-   configurables (`data-suggestions`) que eliminan la página en blanco.
-5. ✅ **Ingesta de repos de GitHub** *(DocsBot, kapa)* — `type: "github"` que
-   trae los `.md` de un repo público; el conector más barato de construir
-   y el más pedido por audiencia developer.
+- **Conectores Notion/Confluence** *(DocsBot, kapa)* — necesitan OAuth, más
+  esfuerzo de integración que PDF/GitHub. Aparcados hasta que alguien los
+  pida explícitamente.
+- **Re-ranking con cross-encoder** — la búsqueda híbrida (RRF) fusiona vector
+  + full-text pero no re-ordena el top-k con un modelo dedicado. Anotado
+  como pendiente desde que se implementó la búsqueda híbrida (2026-07-18).
+- **Mitigar respuestas desviadas con `answered=true`** — el historial ya
+  descarta los turnos sin respuesta, pero una respuesta *mal enfocada* que
+  cuenta como respondida sigue contaminando la reescritura del siguiente
+  turno. Sin arreglo barato encontrado (ver `docs/deuda-tecnica.md` punto
+  5); necesita preguntas reales de usuarios para calibrar algo mejor, no
+  cuatro ejemplos de prueba.
+- **Retomar la señal de confianza vía marcador del LLM** — la vía por
+  distancia coseno está descartada con datos (ver más abajo); la
+  alternativa (pedirle un marcador `PARTIAL`/`NO_ANSWER` al propio LLM,
+  coste cero en la misma llamada) apuntaba bien pero necesita el mismo tipo
+  de calibración con tráfico real que el punto anterior.
+- **OpenSSF Scorecard** — badge y workflow automático (GitHub Action, sin
+  tocar código) que audita prácticas de seguridad del repo. Salió al
+  comparar badges de otros proyectos (2026-07-20); no llegamos a añadirlo,
+  a diferencia de License/Release/Tests que sí se añadieron esa sesión.
+- **Provenance/SBOM en la imagen Docker** — el paquete npm ya lleva
+  provenance (trusted publishing, SLSA attestations verificadas); la imagen
+  de `ghcr.io/mikeljc-dev/docsera` todavía no genera las suyas
+  (`docker/build-push-action` lo soporta con `provenance: true`).
+- **Infra:** decidir plan de Railway cuando se agote el crédito del trial
+  (Hobby ~5 $/mes, o migrar a Cloud Run + Neon con la misma imagen).
 
-## Medio plazo (corazón de la Fase 3)
+Fuera del alcance de este documento (es producto/análisis de competencia,
+no el plan de fases): la **Fase 3 "cloud"** del plan original —versión
+multi-tenant, billing con Stripe, free tier simbólico— sigue sin empezar.
+Todo lo listado aquí y lo ya hecho ha sido pulir el producto self-hosted;
+el salto a SaaS es una decisión de arquitectura mayor que merece su propia
+conversación, no una entrada más en esta lista.
 
-6. ✅ **Analíticas de cobertura** *(2026-07-18)* *(kapa "coverage analytics", Mintlify
-   "categories")* — top preguntas repetidas (clustering con los embeddings
-   que ya tenemos), fuentes más citadas, tasa respondidas/no respondidas,
-   CSAT del feedback. Con `conversations` + `conversation_sources` es
-   mayormente SQL.
-6b. ✅ **Búsqueda híbrida (full-text + vector, RRF)** *(2026-07-18)* — rama FTS
-    de Postgres (`tsvector` 'simple' + `websearch_to_tsquery`) fusionada con
-    la vectorial por Reciprocal Rank Fusion. Caza términos exactos (nombres de
-    variables, códigos de error) donde el embedding flojea; sin dependencias
-    ni servicios nuevos. Re-ranking con cross-encoder queda para después.
-7. ✅ **Multi-turno con refinado de pregunta** *(2026-07-19)* *(Fin: refinar →
-   recuperar → responder)* — se reescribe la pregunta con los 3 últimos turnos
-   de la sesión (ventana de 30 min) antes de embeber, y los turnos previos van
-   al prompt como mensajes reales. Coste: una llamada extra al LLM, solo en las
-   preguntas de seguimiento.
-8. ⚠️ **Señal de confianza** *(kapa)* — marcar respuestas cerca del umbral
-   como "posiblemente incompleta" en vez del binario sé/no sé.
-   **Implementado y revertido el 2026-07-19: por distancia NO funciona.**
-   Medido contra la doc real (nomic-embed-text, 768d): "Kubernetes ingress
-   controller" (no documentado) da 0.369, mejor que "ingest a GitHub repo"
-   (documentado) con 0.436; "Stripe billing" (no documentado) 0.426. No hay
-   umbral que separe respondible de no respondible: la distancia coseno mide
-   parentesco temático, no cobertura. Con el umbral puesto, una respuesta
-   inventada sobre Kubernetes salía marcada como confianza *alta* — peor que
-   no tener señal.
-   La vía que sí apunta bien es pedirle el marcador al propio LLM (coste
-   cero, misma llamada): en la prueba, Stripe pasó a `NO_ANSWER` y Kubernetes
-   a `PARTIAL`, pero `llama3.2` se pasó de prudente y marcó `PARTIAL` una
-   pregunta sí documentada. Retomarlo tras el lanzamiento, detrás de un flag
-   y calibrando con preguntas reales de usuarios, no con cuatro ejemplos.
-9. ✅ **Streaming de respuestas** *(2026-07-19)* *(todos)* — `POST /chat/stream`
-   por SSE (eventos `delta` + `done`), `chatStream` opcional en los tres
-   adaptadores, y el widget rellenando la burbuja fragmento a fragmento. El
-   centinela de no-respuesta se retiene los primeros 32 caracteres para que
-   nunca se pinte a medias.
-10. ✅ **Conector PDF** *(2026-07-20)* *(DocsBot 29+ fuentes, kapa 30+)* —
-    `type: "pdf"` en `/ingest`: URL pública (máx 20 MB), sin OAuth de por
-    medio. Extracción con `unpdf` (envuelve pdf.js, sin worker ni deps
-    nativas). Sin OCR: solo el texto ya embebido en el PDF; una página
-    escaneada sin capa de texto se salta sola. Una sección por página
-    (`#page=N`, la sintaxis que usan los visores de PDF para saltar a una
-    página), título desde los metadatos `/Title` con fallback a la URL.
-    Notion/Confluence quedan para cuando alguien los pida (necesitan OAuth,
-    más esfuerzo de integración).
+## Aparcado a propósito (no reabrir sin una razón nueva)
 
-## Apuestas diferenciales (más esfuerzo, más titular)
+- **#8 — Señal de confianza por distancia coseno.** Implementada y
+  revertida el 2026-07-19: medida contra la doc real, la distancia no
+  separa "respondible" de "no respondible" ("Kubernetes ingress
+  controller", no documentado, daba mejor distancia que una pregunta sí
+  documentada). Con el umbral puesto, una respuesta inventada salía
+  marcada como confianza *alta* — peor que no tener señal. La vía
+  alternativa está en "Próximos candidatos".
+- **#14 — Targeting por audiencia y acciones multi-paso** *(Fin
+  "Procedures")* — para muy tarde; ahí Intercom lleva años de ventaja.
 
-11. ✅ **Bots de Discord y Slack sobre la misma API** *(Discord 2026-07-19,
-    Slack 2026-07-20)* *(kapa, DocsBot)* — comando `/ask` vía el endpoint
-    HTTP de cada plataforma (`POST /discord/interactions`, `POST
-    /slack/commands`), dentro del mismo server: sin gateway/WebSocket ni
-    dependencias nuevas, rate limits de /chat con clave por usuario. Slack
-    resultó incluso más simple: sin API de registro de comandos (lo nombra
-    quien crea la app) y sin bot token (entrega por `response_url`, de un
-    solo uso). Firma HMAC-SHA256 con protección de replay (rechaza
-    timestamps de más de 5 min) en vez del Ed25519 de Discord.
-12. ✅ **Exponer las docs como servidor MCP** *(2026-07-18)* *(Mintlify)* —
-    `POST /mcp` (Streamable HTTP, stateless) con tools `search_docs` (retrieval
-    puro) y `ask_docs` (RAG con citas). "Tus docs, consumibles por agentes";
-    encaja con nuestra audiencia developer. El `llms.txt` se añadió el 2026-07-19 (`GET /llms.txt`), generado desde
-    los documentos indexados en vez de estático.
-13. ✅ **Redacción de secretos en la ingesta** *(2026-07-20)* *(kapa, como
-    "PII masking")* — `"redactSecrets": true` en `/ingest` enmascara API
-    keys/tokens/claves privadas conocidos y tarjetas (Luhn + prefijo de red)
-    antes de embeber y guardar. Alcance recortado a propósito tras revisarlo:
-    no toca emails/teléfonos (se mencionan a propósito como contacto en
-    muchas docs) ni es un interruptor global — es opt-in **por ingesta**,
-    porque una tarjeta de test real (la `4242...` de Stripe) pasa las mismas
-    validaciones que una filtrada de verdad, y el mismo ajuste que protege
-    una wiki interna rompería un tutorial de pagos. Decisión de diseño en
-    `ARCHITECTURE.md`.
-14. **Targeting por audiencia y acciones multi-paso** *(Fin
-    "Procedures")* — para muy tarde; ahí llevan años de ventaja.
+## Hecho
+
+1. ✅ Feedback 👍/👎 en cada respuesta.
+2. ✅ Markdown renderizado y código copiable en el widget.
+3. ✅ Botón de escape a humano (`data-contact`).
+4. ✅ Preguntas sugeridas al abrir el chat (`data-suggestions`).
+5. ✅ Ingesta de repos de GitHub (`type: "github"`).
+6. ✅ Analíticas de cobertura en el dashboard.
+6b. ✅ Búsqueda híbrida full-text + vector con Reciprocal Rank Fusion.
+7. ✅ Multi-turno con refinado de pregunta antes de embeber.
+9. ✅ Streaming de respuestas (`POST /chat/stream`, SSE).
+10. ✅ Conector PDF (`type: "pdf"`, una sección por página, sin OCR).
+11. ✅ Bots de Discord y Slack sobre la misma API (`/ask`, sin gateway).
+12. ✅ Servidor MCP (`POST /mcp`) y `GET /llms.txt`.
+13. ✅ Redacción de secretos en la ingesta (`redactSecrets`, opt-in por
+    petición, no global).
 
 ## Lectura estratégica
 
 No competir en número de conectores (llevan años y equipos). Competir
 donde ser open source y self-hosted da ventaja: feedback + analíticas de
-cobertura (nuestro dashboard puede ser tan bueno como el suyo sin coste
-por resolución), MCP/llms.txt, y el bot de Discord para comunidades OSS.
-Los puntos 1-5 son abordables antes del primer feedback del lanzamiento.
+cobertura, MCP/llms.txt, y los bots de comunidad (Discord/Slack) — las
+tres áreas de la lista original ya están cubiertas.
 
 ## Referencias
 
