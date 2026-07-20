@@ -142,6 +142,8 @@ Re-ingerir un documento sin cambios no vuelve a gastar en embeddings (deduplicac
 
 Para `"markdown"`, la `url` es opcional pero recomendable: es la identidad del documento (sin ella, una versión modificada del mismo markdown se ingiere como documento nuevo en vez de actualizar el anterior) y además el enlace que citarán las respuestas.
 
+**¿Ingiriendo contenido del que no te fías del todo?** Añade `"redactSecrets": true` para enmascarar API keys, tokens, claves privadas y números de tarjeta conocidos antes de generar embeddings y guardarlos — útil para una wiki interna que no has revisado a fondo. Es opt-in *por ingesta*, no global, a propósito: un tutorial de integración de pagos que muestra una tarjeta de test real (la `4242 4242 4242 4242` de Stripe, por ejemplo) necesita que ese número se quede tal cual, así que simplemente no lo activas para ese documento. Nunca toca emails ni teléfonos: muchas docs los mencionan a propósito como contacto de soporte.
+
 **Mantenlo sincronizado desde CI:** llama a `/ingest` desde tu pipeline en cada deploy de las docs — las páginas sin cambios no cuestan nada, así que es seguro en cada merge. Hay un [workflow de GitHub Actions listo para copiar](https://docs.docsera.dev/#reindex-from-ci) en las docs.
 
 ### 2. Instala el widget en tu web

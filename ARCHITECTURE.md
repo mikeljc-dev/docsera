@@ -51,6 +51,33 @@ wrong) — parsing a PDF is far more CPU/memory-intensive than handling text,
 so an unbounded fetch is a real cost in a way `"url"`/`"sitemap"` ingestion
 isn't.
 
+## Why is secret redaction opt-in per ingestion, not a global setting?
+
+`redactSecrets: true` on an `/ingest` call masks known API keys, tokens,
+private keys and card numbers (Luhn-validated, matched against real card
+network prefixes) in the extracted chunks *before* they're embedded and
+stored, so a leaked value never reaches Postgres or the LLM. It deliberately
+does **not** touch emails or phone numbers — those are frequently
+*intentional* content (a support contact), and masking them would make the
+assistant worse, not more private.
+
+The harder design question was where the flag lives. A global env var
+(`PII_MASKING=true` for the whole instance) was the first draft, and it's
+wrong: the same masking that protects an internal wiki someone hasn't fully
+reviewed would silently corrupt a payments-integration tutorial that shows
+a real, intentionally-public test card — Stripe's `4242 4242 4242 4242`
+passes Luhn and the Visa prefix check exactly like a real card, because
+it's designed to. There's no regex-level way to tell "leaked real secret"
+from "official test value published on purpose," and a per-instance toggle
+would apply the same answer to both. Making it a parameter *on the ingest
+request itself* moves the decision to the only place that actually has the
+context to make it: whoever is ingesting that specific document knows
+whether its content is trusted.
+
+The response reports a `redactions` count per document (present only when
+the flag was used), so it's never a silent no-op — if nothing matched, you
+see `0`, not an absent field pretending the check never ran.
+
 ## What's the retrieval strategy?
 
 **Hybrid retrieval**: two branches run in parallel and are fused. The

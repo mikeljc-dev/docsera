@@ -85,8 +85,16 @@ webs y docs oficiales de cada producto a fecha del análisis.
     puro) y `ask_docs` (RAG con citas). "Tus docs, consumibles por agentes";
     encaja con nuestra audiencia developer. El `llms.txt` se añadió el 2026-07-19 (`GET /llms.txt`), generado desde
     los documentos indexados en vez de estático.
-13. **PII masking en la ingesta** *(kapa)* — argumento enterprise que casa
-    con el "privacy-first".
+13. ✅ **Redacción de secretos en la ingesta** *(2026-07-20)* *(kapa, como
+    "PII masking")* — `"redactSecrets": true` en `/ingest` enmascara API
+    keys/tokens/claves privadas conocidos y tarjetas (Luhn + prefijo de red)
+    antes de embeber y guardar. Alcance recortado a propósito tras revisarlo:
+    no toca emails/teléfonos (se mencionan a propósito como contacto en
+    muchas docs) ni es un interruptor global — es opt-in **por ingesta**,
+    porque una tarjeta de test real (la `4242...` de Stripe) pasa las mismas
+    validaciones que una filtrada de verdad, y el mismo ajuste que protege
+    una wiki interna rompería un tutorial de pagos. Decisión de diseño en
+    `ARCHITECTURE.md`.
 14. **Targeting por audiencia y acciones multi-paso** *(Fin
     "Procedures")* — para muy tarde; ahí llevan años de ventaja.
 

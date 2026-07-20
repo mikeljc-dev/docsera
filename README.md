@@ -142,6 +142,8 @@ Re-ingesting an unchanged document costs nothing in embeddings (content-hash ded
 
 For `"markdown"`, the `url` is optional but recommended: it's the document's identity (without it, a modified version of the same markdown is ingested as a new document instead of updating the previous one) and it's also the link that answers will cite.
 
+**Ingesting content you don't fully trust?** Add `"redactSecrets": true` to mask known API keys, tokens, private keys and card numbers before they're embedded and stored — useful for an internal wiki you're not sure about. It's opt-in *per ingestion*, not global, on purpose: a payments-integration tutorial that shows a real test card (Stripe's `4242 4242 4242 4242`, for instance) needs that number to stay put, so you'd simply not set it for that one. It never touches emails or phone numbers — docs often list those on purpose as a support contact.
+
 **Keep it in sync from CI:** call `/ingest` from your pipeline on every docs deploy — unchanged pages cost nothing, so it's safe on every merge. See the [ready-made GitHub Actions workflow](https://docs.docsera.dev/#reindex-from-ci) in the docs.
 
 ### 2. Add the widget to your site

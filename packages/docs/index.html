@@ -153,6 +153,14 @@ docker compose up -d --build</code></pre>
         </ul>
         <p>Re-ingesting an unchanged document costs nothing in embeddings (content-hash deduplication). Headings (or, for PDFs, pages) become anchors, so citations deep-link to the exact section.</p>
 
+        <h3 id="redact-secrets">Ingesting content you don't fully trust</h3>
+        <p>Add <code>"redactSecrets": true</code> to the request body to mask known API keys, tokens, private keys and card numbers before they're embedded and stored:</p>
+        <pre><code>curl -X POST http://localhost:3000/ingest \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -d '{"type": "url", "source": "https://internal-wiki.example.com/runbook", "redactSecrets": true}'</code></pre>
+        <p>It's opt-in <strong>per ingestion</strong>, not a global setting, on purpose: the same masking that protects an internal wiki you haven't fully reviewed would break a payments-integration tutorial that needs to show a real test card (Stripe's <code>4242 4242 4242 4242</code>, for instance — it passes the same validity checks a real card would). Decide per document, not once for the whole instance. It never touches emails or phone numbers: docs frequently list those on purpose as a support contact, and masking them would make the assistant worse, not more private. The response reports how many things were redacted per document (field <code>redactions</code>), so you can tell at a glance whether anything matched. Using the CLI? <code>npx docsera ingest &lt;source&gt; --redact-secrets</code> does the same thing.</p>
+
         <h3 id="reindex-from-ci">Reindex from CI</h3>
         <p>Keep the assistant in sync with your docs automatically: call <code>/ingest</code> from your pipeline on every deploy. Unchanged pages are skipped for free, so this is safe to run on every merge. Example GitHub Actions workflow:</p>
         <pre><code>name: Reindex docs
