@@ -5,6 +5,7 @@ import { extractFromHtml } from "./extractHtml.js";
 import { extractFromMarkdown } from "./extractMarkdown.js";
 import { extractFromPdf } from "./extractPdf.js";
 import { type IngestSourceInput, resolveSources } from "./fetchSource.js";
+import { redactSecrets } from "./redactSecrets.js";
 import {
   findDocumentByUrl,
   findUrllessDocumentByHash,
@@ -19,6 +20,8 @@ export interface IngestDocumentResult {
   title: string;
   status: "created" | "updated" | "unchanged" | "failed";
   chunks: number;
+  /** Secretos/tarjetas enmascarados antes de guardar (solo si se pidió `redactSecrets`). */
+  redactions?: number;
   error?: string;
 }
 
@@ -67,11 +70,29 @@ export async function runIngest(input: IngestSourceInput): Promise<IngestResult>
             : extractFromHtml(rawDoc.rawContent);
 
       const title = rawDoc.title || extracted.title || lastResort;
-      const chunks = chunkBlocks(extracted.blocks);
+      let chunks = chunkBlocks(extracted.blocks);
 
       if (chunks.length === 0) {
         results.push({ url: rawDoc.url, title, status: "failed", chunks: 0, error: "No content extracted" });
         continue;
+      }
+
+      // Opt-in por petición, no global: solo quien ingesta un documento
+      // concreto sabe si su contenido puede llevar un secreto real
+      // filtrado por error (una wiki interna) o si al revés necesita ese
+      // dato tal cual (un tutorial de pagos con la tarjeta de test oficial
+      // de Stripe, que pasaría Luhn igual que una real). Enmascara ANTES
+      // de generar embeddings, para que el valor real nunca llegue a
+      // guardarse ni a indexarse. Deliberadamente no toca emails/teléfonos
+      // (ver redactSecrets.ts).
+      let redactions: number | undefined;
+      if (input.redactSecrets === true) {
+        redactions = 0;
+        chunks = chunks.map((chunk) => {
+          const redacted = redactSecrets(chunk.content);
+          redactions! += redacted.count;
+          return { ...chunk, content: redacted.text };
+        });
       }
 
       const embeddings = await getEmbeddingsAdapter().embed(chunks.map((chunk) => chunk.content));
@@ -83,7 +104,13 @@ export async function runIngest(input: IngestSourceInput): Promise<IngestResult>
         embeddings,
       );
 
-      results.push({ url: rawDoc.url, title, status: stored.status, chunks: stored.chunks });
+      results.push({
+        url: rawDoc.url,
+        title,
+        status: stored.status,
+        chunks: stored.chunks,
+        ...(redactions !== undefined ? { redactions } : {}),
+      });
     } catch (error) {
       results.push({
         url: rawDoc.url,

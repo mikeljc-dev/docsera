@@ -11,6 +11,7 @@ const ingestSchema = z.object({
   title: z.string().optional(),
   branch: z.string().min(1).max(200).optional(),
   path: z.string().max(500).optional(),
+  redactSecrets: z.boolean().optional(),
 });
 
 export const ingestRoute = new Hono();

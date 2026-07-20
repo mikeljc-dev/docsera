@@ -49,6 +49,14 @@ export interface IngestSourceInput {
   branch?: string;
   /** Solo para type "github": prefijo de carpeta para acotar (ej: "docs"). */
   path?: string;
+  /**
+   * Enmascara secretos conocidos (API keys, tokens, claves privadas) y
+   * números de tarjeta antes de guardar e indexar. Por petición, no global:
+   * decide quien ingesta CADA documento, porque el mismo enmascarado que
+   * conviene en una wiki interna rompería un tutorial de pagos con la
+   * tarjeta de test oficial de Stripe. Apagado por defecto.
+   */
+  redactSecrets?: boolean;
 }
 
 export interface ResolvedSources {
