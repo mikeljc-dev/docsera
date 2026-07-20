@@ -8,15 +8,32 @@ const MAX_SITEMAP_DEPTH = 2;
 const FETCH_CONCURRENCY = 3;
 const FETCH_TIMEOUT_MS = 15_000;
 const USER_AGENT = `DocseraBot/${VERSION}`;
+// Parsear un PDF es mucho más caro en CPU/memoria que texto plano; un límite
+// generoso pero finito evita que un PDF de cientos de MB (o un enlace que
+// sirve un archivo distinto al anunciado) tumbe la ingesta.
+const MAX_PDF_BYTES = 20 * 1024 * 1024;
 
-export interface RawDocument {
+interface RawTextDocument {
   url: string | null;
   title: string;
-  rawContent: string;
   format: "markdown" | "html";
+  rawContent: string;
   /** Título de último recurso si el contenido no trae uno (ej: ruta del archivo). */
   fallbackTitle?: string;
 }
+
+interface RawPdfDocument {
+  url: string | null;
+  title: string;
+  format: "pdf";
+  rawContent: Uint8Array;
+  fallbackTitle?: string;
+}
+
+// Discriminado por `format` a propósito: así el compilador obliga a tratar
+// los bytes de un PDF distinto del texto de markdown/HTML en vez de confiar
+// en que el llamador lo recuerde.
+export type RawDocument = RawTextDocument | RawPdfDocument;
 
 export interface FetchError {
   url: string;
@@ -24,7 +41,7 @@ export interface FetchError {
 }
 
 export interface IngestSourceInput {
-  type: "markdown" | "url" | "sitemap" | "github";
+  type: "markdown" | "url" | "sitemap" | "github" | "pdf";
   source: string;
   url?: string;
   title?: string;
@@ -52,6 +69,33 @@ async function fetchText(url: string): Promise<string> {
       throw new Error(`HTTP ${response.status}`);
     }
     return await response.text();
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function fetchPdfBytes(url: string): Promise<Uint8Array> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: { "User-Agent": USER_AGENT },
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const contentLength = Number(response.headers.get("content-length") ?? "0");
+    if (contentLength > MAX_PDF_BYTES) {
+      throw new Error(`PDF demasiado grande (${Math.round(contentLength / 1024 / 1024)} MB, máximo 20 MB)`);
+    }
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    // Content-Length puede faltar o mentir: la comprobación real es sobre lo
+    // ya descargado, no solo sobre la cabecera.
+    if (bytes.byteLength > MAX_PDF_BYTES) {
+      throw new Error(`PDF demasiado grande (${Math.round(bytes.byteLength / 1024 / 1024)} MB, máximo 20 MB)`);
+    }
+    return bytes;
   } finally {
     clearTimeout(timeout);
   }
@@ -310,6 +354,23 @@ export async function resolveSources(input: IngestSourceInput): Promise<Resolved
       const html = await fetchText(input.source);
       return {
         documents: [{ url: input.source, title: input.title ?? "", rawContent: html, format: "html" }],
+        errors: [],
+        truncated: false,
+      };
+    } catch (error) {
+      return {
+        documents: [],
+        errors: [{ url: input.source, message: error instanceof Error ? error.message : String(error) }],
+        truncated: false,
+      };
+    }
+  }
+
+  if (input.type === "pdf") {
+    try {
+      const bytes = await fetchPdfBytes(input.source);
+      return {
+        documents: [{ url: input.source, title: input.title ?? "", rawContent: bytes, format: "pdf" }],
         errors: [],
         truncated: false,
       };

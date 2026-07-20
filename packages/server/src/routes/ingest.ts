@@ -5,7 +5,7 @@ import { isValidUrl, parseGithubSource } from "../ingest/fetchSource.js";
 import { requireAdminToken } from "../lib/adminAuth.js";
 
 const ingestSchema = z.object({
-  type: z.enum(["markdown", "url", "sitemap", "github"]),
+  type: z.enum(["markdown", "url", "sitemap", "github", "pdf"]),
   source: z.string().min(1),
   url: z.string().min(1).optional(),
   title: z.string().optional(),
@@ -25,8 +25,8 @@ ingestRoute.post("/ingest", requireAdminToken, async (c) => {
 
   const { type, source, url } = parsed.data;
 
-  if ((type === "url" || type === "sitemap") && !isValidUrl(source)) {
-    return c.json({ error: "source debe ser una URL válida para type url/sitemap" }, 400);
+  if ((type === "url" || type === "sitemap" || type === "pdf") && !isValidUrl(source)) {
+    return c.json({ error: "source debe ser una URL válida para type url/sitemap/pdf" }, 400);
   }
 
   if (type === "github" && !parseGithubSource(source)) {

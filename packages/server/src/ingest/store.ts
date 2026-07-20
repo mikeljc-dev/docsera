@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import type { Pool } from "pg";
 import type { Chunk } from "./chunk.js";
 
-export function hashContent(content: string): string {
+export function hashContent(content: string | Uint8Array): string {
   return createHash("sha256").update(content).digest("hex");
 }
 

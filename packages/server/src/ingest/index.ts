@@ -3,6 +3,7 @@ import { getEmbeddingsAdapter } from "../llm/index.js";
 import { chunkBlocks } from "./chunk.js";
 import { extractFromHtml } from "./extractHtml.js";
 import { extractFromMarkdown } from "./extractMarkdown.js";
+import { extractFromPdf } from "./extractPdf.js";
 import { type IngestSourceInput, resolveSources } from "./fetchSource.js";
 import {
   findDocumentByUrl,
@@ -59,9 +60,11 @@ export async function runIngest(input: IngestSourceInput): Promise<IngestResult>
 
       const lastResort = rawDoc.fallbackTitle || rawDoc.url || "Sin título";
       const extracted =
-        rawDoc.format === "markdown"
-          ? extractFromMarkdown(rawDoc.rawContent, rawDoc.title || lastResort)
-          : extractFromHtml(rawDoc.rawContent);
+        rawDoc.format === "pdf"
+          ? await extractFromPdf(rawDoc.rawContent, rawDoc.title || lastResort)
+          : rawDoc.format === "markdown"
+            ? extractFromMarkdown(rawDoc.rawContent, rawDoc.title || lastResort)
+            : extractFromHtml(rawDoc.rawContent);
 
       const title = rawDoc.title || extracted.title || lastResort;
       const chunks = chunkBlocks(extracted.blocks);
