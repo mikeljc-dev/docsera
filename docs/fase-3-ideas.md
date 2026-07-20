@@ -73,13 +73,15 @@ webs y docs oficiales de cada producto a fecha del análisis.
 
 ## Apuestas diferenciales (más esfuerzo, más titular)
 
-11. ✅ **Bot de Discord sobre la misma API** *(2026-07-19)* *(kapa, DocsBot)* —
-    comando `/ask` vía el endpoint HTTP de interacciones (`POST
-    /discord/interactions`), dentro del mismo server: sin gateway/WebSocket,
-    sin dependencias nuevas (Ed25519 con node:crypto), rate limits de /chat
-    con clave por usuario de Discord, respuesta como embed con fuentes
-    enlazadas. Slack queda para cuando alguien lo pida (misma arquitectura,
-    otro portal).
+11. ✅ **Bots de Discord y Slack sobre la misma API** *(Discord 2026-07-19,
+    Slack 2026-07-20)* *(kapa, DocsBot)* — comando `/ask` vía el endpoint
+    HTTP de cada plataforma (`POST /discord/interactions`, `POST
+    /slack/commands`), dentro del mismo server: sin gateway/WebSocket ni
+    dependencias nuevas, rate limits de /chat con clave por usuario. Slack
+    resultó incluso más simple: sin API de registro de comandos (lo nombra
+    quien crea la app) y sin bot token (entrega por `response_url`, de un
+    solo uso). Firma HMAC-SHA256 con protección de replay (rechaza
+    timestamps de más de 5 min) en vez del Ed25519 de Discord.
 12. ✅ **Exponer las docs como servidor MCP** *(2026-07-18)* *(Mintlify)* —
     `POST /mcp` (Streamable HTTP, stateless) con tools `search_docs` (retrieval
     puro) y `ask_docs` (RAG con citas). "Tus docs, consumibles por agentes";

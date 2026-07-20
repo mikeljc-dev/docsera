@@ -184,7 +184,7 @@ returned to the client. `x-forwarded-for` is only
 trusted behind a proxy you control (`TRUST_PROXY`). Admin endpoints
 (`/ingest`, `/admin/*`) require a bearer token compared in constant time.
 
-## Why is the Discord bot an HTTP endpoint and not a gateway bot?
+## Why are the Discord and Slack bots HTTP endpoints, not gateway/socket bots?
 
 The `/ask` command lives at `POST /discord/interactions` — Discord's HTTP
 interactions model — instead of a `discord.js` gateway bot with a persistent
@@ -205,6 +205,22 @@ IPs, the `/chat` rate-limit layers are reused with the **Discord user id**
 as the key instead of the IP — same buckets, same env knobs. Answers are
 delivered by editing the deferred message through the interaction's webhook
 token, so the bot token is used only once at boot to register the command.
+
+The Slack bot (`POST /slack/commands`) follows the exact same shape, and
+turns out even simpler: Slack has no command-registration API at all —
+whoever creates the Slack app names the slash command themselves in its
+dashboard, so the endpoint doesn't hardcode a command name — and its
+delivery mechanism (`response_url`, a single-use webhook Slack hands back
+in every request) needs no bot token whatsoever, unlike Discord's
+interaction webhook, which at least requires the token to *register* the
+command once. Signing differs too: Slack signs with HMAC-SHA256 over a
+shared secret (`v0:{timestamp}:{body}`) instead of Discord's Ed25519, and
+Slack's own docs call for rejecting requests with a timestamp more than 5
+minutes old as replay protection — a check Discord's scheme doesn't need
+since the timestamp is itself part of what's signed and Discord doesn't
+document a staleness requirement. Same rate-limit reuse (Slack user id as
+the key), same "endpoint doesn't exist without its secret configured"
+default.
 
 ## How does the one-command install work?
 

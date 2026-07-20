@@ -59,7 +59,7 @@ Three pieces in one monorepo, all served by a single deployable service:
 
 | Package | What it does |
 |---|---|
-| `packages/server` | The API: `POST /chat` (RAG with citations), `POST /chat/stream` (same, streamed as SSE — what the widget uses), `POST /ingest` (markdown/URL/sitemap/PDF/GitHub), `POST /mcp` (MCP server for AI agents), `GET /llms.txt`, an optional [Discord bot](https://docs.docsera.dev/#discord-bot) (`/ask`), and serves the widget and dashboard as static assets |
+| `packages/server` | The API: `POST /chat` (RAG with citations), `POST /chat/stream` (same, streamed as SSE — what the widget uses), `POST /ingest` (markdown/URL/sitemap/PDF/GitHub), `POST /mcp` (MCP server for AI agents), `GET /llms.txt`, optional [Discord](https://docs.docsera.dev/#discord-bot) and [Slack](https://docs.docsera.dev/#slack-bot) bots (`/ask`), and serves the widget and dashboard as static assets |
 | `packages/widget` | The embeddable web component (the floating chat), bundled into a single `widget.js` |
 | `packages/dashboard` | Admin panel: coverage analytics (answer rate, top unanswered questions, most cited sections, feedback) and conversation history |
 | `packages/web` | The [docsera.dev](https://docsera.dev) landing page (not part of the deployable product) |
@@ -197,6 +197,7 @@ All variables live in `.env` (template in `.env.example`).
 | `CHAT_MAX_DISTANCE` | Max cosine distance for a chunk to count as relevant; if none pass, the no-answer phrase is returned without calling the LLM. `2` disables the filter | `0.8` |
 | `CHAT_NO_ANSWER_TEXT` | Exact phrase when the docs don't have the answer (set it in your users' language, e.g. `No lo sé.`) | `I don't know.` |
 | `DISCORD_PUBLIC_KEY` / `DISCORD_APPLICATION_ID` / `DISCORD_BOT_TOKEN` | Optional [Discord bot](https://docs.docsera.dev/#discord-bot): a `/ask` slash command answering from your docs, with citations. Without them the endpoint doesn't exist | — |
+| `SLACK_SIGNING_SECRET` | Optional [Slack bot](https://docs.docsera.dev/#slack-bot): same idea, no bot token needed. Without it the endpoint doesn't exist | — |
 | `TRUST_PROXY` | `true` only if a reverse proxy you control sits in front and overwrites `x-forwarded-for`; the rate limiter will use that header as the client IP | `false` |
 
 **About embeddings vs. LLM provider:** they're intentionally independent. You can use Anthropic for chat and OpenAI (or Ollama) just for ingestion embeddings, since Anthropic doesn't offer an embeddings API.

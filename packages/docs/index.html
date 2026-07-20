@@ -38,6 +38,7 @@
       <a href="#widget">Add the widget</a>
       <a href="#dashboard">The dashboard</a>
       <a href="#discord-bot">Discord bot</a>
+      <a href="#slack-bot">Slack bot</a>
       <div class="group">Reference</div>
       <a href="#http-api">HTTP API</a>
       <a href="#mcp-server">MCP server</a>
@@ -226,6 +227,7 @@ jobs:
             <tr><td><code>GET /llms.txt</code></td><td>public</td><td><a href="https://llmstxt.org/">llms.txt</a> for your docs, generated from what's actually indexed: how to query them plus the list of pages.</td></tr>
             <tr><td><code>POST /mcp</code></td><td>rate-limited</td><td><a href="#mcp-server">MCP server</a> (Streamable HTTP): <code>search_docs</code> and <code>ask_docs</code> tools</td></tr>
             <tr><td><code>POST /discord/interactions</code></td><td>Ed25519 signature</td><td>Interactions endpoint for the <a href="#discord-bot">Discord bot</a> (<code>/ask</code>). Only exists when <code>DISCORD_PUBLIC_KEY</code> is set.</td></tr>
+            <tr><td><code>POST /slack/commands</code></td><td>HMAC-SHA256 signature</td><td>Slash command endpoint for the <a href="#slack-bot">Slack bot</a> (<code>/ask</code>). Only exists when <code>SLACK_SIGNING_SECRET</code> is set.</td></tr>
             <tr><td><code>POST /ingest</code></td><td>Bearer <code>ADMIN_TOKEN</code></td><td><code>{type, source, url?, title?}</code> → per-document results</td></tr>
             <tr><td><code>GET /admin/conversations</code></td><td>Bearer <code>ADMIN_TOKEN</code></td><td>History with <code>answered</code>, <code>limit</code>, <code>offset</code> filters</td></tr>
             <tr><td><code>GET /widget.js</code></td><td>—</td><td>The embeddable widget bundle</td></tr>
@@ -257,6 +259,20 @@ jobs:
         </ol>
         <p>Then, in any channel: <code>/ask question: How do I configure Ollama?</code> The bot replies with an embed — the answer plus a <strong>Sources</strong> list linking to the exact doc sections. Questions and answers land in the dashboard like any other conversation, so unanswered Discord questions show up in your coverage analytics too.</p>
         <p class="fine-print">Security notes: every interaction is verified with Discord's Ed25519 signature (invalid signatures are rejected), the endpoint doesn't exist unless <code>DISCORD_PUBLIC_KEY</code> is set, and the bot token is only used to register the command — answers are delivered through the interaction's own webhook.</p>
+      </section>
+
+      <section>
+        <h2 id="slack-bot">Slack bot</h2>
+        <p>The same idea for Slack: a slash command that answers with the same RAG pipeline as the widget, citing its sources. It's simpler to set up than Discord — Slack doesn't have a command-registration API, and delivering the answer doesn't need a bot token at all, just Slack's own <code>response_url</code>.</p>
+        <h3 id="slack-setup">Setup</h3>
+        <ol>
+          <li>Create an app at <a href="https://api.slack.com/apps">api.slack.com/apps</a> (dedicate it to Docsera).</li>
+          <li>Under <em>Features → Slash Commands</em>, create a command — <code>/ask</code>, or whatever name you like — with <strong>Request URL</strong> set to <code>https://your-server.example.com/slack/commands</code>.</li>
+          <li>Copy the <strong>Signing Secret</strong> from <em>Settings → Basic Information</em> into your <code>.env</code> as <code>SLACK_SIGNING_SECRET</code>, and restart the server.</li>
+          <li>Install the app to your workspace (Slack prompts for this once a Slash Command exists).</li>
+        </ol>
+        <p>Then, in any channel: <code>/ask How do I configure Ollama?</code> Slack shows an ephemeral "Thinking…" only you can see, then the real answer — with a <strong>Sources</strong> line linking to the exact doc sections — posts visibly to the channel. Like Discord, questions and answers land in the dashboard, and share <code>/chat</code>'s rate limits, keyed by Slack user.</p>
+        <p class="fine-print">Security notes: every request is verified against Slack's HMAC-SHA256 signature (invalid or stale — over 5 minutes old — signatures are rejected), and the endpoint doesn't exist unless <code>SLACK_SIGNING_SECRET</code> is set.</p>
       </section>
 
       <section>
