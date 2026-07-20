@@ -65,12 +65,12 @@ export async function ingest(dir: string, sourceArg?: string): Promise<void> {
   if (sourceArg !== undefined) {
     source = detectSource(sourceArg);
     if (source === null) {
-      throw new Error(`"${sourceArg}" is not an http(s) URL, a sitemap.xml or a GitHub owner/repo.`);
+      throw new Error(`"${sourceArg}" is not an http(s) URL, a sitemap.xml, a .pdf or a GitHub owner/repo.`);
     }
   } else {
     source = readState(dir).source ?? null;
     if (source === null) {
-      throw new Error("No docs source saved yet. Tell me what to index: `npx docsera ingest <url | sitemap.xml | owner/repo>`.");
+      throw new Error("No docs source saved yet. Tell me what to index: `npx docsera ingest <url | sitemap.xml | .pdf | owner/repo>`.");
     }
   }
 

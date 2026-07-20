@@ -23,6 +23,13 @@ test("una URL acabada en .xml es sitemap", () => {
   });
 });
 
+test("una URL acabada en .pdf es pdf", () => {
+  assert.deepEqual(detectSource("https://example.com/whitepaper.pdf"), {
+    type: "pdf",
+    source: "https://example.com/whitepaper.pdf",
+  });
+});
+
 test("cualquier otra URL http(s) es url", () => {
   assert.deepEqual(detectSource("https://docs.example.com/intro"), {
     type: "url",

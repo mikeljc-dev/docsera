@@ -12,7 +12,7 @@ const HELP = `${bold("docsera")} — self-hosted AI chat for your docs ${dim(`(v
 Usage:
   npx docsera                     set everything up and launch it (wizard on first run)
   npx docsera up                  start the stack
-  npx docsera ingest [source]     (re-)index docs: URL, sitemap.xml or GitHub owner/repo
+  npx docsera ingest [source]     (re-)index docs: URL, sitemap.xml, PDF or GitHub owner/repo
   npx docsera down                stop the stack (your data is kept)
   npx docsera --help | --version
 

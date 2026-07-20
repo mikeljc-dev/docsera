@@ -34,7 +34,7 @@ ${bold("Add the chat to your site with one line:")}
 ${bold("Dashboard:")} ${cyan(`${serverUrl}/dashboard`)} ${dim("(log in with the ADMIN_TOKEN from .env)")}
 
 ${bold("Useful commands:")}
-  npx docsera ingest ${dim("[url | sitemap.xml | owner/repo]")}   re-index or add docs
+  npx docsera ingest ${dim("[url | sitemap.xml | .pdf | owner/repo]")}   re-index or add docs
   npx docsera up                                    start again (e.g. after a reboot)
   npx docsera down                                  stop everything ${dim("(your data stays in pgdata/)")}
 `);

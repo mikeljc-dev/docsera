@@ -169,7 +169,7 @@ export async function runWizard(): Promise<WizardAnswers> {
     let source: IngestSource | null = null;
     for (;;) {
       const raw = await ask(
-        `\nYour docs, to index them now — a URL, a sitemap.xml or a GitHub owner/repo ${dim("[Enter to skip]")}: `,
+        `\nYour docs, to index them now — a URL, a sitemap.xml, a PDF or a GitHub owner/repo ${dim("[Enter to skip]")}: `,
       );
       if (raw === "") break;
       source = detectSource(raw);

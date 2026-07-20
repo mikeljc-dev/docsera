@@ -1,7 +1,7 @@
 // Clasifica lo que el usuario teclea como "sus docs" en el tipo que espera
 // POST /ingest, para no preguntarle también el tipo en el wizard.
 export type IngestSource = {
-  type: "url" | "sitemap" | "github";
+  type: "url" | "sitemap" | "github" | "pdf";
   source: string;
 };
 
@@ -29,6 +29,9 @@ export function detectSource(input: string): IngestSource | null {
   }
   if (url.pathname.endsWith(".xml")) {
     return { type: "sitemap", source: trimmed };
+  }
+  if (url.pathname.endsWith(".pdf")) {
+    return { type: "pdf", source: trimmed };
   }
   return { type: "url", source: trimmed };
 }

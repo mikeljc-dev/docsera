@@ -17,7 +17,7 @@ npx docsera
 A short wizard asks three things:
 
 1. **Which LLM answers** — Anthropic, OpenAI (or any compatible API: Gemini, Groq, Mistral, LM Studio…), or [Ollama](https://ollama.com). A locally running Ollama is auto-detected and offered as the default, which makes the whole stack **free and 100% local**, with zero external API calls.
-2. **Which docs to index** — a URL, a `sitemap.xml` or a GitHub `owner/repo`.
+2. **Which docs to index** — a URL, a `sitemap.xml`, a PDF or a GitHub `owner/repo`.
 3. **Where the widget will live** — your site's origin, for CORS.
 
 Everything else is done for you:
@@ -34,7 +34,7 @@ If port 3000 is taken, the next free one is picked automatically. In an empty fo
 | Command | What it does |
 |---|---|
 | `npx docsera` | First run: wizard + launch. Later runs: just launch. |
-| `npx docsera ingest [source]` | Re-index your docs, or index a new source (URL, `sitemap.xml` or `owner/repo`). Unchanged pages cost nothing — content-hash dedupe. |
+| `npx docsera ingest [source]` | Re-index your docs, or index a new source (URL, `sitemap.xml`, PDF or `owner/repo`). Unchanged pages cost nothing — content-hash dedupe. |
 | `npx docsera up` | Start the stack again, e.g. after a reboot. |
 | `npx docsera down` | Stop everything. Your data stays in `pgdata/`. |
 
