@@ -20,24 +20,24 @@ ingestRoute.post("/ingest", requireAdminToken, async (c) => {
   const parsed = ingestSchema.safeParse(body);
 
   if (!parsed.success) {
-    return c.json({ error: "Body inválido", details: parsed.error.flatten() }, 400);
+    return c.json({ error: "Invalid body", details: parsed.error.flatten() }, 400);
   }
 
   const { type, source, url } = parsed.data;
 
   if ((type === "url" || type === "sitemap" || type === "pdf") && !isValidUrl(source)) {
-    return c.json({ error: "source debe ser una URL válida para type url/sitemap/pdf" }, 400);
+    return c.json({ error: "source must be a valid URL for type url/sitemap/pdf" }, 400);
   }
 
   if (type === "github" && !parseGithubSource(source)) {
     return c.json(
-      { error: 'source debe ser "owner/repo" o una URL de github.com para type github' },
+      { error: 'source must be "owner/repo" or a github.com URL for type github' },
       400,
     );
   }
 
   if (url !== undefined && !isValidUrl(url)) {
-    return c.json({ error: "url debe ser una URL válida" }, 400);
+    return c.json({ error: "url must be a valid URL" }, 400);
   }
 
   try {
@@ -45,7 +45,7 @@ ingestRoute.post("/ingest", requireAdminToken, async (c) => {
     return c.json(result);
   } catch (error) {
     return c.json(
-      { error: error instanceof Error ? error.message : "Error desconocido durante la ingesta" },
+      { error: error instanceof Error ? error.message : "Unknown error during ingestion" },
       500,
     );
   }

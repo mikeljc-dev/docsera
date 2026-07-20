@@ -87,13 +87,13 @@ async function fetchPdfBytes(url: string): Promise<Uint8Array> {
     }
     const contentLength = Number(response.headers.get("content-length") ?? "0");
     if (contentLength > MAX_PDF_BYTES) {
-      throw new Error(`PDF demasiado grande (${Math.round(contentLength / 1024 / 1024)} MB, máximo 20 MB)`);
+      throw new Error(`PDF too large (${Math.round(contentLength / 1024 / 1024)} MB, 20 MB max)`);
     }
     const bytes = new Uint8Array(await response.arrayBuffer());
     // Content-Length puede faltar o mentir: la comprobación real es sobre lo
     // ya descargado, no solo sobre la cabecera.
     if (bytes.byteLength > MAX_PDF_BYTES) {
-      throw new Error(`PDF demasiado grande (${Math.round(bytes.byteLength / 1024 / 1024)} MB, máximo 20 MB)`);
+      throw new Error(`PDF too large (${Math.round(bytes.byteLength / 1024 / 1024)} MB, 20 MB max)`);
     }
     return bytes;
   } finally {
@@ -167,7 +167,7 @@ async function fetchGithubJson<T>(url: string): Promise<T> {
     if (!response.ok) {
       const hint =
         response.status === 403 || response.status === 429
-          ? " (¿límite de la API de GitHub? Configura GITHUB_TOKEN)"
+          ? " (GitHub API rate limit? Set GITHUB_TOKEN)"
           : "";
       throw new Error(`GitHub API HTTP ${response.status}${hint}`);
     }
@@ -185,7 +185,7 @@ interface GithubTreeEntry {
 async function resolveGithub(input: IngestSourceInput): Promise<ResolvedSources> {
   const parsed = parseGithubSource(input.source);
   if (!parsed) {
-    throw new Error('source debe ser "owner/repo" o una URL de github.com para type "github"');
+    throw new Error('source must be "owner/repo" or a github.com URL for type "github"');
   }
   const { owner, repo } = parsed;
   const api = `https://api.github.com/repos/${owner}/${repo}`;
@@ -202,7 +202,7 @@ async function resolveGithub(input: IngestSourceInput): Promise<ResolvedSources>
     .map((entry) => entry.path);
 
   if (files.length === 0) {
-    throw new Error("El repo no contiene archivos .md/.mdx en la ruta indicada");
+    throw new Error("The repo has no .md/.mdx files at the given path");
   }
 
   const truncated = tree.truncated || files.length > MAX_PAGES;
@@ -387,7 +387,7 @@ export async function resolveSources(input: IngestSourceInput): Promise<Resolved
   const collected = await collectSitemapPages(input.source);
 
   if (collected.pages.length === 0 && collected.errors.length === 0) {
-    throw new Error("El sitemap no contiene URLs (<loc>) válidas");
+    throw new Error("The sitemap contains no valid URLs (<loc>)");
   }
 
   const { pages: urls, truncated } = collected;

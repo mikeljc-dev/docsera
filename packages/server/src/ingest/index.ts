@@ -58,7 +58,7 @@ export async function runIngest(input: IngestSourceInput): Promise<IngestResult>
         continue;
       }
 
-      const lastResort = rawDoc.fallbackTitle || rawDoc.url || "Sin título";
+      const lastResort = rawDoc.fallbackTitle || rawDoc.url || "Untitled";
       const extracted =
         rawDoc.format === "pdf"
           ? await extractFromPdf(rawDoc.rawContent, rawDoc.title || lastResort)
@@ -70,7 +70,7 @@ export async function runIngest(input: IngestSourceInput): Promise<IngestResult>
       const chunks = chunkBlocks(extracted.blocks);
 
       if (chunks.length === 0) {
-        results.push({ url: rawDoc.url, title, status: "failed", chunks: 0, error: "No se extrajo contenido" });
+        results.push({ url: rawDoc.url, title, status: "failed", chunks: 0, error: "No content extracted" });
         continue;
       }
 

@@ -11,7 +11,7 @@ export function extractFromHtml(html: string): ExtractedDocument {
 
   const root = $("main").length ? $("main") : $("article").length ? $("article") : $("body");
 
-  const title = $("title").first().text().trim() || $("h1").first().text().trim() || "Sin título";
+  const title = $("title").first().text().trim() || $("h1").first().text().trim() || "Untitled";
 
   const blocks: ContentBlock[] = [];
   root.find(CONTENT_SELECTOR).each((_, el) => {
