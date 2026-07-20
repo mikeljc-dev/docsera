@@ -3,6 +3,9 @@
 # Docsera
 
 [![CI](https://github.com/mikeljc-dev/docsera/actions/workflows/ci.yml/badge.svg)](https://github.com/mikeljc-dev/docsera/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/mikeljc-dev/docsera)](./LICENSE)
+[![Release](https://img.shields.io/github/v/release/mikeljc-dev/docsera)](https://github.com/mikeljc-dev/docsera/releases)
+[![Tests](https://img.shields.io/badge/tests-172%20passing-brightgreen)](https://github.com/mikeljc-dev/docsera/actions/workflows/ci.yml)
 
 **AI chat for your docs. Open source, self-hosted, one line of code.**
 
