@@ -44,6 +44,10 @@ jobs:
           file: packages/server/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
+          # Provenance ya la añade solo build-push-action al publicar en un
+          # registro público; el SBOM (lista de paquetes/versiones de la
+          # imagen) no es automático, hay que pedirlo.
+          sbom: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/docsera:${{ steps.version.outputs.version }}
             ghcr.io/${{ github.repository_owner }}/docsera:latest
