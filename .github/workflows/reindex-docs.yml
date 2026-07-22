@@ -1,0 +1,33 @@
+# Reindexa la demo pública (docs.docsera.dev) para que el asistente conozca
+# las features nuevas sin depender de que alguien se acuerde de lanzar un
+# curl a mano tras cada release. Diario en vez de "en cada push a main" para
+# no tener que esperar/encadenar con el deploy asíncrono de Vercel — la
+# re-ingesta es barata en contenido sin cambios (dedupe por hash), así que
+# ejecutarla de más no cuesta nada.
+name: reindex-docs
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reindex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ingest docs.docsera.dev
+        run: |
+          curl -sf -X POST https://api.docsera.dev/ingest \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.DOCSERA_ADMIN_TOKEN }}" \
+            -d '{"type": "url", "source": "https://docs.docsera.dev/"}'
+
+      - name: Ingest README.md
+        run: |
+          curl -sf -X POST https://api.docsera.dev/ingest \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.DOCSERA_ADMIN_TOKEN }}" \
+            -d '{"type": "github", "source": "mikeljc-dev/docsera", "path": "README.md"}'
