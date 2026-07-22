@@ -2,7 +2,10 @@
 # build.context: ., build.dockerfile: packages/server/Dockerfile), porque el
 # server sirve tambien el bundle del widget y el build del dashboard, y
 # necesita el workspace completo para instalarlos/compilarlos.
-FROM node:20-alpine
+# Pineada por digest (no por tag flotante): Dependabot abre PR solo cuando
+# hay uno nuevo para node:20-alpine, así que se sigue actualizando sin
+# perder reproducibilidad entre builds.
+FROM node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
 
 WORKDIR /app
 
