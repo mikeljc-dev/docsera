@@ -199,6 +199,7 @@ Todas las variables viven en `.env` (plantilla en `.env.example`).
 | `CHAT_DAILY_LIMIT` | Tope opcional de preguntas por IP y día (`0` lo desactiva) — para demos públicas | `0` |
 | `CHAT_GLOBAL_DAILY_LIMIT` | Presupuesto diario opcional de preguntas de toda la instancia (`0` lo desactiva) | `0` |
 | `PUBLIC_STATS` | Expone `GET /stats/public` solo con agregados (nunca las preguntas de los visitantes) — para demos públicas | `false` |
+| `LLMS_TXT_TITLE` | Título usado como H1 de `GET /llms.txt` | `Documentation` |
 | `CHAT_MAX_DISTANCE` | Distancia coseno máxima para considerar un chunk relevante; si ninguno pasa, se responde la frase de no-respuesta sin llamar al LLM. `2` desactiva el filtro | `0.8` |
 | `CHAT_NO_ANSWER_TEXT` | Frase exacta cuando la doc no tiene la respuesta (ponla en el idioma de tus usuarios, ej: `No lo sé.`) | `I don't know.` |
 | `DISCORD_PUBLIC_KEY` / `DISCORD_APPLICATION_ID` / `DISCORD_BOT_TOKEN` | [Bot de Discord](https://docs.docsera.dev/#discord-bot) opcional: un comando `/ask` que responde desde tus docs, con citas. Sin ellos, el endpoint no existe | — |
