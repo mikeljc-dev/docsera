@@ -26,5 +26,12 @@
     "eslint": "^10.7.0",
     "typescript": "^5.5.0",
     "typescript-eslint": "^8.64.0"
+  },
+  "pnpm": {
+    "//": "fast-uri < 3.1.4 tiene un fallo de confusion de host (GHSA-v2hh-gcrm-f6hx); nos llega transitivamente via ajv, que depende de @modelcontextprotocol/sdk. ajv acepta ^3.0.1, asi que el override no rompe su rango. @hono/node-server < 2.0.5 tiene un path traversal en serve-static en Windows (GHSA-frvp-7c67-39w9); nos llega via @modelcontextprotocol/sdk (que solo importa getRequestListener, no serve-static, asi que no era explotable) pero el SDK sigue en ^1.19.9 — getRequestListener tiene la misma firma en 1.19.14 y 2.0.10, verificado a mano, asi que forzar la v2 es seguro aunque incumpla el rango declarado del SDK.",
+    "overrides": {
+      "fast-uri": "^3.1.4",
+      "@hono/node-server": "^2.0.10"
+    }
   }
 }
