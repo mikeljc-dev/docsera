@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
 
+# Solo lee el repo (checkout) y no escribe en ningun sitio: least privilege.
+permissions:
+  contents: read
+
 jobs:
   ci:
     runs-on: ubuntu-latest
