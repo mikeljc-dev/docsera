@@ -128,12 +128,14 @@ docker compose up -d --build</code></pre>
             <tr><td><code>LLMS_TXT_TITLE</code></td><td>Title used as the H1 of <code>GET /llms.txt</code></td><td><code>Documentation</code></td></tr>
             <tr><td><code>PUBLIC_STATS</code></td><td>Expose <code>GET /stats/public</code> with aggregates only (never visitor questions) — for public demos</td><td><code>false</code></td></tr>
             <tr><td><code>CHAT_MAX_DISTANCE</code></td><td>Max cosine distance for a chunk to count as relevant; <code>2</code> disables the filter</td><td><code>0.8</code></td></tr>
+            <tr><td><code>RERANKER_ENABLED</code></td><td>Re-rank retrieved chunks with a cross-encoder for better precision; downloads a small model (~24&nbsp;MB) on first use, adds latency (WASM, no GPU)</td><td><code>false</code></td></tr>
             <tr><td><code>CHAT_NO_ANSWER_TEXT</code></td><td>Exact phrase when the docs don't have the answer (set it in your users' language)</td><td><code>I don't know.</code></td></tr>
             <tr><td><code>TRUST_PROXY</code></td><td><code>true</code> only behind a reverse proxy you control that overwrites <code>x-forwarded-for</code></td><td><code>false</code></td></tr>
           </tbody>
         </table>
         <p><strong>Embeddings vs. LLM provider:</strong> intentionally independent. Use Anthropic for chat and OpenAI (or Ollama) just for ingestion embeddings — Anthropic doesn't offer an embeddings API.</p>
         <p><strong>Zero-cost with Ollama:</strong> <code>LLM_PROVIDER=ollama</code> + <code>EMBEDDING_PROVIDER=ollama</code> (with <code>EMBEDDING_DIMENSIONS=768</code> for <code>nomic-embed-text</code>) means zero external API calls.</p>
+        <p><strong>Re-ranking:</strong> <code>RERANKER_ENABLED=true</code> asks a small cross-encoder to re-score the top candidates that hybrid retrieval already found, before the final cut — it can promote a chunk that ranked lower in the fused list but is actually a better match for the exact question. It's opt-in because it adds per-question latency (the model runs on WASM, no GPU) in exchange for precision; the model itself (~24&nbsp;MB) downloads once on first use instead of shipping in the image.</p>
       </section>
 
       <section>

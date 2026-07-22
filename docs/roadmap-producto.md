@@ -26,9 +26,6 @@ identificaron trabajando en otras cosas, no una cola.
 - **CII Best Practices badge** *(Scorecard, 0/10)* — cuestionario de
   autoevaluación en bestpractices.dev, no una config de repo. Más esfuerzo
   que los otros checks de Scorecard, aparcado por ahora.
-- **Re-ranking con cross-encoder** — la búsqueda híbrida (RRF) fusiona vector
-  + full-text pero no re-ordena el top-k con un modelo dedicado. Anotado
-  como pendiente desde que se implementó la búsqueda híbrida (2026-07-18).
 - **Mitigar respuestas desviadas con `answered=true`** — el historial ya
   descarta los turnos sin respuesta, pero una respuesta *mal enfocada* que
   cuenta como respondida sigue contaminando la reescritura del siguiente
@@ -130,6 +127,24 @@ conversación, no una entrada más en esta lista.
     No bloquea el merge de PRs (branch protection solo exige el check
     `ci`): los hallazgos que saque se triarán aparte, no junto al resto
     del hardening.
+17. ✅ **Re-ranking con cross-encoder** *(2026-07-22)* — `RERANKER_ENABLED`,
+    opt-in. `Xenova/ms-marco-MiniLM-L-6-v2` (int8, ~23 MB) reordena el pool
+    ya fusionado por RRF antes del corte a `TOP_K`. Alcance mayor de lo
+    esperado al empezar: `onnxruntime-node` (nativo) no carga en Alpine
+    (falta el loader glibc, confirmado en un contenedor real — issue
+    abierto en microsoft/onnxruntime desde 2021) y cambiar a una imagen
+    base con glibc casi duplicaba el tamaño de la imagen (medido:
+    +121 MB de base + 259 MB del paquete, contra 470 MB actuales). Se optó
+    por `onnxruntime-web` (WASM): +132 MB fijos, se queda en Alpine, algo
+    más lento sin GPU. El modelo no se hornea en la imagen — se descarga
+    una vez al primer uso (como `ollama pull`), así que no afecta a quien
+    no activa la feature. `@huggingface/tokenizers` en vez de tokenizar
+    WordPiece a mano; construye sus piezas internas directamente desde
+    `tokenizer.json` sin instanciarlas una a una. Verificado con un
+    prototipo aislado antes de integrarlo: discrimina de verdad (pasaje
+    relevante +7.25, relacionado pero no relevante -8.87, ajeno -11.23).
+    Racional completo, con los números reales de cada alternativa, en
+    `ARCHITECTURE.md`.
 
 ## Lectura estratégica
 

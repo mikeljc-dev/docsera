@@ -201,6 +201,7 @@ Todas las variables viven en `.env` (plantilla en `.env.example`).
 | `PUBLIC_STATS` | Expone `GET /stats/public` solo con agregados (nunca las preguntas de los visitantes) — para demos públicas | `false` |
 | `LLMS_TXT_TITLE` | Título usado como H1 de `GET /llms.txt` | `Documentation` |
 | `CHAT_MAX_DISTANCE` | Distancia coseno máxima para considerar un chunk relevante; si ninguno pasa, se responde la frase de no-respuesta sin llamar al LLM. `2` desactiva el filtro | `0.8` |
+| `RERANKER_ENABLED` | Reordena los chunks recuperados con un cross-encoder antes de que lleguen al LLM, para mejor precisión en los primeros resultados. Descarga un modelo pequeño (~24 MB) en el primer uso, cacheado localmente — no hace crecer la imagen Docker para instancias que no lo activan. Añade latencia (corre en WASM, sin GPU) | `false` |
 | `CHAT_NO_ANSWER_TEXT` | Frase exacta cuando la doc no tiene la respuesta (ponla en el idioma de tus usuarios, ej: `No lo sé.`) | `I don't know.` |
 | `DISCORD_PUBLIC_KEY` / `DISCORD_APPLICATION_ID` / `DISCORD_BOT_TOKEN` | [Bot de Discord](https://docs.docsera.dev/#discord-bot) opcional: un comando `/ask` que responde desde tus docs, con citas. Sin ellos, el endpoint no existe | — |
 | `SLACK_SIGNING_SECRET` | [Bot de Slack](https://docs.docsera.dev/#slack-bot) opcional: la misma idea, sin necesitar bot token. Sin ella, el endpoint no existe | — |
