@@ -17,6 +17,17 @@ identificaron trabajando en otras cosas, no una cola.
 - **Conectores Notion/Confluence** *(DocsBot, kapa)* — necesitan OAuth, más
   esfuerzo de integración que PDF/GitHub. Aparcados hasta que alguien los
   pida explícitamente.
+- **Branch protection en `main`** *(Scorecard, 0/10)* — exigir PRs con
+  revisión chocaría con la forma de trabajar actual (directo en `main`,
+  preguntar antes de cada push). Necesita que Mikel decida el trade-off,
+  no es una config que se activa sola.
+- **CII Best Practices badge** *(Scorecard, 0/10)* — cuestionario de
+  autoevaluación en bestpractices.dev, no una config de repo. Más esfuerzo
+  que los otros checks de Scorecard, aparcado por ahora.
+- **CodeQL / SAST** *(Scorecard, 0/10)* — no se llegó a añadir el
+  2026-07-22 junto al resto de hardening; añadir un workflow estándar de
+  GitHub es barato, pero puede sacar hallazgos propios que haya que
+  triar, a diferencia de los cambios de config de esa sesión.
 - **Re-ranking con cross-encoder** — la búsqueda híbrida (RRF) fusiona vector
   + full-text pero no re-ordena el top-k con un modelo dedicado. Anotado
   como pendiente desde que se implementó la búsqueda híbrida (2026-07-18).
@@ -77,6 +88,31 @@ conversación, no una entrada más en esta lista.
     público (verificado con `docker buildx imagetools inspect` sobre la
     0.7.0 ya publicada — SLSA provenance real de BuildKit, con el builder
     apuntando al run de GitHub Actions). Solo el SBOM faltaba pedirlo.
+
+    **Primer informe real (2026-07-22): 3.3/10.** La mayoría de lo bajo es
+    estructural (proyecto <90 días, sin PRs externos, un solo mantenedor —
+    no arreglable hoy) o pide una decisión aparte (Branch-Protection choca
+    con trabajar directo en `main`; CII-Best-Practices es un cuestionario
+    de autoevaluación, no una config). Lo accionable, hecho el mismo día:
+    - Dos vulnerabilidades transitivas reales de la fecha (`fast-uri`
+      confusión de host, `@hono/node-server` path traversal en
+      serve-static), ambas via `@modelcontextprotocol/sdk`. Investigadas a
+      fondo antes de tocar nada: la de `@hono/node-server` no era
+      explotable en nuestro caso (el SDK solo usa `getRequestListener`,
+      nunca `serve-static`), pero se corrigió igual con un override de
+      pnpm — verificado que la firma de la función es idéntica entre
+      1.19.14 y 2.0.10 antes de forzar el salto de major. La de `fast-uri`
+      sí aplicaba de verdad. Ambas con override + E2E real (cliente MCP
+      conectando contra el server con las versiones forzadas).
+    - `SECURITY.md`/`SECURITY.es.md` + private vulnerability reporting de
+      GitHub activado (ajuste de API, no de código).
+    - `.github/dependabot.yml` (npm del workspace pnpm entero, github-actions,
+      docker).
+    - Permisos mínimos explícitos en `ci.yml` (le faltaban; los otros dos
+      workflows ya los tenían desde que se escribieron).
+    - Los tres workflows y el `FROM` del Dockerfile pineados por SHA/digest
+      en vez de por tag flotante — viable sin perder actualizaciones porque
+      Dependabot ya sabe mantener pines al día.
 
 ## Lectura estratégica
 
