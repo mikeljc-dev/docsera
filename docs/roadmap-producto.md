@@ -1,4 +1,4 @@
-# Roadmap de producto — Fase 3
+# Roadmap de producto (self-hosted)
 
 Nació como análisis de la competencia (Intercom Fin, Mintlify, DocsBot,
 kapa.ai) el 2026-07-17: qué tienen ellos que Docsera podía implementar,
@@ -8,6 +8,12 @@ las 14 ideas originales están hechas, así que este documento pasa de
 diseño vive en `ARCHITECTURE.md`, las notas de sesión en `CLAUDE.md`, y el
 porqué de cada decisión en los mensajes de commit), y lo que sigue abierto
 queda arriba, no enterrado entre párrafos.
+
+**No confundir con la Fase 3 del plan por fases** (`CLAUDE.md` —
+"Tracción": versión cloud, multi-tenant, billing). Este documento se
+llamaba "fase-3-ideas.md" porque nació cronológicamente durante esa fase,
+pero su contenido es mejoras del producto self-hosted, no el pivote a
+SaaS — de ahí el renombrado (2026-07-22).
 
 ## Próximos candidatos
 
