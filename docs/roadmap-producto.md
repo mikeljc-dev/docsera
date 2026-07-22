@@ -26,10 +26,6 @@ identificaron trabajando en otras cosas, no una cola.
 - **CII Best Practices badge** *(Scorecard, 0/10)* — cuestionario de
   autoevaluación en bestpractices.dev, no una config de repo. Más esfuerzo
   que los otros checks de Scorecard, aparcado por ahora.
-- **CodeQL / SAST** *(Scorecard, 0/10)* — no se llegó a añadir el
-  2026-07-22 junto al resto de hardening; añadir un workflow estándar de
-  GitHub es barato, pero puede sacar hallazgos propios que haya que
-  triar, a diferencia de los cambios de config de esa sesión.
 - **Re-ranking con cross-encoder** — la búsqueda híbrida (RRF) fusiona vector
   + full-text pero no re-ordena el top-k con un modelo dedicado. Anotado
   como pendiente desde que se implementó la búsqueda híbrida (2026-07-18).
@@ -126,6 +122,14 @@ conversación, no una entrada más en esta lista.
     patch de seguridad cortada porque la imagen `0.7.0` en GHCR se había
     remutado en silencio (reconstruida dos veces el mismo día sin subir
     versión).
+
+16. ✅ **CodeQL / SAST** *(2026-07-22)* — `.github/workflows/codeql.yml`,
+    un solo lenguaje (`javascript-typescript` cubre todo el monorepo, sin
+    paso de build manual), en cada push/PR a `main` y semanalmente. Badge
+    en el README. Pineado por SHA como el resto de workflows de seguridad.
+    No bloquea el merge de PRs (branch protection solo exige el check
+    `ci`): los hallazgos que saque se triarán aparte, no junto al resto
+    del hardening.
 
 ## Lectura estratégica
 
