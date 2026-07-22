@@ -1,6 +1,6 @@
 {
   "name": "@docsera/server",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "private": true,
   "description": "API de Docsera: chat (RAG), ingesta y administracion",
   "license": "AGPL-3.0-only",

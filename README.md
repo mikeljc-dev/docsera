@@ -5,7 +5,7 @@
 [![CI](https://github.com/mikeljc-dev/docsera/actions/workflows/ci.yml/badge.svg)](https://github.com/mikeljc-dev/docsera/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/mikeljc-dev/docsera)](./LICENSE)
 [![Release](https://img.shields.io/github/v/release/mikeljc-dev/docsera)](https://github.com/mikeljc-dev/docsera/releases)
-[![Tests](https://img.shields.io/badge/tests-172%20passing-brightgreen)](https://github.com/mikeljc-dev/docsera/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-175%20passing-brightgreen)](https://github.com/mikeljc-dev/docsera/actions/workflows/ci.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/mikeljc-dev/docsera/badge)](https://scorecard.dev/viewer/?uri=github.com/mikeljc-dev/docsera)
 [![CodeQL](https://github.com/mikeljc-dev/docsera/actions/workflows/codeql.yml/badge.svg)](https://github.com/mikeljc-dev/docsera/actions/workflows/codeql.yml)
 
@@ -20,7 +20,7 @@ Your data never leaves your server. Works with Anthropic, OpenAI or local models
 
 </div>
 
-> **Status: v0.7.1.** Server, ingestion, RAG chat with citations, widget,
+> **Status: v0.8.0.** Server, ingestion, RAG chat with citations, widget,
 > dashboard and Docker all work end to end. Young project — feedback and
 > issues are very welcome (see [Roadmap](#roadmap)).
 
@@ -112,7 +112,7 @@ This starts Postgres+pgvector, applies migrations automatically and runs the ser
 
 ```bash
 curl http://localhost:3000/health
-# {"status":"ok","version":"0.7.1"}
+# {"status":"ok","version":"0.8.0"}
 ```
 
 ## Usage
