@@ -19,7 +19,7 @@ Your data never leaves your server. Works with Anthropic, OpenAI or local models
 
 </div>
 
-> **Status: v0.7.0.** Server, ingestion, RAG chat with citations, widget,
+> **Status: v0.7.1.** Server, ingestion, RAG chat with citations, widget,
 > dashboard and Docker all work end to end. Young project — feedback and
 > issues are very welcome (see [Roadmap](#roadmap)).
 
@@ -111,7 +111,7 @@ This starts Postgres+pgvector, applies migrations automatically and runs the ser
 
 ```bash
 curl http://localhost:3000/health
-# {"status":"ok","version":"0.7.0"}
+# {"status":"ok","version":"0.7.1"}
 ```
 
 ## Usage
