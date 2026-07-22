@@ -1,0 +1,18 @@
+# Dependabot entiende pnpm-workspace.yaml desde un único directorio raiz: no
+# hace falta una entrada por paquete del monorepo.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/packages/server"
+    schedule:
+      interval: "weekly"
