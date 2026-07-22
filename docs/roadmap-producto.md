@@ -23,10 +23,6 @@ identificaron trabajando en otras cosas, no una cola.
 - **Conectores Notion/Confluence** *(DocsBot, kapa)* — necesitan OAuth, más
   esfuerzo de integración que PDF/GitHub. Aparcados hasta que alguien los
   pida explícitamente.
-- **Branch protection en `main`** *(Scorecard, 0/10)* — exigir PRs con
-  revisión chocaría con la forma de trabajar actual (directo en `main`,
-  preguntar antes de cada push). Necesita que Mikel decida el trade-off,
-  no es una config que se activa sola.
 - **CII Best Practices badge** *(Scorecard, 0/10)* — cuestionario de
   autoevaluación en bestpractices.dev, no una config de repo. Más esfuerzo
   que los otros checks de Scorecard, aparcado por ahora.
@@ -97,9 +93,9 @@ conversación, no una entrada más en esta lista.
 
     **Primer informe real (2026-07-22): 3.3/10.** La mayoría de lo bajo es
     estructural (proyecto <90 días, sin PRs externos, un solo mantenedor —
-    no arreglable hoy) o pide una decisión aparte (Branch-Protection choca
-    con trabajar directo en `main`; CII-Best-Practices es un cuestionario
-    de autoevaluación, no una config). Lo accionable, hecho el mismo día:
+    no arreglable hoy) o pide una decisión aparte (CII-Best-Practices es un
+    cuestionario de autoevaluación, no una config). Lo accionable, hecho el
+    mismo día:
     - Dos vulnerabilidades transitivas reales de la fecha (`fast-uri`
       confusión de host, `@hono/node-server` path traversal en
       serve-static), ambas via `@modelcontextprotocol/sdk`. Investigadas a
@@ -119,6 +115,17 @@ conversación, no una entrada más en esta lista.
     - Los tres workflows y el `FROM` del Dockerfile pineados por SHA/digest
       en vez de por tag flotante — viable sin perder actualizaciones porque
       Dependabot ya sabe mantener pines al día.
+
+    **Branch protection en `main`, decidida después de plantear el
+    trade-off** (2026-07-22): PR obligatoria, 0 aprobaciones exigidas (para
+    no autobloquear al mantenedor único — GitHub no deja aprobar tu propia
+    PR), check `ci` requerido, sin force-push ni borrado,
+    `enforce_admins: false` como válvula de escape. Cambia el flujo de
+    trabajo real (ya no hay push directo a `main`); probado de punta a
+    punta con el primer PR real del repo (#12), incluida la v0.7.1 —
+    patch de seguridad cortada porque la imagen `0.7.0` en GHCR se había
+    remutado en silencio (reconstruida dos veces el mismo día sin subir
+    versión).
 
 ## Lectura estratégica
 
