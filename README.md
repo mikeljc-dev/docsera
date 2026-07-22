@@ -6,6 +6,7 @@
 [![License](https://img.shields.io/github/license/mikeljc-dev/docsera)](./LICENSE)
 [![Release](https://img.shields.io/github/v/release/mikeljc-dev/docsera)](https://github.com/mikeljc-dev/docsera/releases)
 [![Tests](https://img.shields.io/badge/tests-172%20passing-brightgreen)](https://github.com/mikeljc-dev/docsera/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/mikeljc-dev/docsera/badge)](https://scorecard.dev/viewer/?uri=github.com/mikeljc-dev/docsera)
 
 **AI chat for your docs. Open source, self-hosted, one line of code.**
 

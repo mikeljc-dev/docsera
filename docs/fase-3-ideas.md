@@ -31,14 +31,6 @@ identificaron trabajando en otras cosas, no una cola.
   alternativa (pedirle un marcador `PARTIAL`/`NO_ANSWER` al propio LLM,
   coste cero en la misma llamada) apuntaba bien pero necesita el mismo tipo
   de calibración con tráfico real que el punto anterior.
-- **OpenSSF Scorecard** — badge y workflow automático (GitHub Action, sin
-  tocar código) que audita prácticas de seguridad del repo. Salió al
-  comparar badges de otros proyectos (2026-07-20); no llegamos a añadirlo,
-  a diferencia de License/Release/Tests que sí se añadieron esa sesión.
-- **Provenance/SBOM en la imagen Docker** — el paquete npm ya lleva
-  provenance (trusted publishing, SLSA attestations verificadas); la imagen
-  de `ghcr.io/mikeljc-dev/docsera` todavía no genera las suyas
-  (`docker/build-push-action` lo soporta con `provenance: true`).
 - **Infra:** decidir plan de Railway cuando se agote el crédito del trial
   (Hobby ~5 $/mes, o migrar a Cloud Run + Neon con la misma imagen).
 
@@ -77,6 +69,14 @@ conversación, no una entrada más en esta lista.
 12. ✅ Servidor MCP (`POST /mcp`) y `GET /llms.txt`.
 13. ✅ Redacción de secretos en la ingesta (`redactSecrets`, opt-in por
     petición, no global).
+15. ✅ **OpenSSF Scorecard y provenance/SBOM en la imagen Docker**
+    *(2026-07-22)* — workflow de Scorecard (badge en el README, corre en
+    cada push a main y semanalmente) y `sbom: true` en `release-image.yml`.
+    La provenance de la imagen resultó ya estar puesta sola: `docker/
+    build-push-action` la genera por defecto al publicar en un registro
+    público (verificado con `docker buildx imagetools inspect` sobre la
+    0.7.0 ya publicada — SLSA provenance real de BuildKit, con el builder
+    apuntando al run de GitHub Actions). Solo el SBOM faltaba pedirlo.
 
 ## Lectura estratégica
 
