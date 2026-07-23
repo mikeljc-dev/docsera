@@ -20,14 +20,20 @@ jobs:
     steps:
       - name: Ingest docs.docsera.dev
         run: |
-          curl -sf -X POST https://api.docsera.dev/ingest \
+          code=$(curl -s -o response.json -w "%{http_code}" -X POST https://api.docsera.dev/ingest \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${{ secrets.DOCSERA_ADMIN_TOKEN }}" \
-            -d '{"type": "url", "source": "https://docs.docsera.dev/"}'
+            -d '{"type": "url", "source": "https://docs.docsera.dev/"}')
+          cat response.json
+          echo
+          [ "$code" -lt 400 ]
 
       - name: Ingest README.md
         run: |
-          curl -sf -X POST https://api.docsera.dev/ingest \
+          code=$(curl -s -o response.json -w "%{http_code}" -X POST https://api.docsera.dev/ingest \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${{ secrets.DOCSERA_ADMIN_TOKEN }}" \
-            -d '{"type": "github", "source": "mikeljc-dev/docsera", "path": "README.md"}'
+            -d '{"type": "github", "source": "mikeljc-dev/docsera", "path": "README.md"}')
+          cat response.json
+          echo
+          [ "$code" -lt 400 ]
