@@ -174,7 +174,7 @@ En producción, sustituye `localhost:3000` por el dominio donde tengas desplegad
 
 ### 3. Revisa las analíticas en el dashboard
 
-Abre `http://localhost:3000/dashboard` y pega tu `ADMIN_TOKEN`. La pestaña Analytics muestra tu tasa de respuesta, preguntas por día, el feedback 👍/👎 y el top de preguntas sin responder — la señal más directa de qué le falta a tu documentación — más el historial completo en su propia pestaña.
+Abre `http://localhost:3000/dashboard` y pega tu `ADMIN_TOKEN`. La pestaña Analytics muestra tu tasa de respuesta, preguntas por día, el feedback 👍/👎 y el top de preguntas sin responder — la señal más directa de qué le falta a tu documentación — sobre el rango de fechas que elijas, y al hacer clic en una pregunta saltas a esas conversaciones. La pestaña Conversations es el historial completo: búscalo, fíltralo y ordénalo, y abre cualquier respuesta en un popup renderizada igual que la muestra el widget.
 
 ## Configuración
 

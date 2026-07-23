@@ -174,7 +174,7 @@ In production, replace `localhost:3000` with the domain where your server is dep
 
 ### 3. Review the analytics in the dashboard
 
-Open `http://localhost:3000/dashboard` and paste your `ADMIN_TOKEN`. The Analytics tab shows your answer rate, questions per day, 👍/👎 feedback and the top unanswered questions — the most direct signal of what's missing in your documentation — plus the full conversation history in its own tab.
+Open `http://localhost:3000/dashboard` and paste your `ADMIN_TOKEN`. The Analytics tab shows your answer rate, questions per day, 👍/👎 feedback and the top unanswered questions — the most direct signal of what's missing in your documentation — over a date range you choose, and clicking a question drills into those conversations. The Conversations tab is the full history: search, filter and sort it, and open any answer in a popup rendered just like the widget shows it.
 
 ## Configuration
 

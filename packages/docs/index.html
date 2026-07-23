@@ -217,8 +217,9 @@ jobs:
 
       <section>
         <h2 id="dashboard">The dashboard</h2>
-        <p>Open <code>/dashboard</code> on your server and paste your <code>ADMIN_TOKEN</code>. The <strong>Analytics</strong> tab shows your answer rate, 👍/👎 feedback, questions per day, the <strong>top unanswered questions</strong> (grouped, so repeated questions bubble up — the most direct signal of what's missing in your docs) and the most cited sections. The <strong>Conversations</strong> tab has the full history with answered/unanswered filters and each answer's feedback.</p>
-        <img class="screenshot" src="/dashboard.png" alt="The Analytics tab of the Docsera dashboard: answer rate, questions per day, top unanswered questions and most cited sections" loading="lazy" />
+        <p>Open <code>/dashboard</code> on your server and paste your <code>ADMIN_TOKEN</code>. The <strong>Analytics</strong> tab shows your answer rate, 👍/👎 feedback, questions per day, the <strong>top unanswered questions</strong> (grouped, so repeated questions bubble up — the most direct signal of what's missing in your docs) and the most cited sections, all scoped to a date range (7/30 days or all time). Clicking a top unanswered question jumps straight to those conversations.</p>
+        <img class="screenshot" src="/dashboard.png" alt="The Analytics tab of the Docsera dashboard: a date-range selector, answer rate, questions per day, top unanswered questions and most cited sections" loading="lazy" />
+        <p>The <strong>Conversations</strong> tab is the full history — search by question, filter by status and date, sort by date, citations or feedback, and drill into a single session. Open any row to read the full answer rendered exactly as the widget shows it (code blocks and all), with its sources; delete conversations you don't want to keep.</p>
         <div id="live-stats" hidden></div>
         <p class="fine-print">Live numbers come from this demo's own instance via an aggregates-only public endpoint (<code>PUBLIC_STATS=true</code>, off by default) — visitor questions are never exposed.</p>
       </section>
