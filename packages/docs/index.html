@@ -6,7 +6,10 @@
   <title>Docsera Docs — self-hosted AI chat for your documentation</title>
   <meta name="description" content="Install, configure and run Docsera: the open-source, self-hosted AI chat widget for your documentation. RAG with citations, LLM-agnostic, Docker Compose." />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="icon" href="/favicon.png" type="image/png" />
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="icon" href="/favicon-64.png" sizes="64x64" type="image/png" />
+  <link rel="icon" href="/favicon.png" sizes="512x512" type="image/png" />
+  <link rel="apple-touch-icon" href="/favicon-180.png" />
   <script>
     // Antes del primer pintado: aplica el tema elegido si lo hay
     try { var t = localStorage.getItem("docsera-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
@@ -16,7 +19,11 @@
 <body>
   <div class="topbar">
     <div class="brand">
-      <a class="logo" href="/">Doc<span>sera</span> Docs</a>
+      <a class="logo" href="/">
+        <img class="logo-dark" src="/assets/docsera-logotype-dark.svg" width="112" height="28" alt="Docsera" />
+        <img class="logo-light" src="/assets/docsera-logotype-light.svg" width="112" height="28" alt="Docsera" />
+        Docs
+      </a>
       <span class="badge">v__DOCSERA_VERSION__</span>
     </div>
     <nav>

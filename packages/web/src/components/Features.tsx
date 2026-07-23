@@ -1,51 +1,53 @@
 interface Feature {
-  icon: string;
+  shape: "square" | "circle" | "diamond";
   title: string;
   body: string;
 }
 
 const FEATURES: Feature[] = [
   {
-    icon: "🔒",
-    title: "Privacy-first, self-hosted",
-    body: "Deploy with Docker Compose in under 10 minutes. Conversations and documents stay in your Postgres. No third-party SaaS in the middle.",
+    shape: "square",
+    title: "Privacy-first",
+    body: "Self-hosted: your data never leaves your server, except calls to whatever LLM you choose — or none at all with Ollama.",
   },
   {
-    icon: "🔌",
-    title: "Bring your own LLM",
-    body: "Anthropic, OpenAI, or fully local models via Ollama — swappable adapters for chat and embeddings, configured independently.",
+    shape: "circle",
+    title: "LLM-agnostic",
+    body: "Anthropic, OpenAI, or local models via Ollama. Chat and embeddings are configured independently.",
   },
   {
-    icon: "📎",
+    shape: "diamond",
     title: "Answers with sources",
-    body: 'Every response links to the exact section of your docs it came from. When the docs don\'t have the answer, it says "I don\'t know" — before hallucinating.',
+    body: 'Every response links to the exact section it came from. Before hallucinating, it says "I don\'t know."',
   },
   {
-    icon: "📥",
-    title: "Ingest anything",
-    body: "Point it at a sitemap (nested indexes included), a URL, or raw Markdown from your CI. Re-ingesting unchanged content costs nothing.",
+    shape: "square",
+    title: "Flexible ingestion",
+    body: "Markdown, a URL, a full sitemap, a PDF, or an entire GitHub repo — in one shot.",
   },
   {
-    icon: "📊",
-    title: "Find your docs' gaps",
-    body: "The dashboard shows your answer rate, top unanswered questions, most cited sections and 👍/👎 feedback — the most direct signal of what's missing in your documentation.",
+    shape: "circle",
+    title: "Analytics dashboard",
+    body: "Answer rate, unanswered questions, most-cited sections, and 👍/👎 feedback.",
   },
   {
-    icon: "⚖️",
-    title: "Open source, AGPL-3.0",
-    body: "The core is and will always be open source. TypeScript monorepo: Hono API, Lit web component, Postgres + pgvector. No vendor lock-in.",
+    shape: "diamond",
+    title: "MCP server",
+    body: "Expose your docs as an MCP server so AI agents can query them directly.",
   },
 ];
 
 export function Features() {
   return (
     <section id="features">
-      <h2 class="reveal">Like Intercom for your docs — but yours</h2>
-      <p class="lead reveal">Everything runs on your infrastructure with the LLM provider you choose.</p>
+      <h2 class="reveal">Everything a support chat needs, without giving up your data</h2>
+      <p class="lead reveal">Think of the Intercom chat — but open source and hosted by you.</p>
       <div class="grid">
         {FEATURES.map((feature) => (
           <div class="card reveal" key={feature.title}>
-            <div class="icon">{feature.icon}</div>
+            <div class="icon-tile">
+              <span class={`icon-shape ${feature.shape}`} />
+            </div>
             <h3>{feature.title}</h3>
             <p>{feature.body}</p>
           </div>

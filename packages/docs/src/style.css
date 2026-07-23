@@ -49,8 +49,22 @@ a { color: var(--primary); }
 }
 .theme-toggle[aria-checked="true"] .knob { transform: translateX(26px); }
 .topbar .brand { display: flex; align-items: center; gap: 0.6rem; }
-.topbar .logo { font-weight: 700; font-size: 1.05rem; color: var(--fg); text-decoration: none; }
-.topbar .logo span { color: var(--primary); }
+.topbar .logo {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-weight: 700; font-size: 1.05rem; color: var(--muted); text-decoration: none;
+}
+.topbar .logo img { height: 26px; width: auto; }
+/* El logotype ya trae el texto dibujado (fill fijo): se alterna el SVG
+   entero por tema en vez de recolorear con CSS. Especificidad "img.clase"
+   a propósito, para ganarle a ".topbar .logo img" de arriba. */
+.topbar .logo img.logo-dark { display: block; }
+.topbar .logo img.logo-light { display: none; }
+:root[data-theme="light"] .topbar .logo img.logo-dark { display: none; }
+:root[data-theme="light"] .topbar .logo img.logo-light { display: block; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .topbar .logo img.logo-dark { display: none; }
+  :root:not([data-theme="dark"]) .topbar .logo img.logo-light { display: block; }
+}
 .topbar .badge {
   font-size: 0.72rem; color: var(--muted); border: 1px solid var(--border);
   border-radius: 999px; padding: 0.1rem 0.55rem;
