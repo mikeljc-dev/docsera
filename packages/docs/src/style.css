@@ -145,6 +145,11 @@ footer {
 .live-chart, .live-sources {
   background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px;
   padding: 0.8rem 0.9rem;
+  /* Items de grid: por defecto min-width:auto no les deja encoger por debajo
+     del ancho de su contenido (el gráfico y la lista con nowrap), así que en
+     móvil se salían de la columna y provocaban scroll horizontal de la
+     página. min-width:0 les deja encoger y que el ellipsis/overflow funcionen. */
+  min-width: 0;
 }
 .live-days { display: flex; align-items: flex-end; gap: 4px; height: 72px; }
 .live-day { flex: 1; display: flex; align-items: flex-end; height: 100%; }
