@@ -16,6 +16,6 @@
     "vite": "^8.1.5"
   },
   "dependencies": {
-    "driver.js": "^1.7.0"
+    "driver.js": "^1.8.0"
   }
 }
