@@ -1,4 +1,3 @@
-import { Fragment } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import {
   type Conversation,
@@ -8,6 +7,7 @@ import {
   type SortDir,
   UnauthorizedError,
 } from "./api.js";
+import { ConversationModal } from "./ConversationModal.js";
 
 const PAGE_SIZE = 25;
 const SEARCH_DEBOUNCE_MS = 350;
@@ -40,19 +40,6 @@ interface Props {
   onUnauthorized: () => void;
   // Búsqueda con la que arrancar (llega de un drill-down desde Analytics).
   initialSearch?: string;
-}
-
-// Sin el título del documento delante: casi todas las citas de una misma
-// instancia vienen del mismo documento, así que repetirlo en cada chip
-// solo añade ruido. Sin anchor no queda otra que caer al título.
-function sourceLabel(source: Conversation["sources"][number]): string {
-  if (!source.anchor) return source.title;
-  return source.anchor.replace(/-/g, " ");
-}
-
-function sourceHref(source: Conversation["sources"][number]): string {
-  if (!source.url) return "";
-  return source.anchor ? `${source.url}#${source.anchor}` : source.url;
 }
 
 // toLocaleString() da fechas de longitud variable (con/sin AM-PM, día de 1 o
@@ -128,7 +115,7 @@ export function ConversationsView({ token, onUnauthorized, initialSearch = "" }:
   // sin parpadeo.
   const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Conversation | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
 
@@ -198,7 +185,7 @@ export function ConversationsView({ token, onUnauthorized, initialSearch = "" }:
     setDeletingId(id);
     try {
       await deleteConversation(token, id);
-      setExpanded(null);
+      setSelected(null);
       setReloadToken((t) => t + 1);
     } catch (err: unknown) {
       if (err instanceof UnauthorizedError) {
@@ -301,103 +288,52 @@ export function ConversationsView({ token, onUnauthorized, initialSearch = "" }:
               </tr>
             </thead>
             <tbody>
-              {conversations.map((conversation) => {
-                const isExpanded = expanded === conversation.id;
-                return (
-                  <Fragment key={conversation.id}>
-                    <tr
-                      class={`row ${isExpanded ? "expanded" : ""}`}
-                      onClick={() => setExpanded(isExpanded ? null : conversation.id)}
-                    >
-                      <td class="date">
-                        <div class="date-row">
-                          {formatDate(conversation.createdAt)}
-                          <button
-                            class="session-link"
-                            title="Filter this session"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              setSessionFilter(conversation.sessionId);
-                              setPage(0);
-                            }}
-                          >
-                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                      <td>
-                        <div class={isExpanded ? "" : "clamp"}>
-                          {highlight(conversation.question, search)}
-                        </div>
-                      </td>
-                      <td>
-                        {conversation.answer == null ? (
-                          "—"
-                        ) : isExpanded ? (
-                          // Al expandir: Markdown limpiado pero con los saltos
-                          // de línea intactos (pre-wrap), para que un bloque de
-                          // código o una lista se lean como tal.
-                          <div class="answer-full">{stripMarkdown(conversation.answer)}</div>
-                        ) : (
-                          <div class="clamp">
-                            {stripMarkdown(conversation.answer).replace(/\s+/g, " ").trim()}
-                          </div>
-                        )}
-                      </td>
-                      <td>
-                        <span class={conversation.answered ? "badge ok" : "badge warn"}>
-                          {conversation.answered ? "Answered" : "Unanswered"}
-                        </span>
-                      </td>
-                      <td class="center">{conversation.sources.length}</td>
-                      <td class="center">
-                        {conversation.feedback === 1
-                          ? "👍"
-                          : conversation.feedback === -1
-                            ? "👎"
-                            : "—"}
-                      </td>
-                    </tr>
-                    {isExpanded && (
-                      <tr class="row-detail">
-                        <td colSpan={6}>
-                          {conversation.sources.length > 0 && (
-                            <>
-                              <span class="source-chips-label">Sources</span>
-                              <div class="source-chips">
-                                {conversation.sources.map((source) => (
-                                  <a
-                                    key={sourceHref(source)}
-                                    href={sourceHref(source)}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    onClick={(event) => event.stopPropagation()}
-                                  >
-                                    {sourceLabel(source)}
-                                  </a>
-                                ))}
-                              </div>
-                            </>
-                          )}
-                          <button
-                            class="delete-button"
-                            disabled={deletingId === conversation.id}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              void handleDelete(conversation.id);
-                            }}
-                          >
-                            {deletingId === conversation.id ? "Deleting…" : "Delete conversation"}
-                          </button>
-                        </td>
-                      </tr>
-                    )}
-                  </Fragment>
-                );
-              })}
+              {conversations.map((conversation) => (
+                <tr key={conversation.id} class="row" onClick={() => setSelected(conversation)}>
+                  <td class="date">
+                    <div class="date-row">
+                      {formatDate(conversation.createdAt)}
+                      <button
+                        class="session-link"
+                        title="Filter this session"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setSessionFilter(conversation.sessionId);
+                          setPage(0);
+                        }}
+                      >
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="clamp">{highlight(conversation.question, search)}</div>
+                  </td>
+                  <td>
+                    <div class="clamp">
+                      {conversation.answer == null
+                        ? "—"
+                        : stripMarkdown(conversation.answer).replace(/\s+/g, " ").trim()}
+                    </div>
+                  </td>
+                  <td>
+                    <span class={conversation.answered ? "badge ok" : "badge warn"}>
+                      {conversation.answered ? "Answered" : "Unanswered"}
+                    </span>
+                  </td>
+                  <td class="center">{conversation.sources.length}</td>
+                  <td class="center">
+                    {conversation.feedback === 1
+                      ? "👍"
+                      : conversation.feedback === -1
+                        ? "👎"
+                        : "—"}
+                  </td>
+                </tr>
+              ))}
               {conversations.length === 0 && (
                 <tr>
                   <td colSpan={6} class="empty">
@@ -420,6 +356,15 @@ export function ConversationsView({ token, onUnauthorized, initialSearch = "" }:
             </button>
           </div>
         </div>
+      )}
+
+      {selected && (
+        <ConversationModal
+          conversation={selected}
+          deleting={deletingId === selected.id}
+          onClose={() => setSelected(null)}
+          onDelete={(id) => void handleDelete(id)}
+        />
       )}
     </div>
   );
