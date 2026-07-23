@@ -16,6 +16,11 @@ function sourceLabel(source: AdminStats["topSources"][number]): string {
   return `${source.title} § ${source.anchor.replace(/-/g, " ")}`;
 }
 
+function sourceHref(source: AdminStats["topSources"][number]): string | null {
+  if (!source.url) return null;
+  return source.anchor ? `${source.url}#${source.anchor}` : source.url;
+}
+
 export function AnalyticsView({ token, onUnauthorized }: Props) {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -121,15 +126,24 @@ export function AnalyticsView({ token, onUnauthorized }: Props) {
             <p class="empty-note">No citations yet.</p>
           ) : (
             <ol class="rank">
-              {stats.topSources.map((item) => (
-                <li key={`${item.url}#${item.anchor}`}>
-                  <div class="rank-row">
-                    <span class="rank-text">{sourceLabel(item)}</span>
-                    <span class="rank-count">{item.times}</span>
-                  </div>
-                  <div class="rank-bar" style={{ width: `${(item.times / maxSource) * 100}%` }} />
-                </li>
-              ))}
+              {stats.topSources.map((item) => {
+                const href = sourceHref(item);
+                return (
+                  <li key={`${item.url}#${item.anchor}`}>
+                    <div class="rank-row">
+                      {href ? (
+                        <a class="rank-text" href={href} target="_blank" rel="noopener noreferrer">
+                          {sourceLabel(item)}
+                        </a>
+                      ) : (
+                        <span class="rank-text">{sourceLabel(item)}</span>
+                      )}
+                      <span class="rank-count">{item.times}</span>
+                    </div>
+                    <div class="rank-bar" style={{ width: `${(item.times / maxSource) * 100}%` }} />
+                  </li>
+                );
+              })}
             </ol>
           )}
         </section>

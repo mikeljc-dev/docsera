@@ -128,9 +128,28 @@ body {
   margin: 0;
 }
 
+header h1 {
+  margin: 0 0 1rem;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
 .filters {
   display: flex;
   gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .filters button {
@@ -150,15 +169,14 @@ body {
 }
 
 .search {
-  display: block;
-  width: 100%;
+  flex: 1;
+  min-width: 160px;
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--fg);
   border-radius: 8px;
   padding: 0.55rem 0.8rem;
   font-size: 0.9rem;
-  margin-bottom: 1rem;
 }
 
 .search:focus {
@@ -168,6 +186,11 @@ body {
 
 table {
   width: 100%;
+  /* fixed a propósito: con "auto" (por defecto), el ancho de cada columna se
+     recalcula según el contenido visible, así que expandir una fila (texto
+     completo, sin recorte) movía las columnas de toda la tabla. Con "fixed"
+     los anchos vienen del colgroup y no varían nunca. */
+  table-layout: fixed;
   border-collapse: collapse;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -223,24 +246,33 @@ td.empty {
   background: var(--bg);
 }
 
-td.clamp {
+/* Nunca en el propio <td>: -webkit-box le quita su display:table-cell y
+   descoloca el resto de la fila. Va en un div envolviendo el contenido. */
+.clamp {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  max-width: 320px;
 }
 
 .row-detail td {
-  padding-top: 0;
+  padding: 0 0.8rem 1rem;
   background: var(--bg);
+}
+
+.source-chips-label {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0.6rem 0 0.6rem;
 }
 
 .source-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  padding-bottom: 0.4rem;
+  gap: 0.5rem 0.6rem;
 }
 
 .source-chips a {
@@ -248,8 +280,9 @@ td.clamp {
   background: var(--surface);
   color: var(--fg);
   border-radius: 999px;
-  padding: 0.25rem 0.7rem;
+  padding: 0.4rem 0.95rem;
   font-size: 0.78rem;
+  line-height: 1.3;
   text-decoration: none;
 }
 
@@ -460,6 +493,13 @@ td.clamp {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+a.rank-text:hover {
+  color: var(--primary);
+  text-decoration: underline;
 }
 
 .rank-count {

@@ -84,29 +84,30 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
     <div>
       <header>
         <h1>Conversations</h1>
-        <div class="filters">
-          {FILTERS.map(({ value, label }) => (
-            <button
-              key={value}
-              class={filter === value ? "active" : ""}
-              onClick={() => {
-                setFilter(value);
-                setPage(0);
-              }}
-            >
-              {label}
-            </button>
-          ))}
+        <div class="toolbar">
+          <div class="filters">
+            {FILTERS.map(({ value, label }) => (
+              <button
+                key={value}
+                class={filter === value ? "active" : ""}
+                onClick={() => {
+                  setFilter(value);
+                  setPage(0);
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <input
+            class="search"
+            type="search"
+            placeholder="Search questions…"
+            value={searchInput}
+            onInput={(event) => setSearchInput((event.target as HTMLInputElement).value)}
+          />
         </div>
       </header>
-
-      <input
-        class="search"
-        type="search"
-        placeholder="Search questions…"
-        value={searchInput}
-        onInput={(event) => setSearchInput((event.target as HTMLInputElement).value)}
-      />
 
       {error && <p class="error">{error}</p>}
       {loading && <p class="loading">Loading…</p>}
@@ -114,6 +115,14 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
       {!loading && !error && (
         <>
           <table>
+            <colgroup>
+              <col style="width: 14%" />
+              <col style="width: 27%" />
+              <col style="width: 27%" />
+              <col style="width: 12%" />
+              <col style="width: 10%" />
+              <col style="width: 10%" />
+            </colgroup>
             <thead>
               <tr>
                 <th>Date</th>
@@ -134,8 +143,12 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
                       onClick={() => setExpanded(isExpanded ? null : conversation.id)}
                     >
                       <td class="date">{new Date(conversation.createdAt).toLocaleString()}</td>
-                      <td class={isExpanded ? "" : "clamp"}>{conversation.question}</td>
-                      <td class={isExpanded ? "" : "clamp"}>{conversation.answer ?? "—"}</td>
+                      <td>
+                        <div class={isExpanded ? "" : "clamp"}>{conversation.question}</div>
+                      </td>
+                      <td>
+                        <div class={isExpanded ? "" : "clamp"}>{conversation.answer ?? "—"}</div>
+                      </td>
                       <td>
                         <span class={conversation.answered ? "badge ok" : "badge warn"}>
                           {conversation.answered ? "Answered" : "Unanswered"}
@@ -153,6 +166,7 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
                     {isExpanded && conversation.sources.length > 0 && (
                       <tr class="row-detail">
                         <td colSpan={6}>
+                          <span class="source-chips-label">Sources</span>
                           <div class="source-chips">
                             {conversation.sources.map((source) => (
                               <a
