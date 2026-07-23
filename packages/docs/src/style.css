@@ -57,13 +57,13 @@ a { color: var(--primary); }
 /* El logotype ya trae el texto dibujado (fill fijo): se alterna el SVG
    entero por tema en vez de recolorear con CSS. Especificidad "img.clase"
    a propósito, para ganarle a ".topbar .logo img" de arriba. */
-.topbar .logo img.logo-dark { display: block; }
-.topbar .logo img.logo-light { display: none; }
-:root[data-theme="light"] .topbar .logo img.logo-dark { display: none; }
-:root[data-theme="light"] .topbar .logo img.logo-light { display: block; }
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) .topbar .logo img.logo-dark { display: none; }
-  :root:not([data-theme="dark"]) .topbar .logo img.logo-light { display: block; }
+.topbar .logo img.logo-dark { display: none; }
+.topbar .logo img.logo-light { display: block; }
+:root[data-theme="dark"] .topbar .logo img.logo-dark { display: block; }
+:root[data-theme="dark"] .topbar .logo img.logo-light { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .topbar .logo img.logo-dark { display: block; }
+  :root:not([data-theme="light"]) .topbar .logo img.logo-light { display: none; }
 }
 .topbar .badge {
   font-size: 0.72rem; color: var(--muted); border: 1px solid var(--border);

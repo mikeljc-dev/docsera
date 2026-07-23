@@ -3,6 +3,7 @@
   --primary: #2563eb;
   --bg: #f9fafb;
   --surface: #ffffff;
+  --th-bg: #f3f4f6;
   --fg: #1f2937;
   --muted: #6b7280;
   --border: #e5e7eb;
@@ -10,6 +11,39 @@
   --ok-fg: #166534;
   --warn-bg: #fef3c7;
   --warn-fg: #92400e;
+  --error-fg: #991b1b;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b1020;
+  --surface: #111832;
+  --th-bg: #161d3a;
+  --fg: #e6e9f2;
+  --muted: #9aa3b8;
+  --border: #1f2a4a;
+  --ok-bg: rgba(34, 197, 94, 0.16);
+  --ok-fg: #4ade80;
+  --warn-bg: rgba(245, 158, 11, 0.16);
+  --warn-fg: #fbbf24;
+  --error-fg: #f87171;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0b1020;
+    --surface: #111832;
+    --th-bg: #161d3a;
+    --fg: #e6e9f2;
+    --muted: #9aa3b8;
+    --border: #1f2a4a;
+    --ok-bg: rgba(34, 197, 94, 0.16);
+    --ok-fg: #4ade80;
+    --warn-bg: rgba(245, 158, 11, 0.16);
+    --warn-fg: #fbbf24;
+    --error-fg: #f87171;
+  }
 }
 
 * {
@@ -30,8 +64,15 @@ body {
   text-align: center;
 }
 
-.login h1 {
-  font-size: 1.2rem;
+.login .logo {
+  height: 35px;
+  width: auto;
+}
+
+.login-subtitle {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0.4rem 0 0;
 }
 
 .login form {
@@ -87,9 +128,29 @@ body {
   margin: 0;
 }
 
+header h1 {
+  margin: 0 0 1rem;
+}
+
+.toolbar {
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
 .filters {
   display: flex;
   gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .filters button {
@@ -108,8 +169,29 @@ body {
   border-color: var(--primary);
 }
 
+.search {
+  flex: 1;
+  min-width: 160px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  border-radius: 8px;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+.search:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
 table {
   width: 100%;
+  /* fixed a propósito: con "auto" (por defecto), el ancho de cada columna se
+     recalcula según el contenido visible, así que expandir una fila (texto
+     completo, sin recorte) movía las columnas de toda la tabla. Con "fixed"
+     los anchos vienen del colgroup y no varían nunca. */
+  table-layout: fixed;
   border-collapse: collapse;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -127,11 +209,32 @@ td {
 }
 
 th {
-  background: #f3f4f6;
+  background: var(--th-bg);
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.02em;
   color: var(--muted);
+}
+
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+th.sortable:hover {
+  color: var(--fg);
+}
+
+.sort-arrow {
+  margin-left: 0.3rem;
+  font-size: 0.7em;
+}
+
+mark {
+  background: rgba(37, 99, 235, 0.25);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 0.05em;
 }
 
 tr:last-child td {
@@ -139,8 +242,35 @@ tr:last-child td {
 }
 
 td.date {
-  white-space: nowrap;
   color: var(--muted);
+  white-space: nowrap;
+}
+
+.date-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.session-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 0.15rem;
+  border-radius: 5px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.row:hover .session-link {
+  opacity: 0.7;
+}
+
+.session-link:hover {
+  opacity: 1 !important;
+  background: var(--th-bg);
+  color: var(--primary);
 }
 
 td.center {
@@ -151,6 +281,97 @@ td.empty {
   text-align: center;
   color: var(--muted);
   padding: 2rem;
+}
+
+.row {
+  cursor: pointer;
+}
+
+.row:hover td {
+  background: var(--bg);
+}
+
+/* Nunca en el propio <td>: -webkit-box le quita su display:table-cell y
+   descoloca el resto de la fila. Va en un div envolviendo el contenido. */
+.clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.source-chips-label {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0.6rem 0 0.6rem;
+}
+
+.source-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.6rem;
+}
+
+.source-chips a {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  border-radius: 999px;
+  padding: 0.4rem 0.95rem;
+  font-size: 0.78rem;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+.source-chips a:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.active-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  border-radius: 999px;
+  padding: 0.3rem 0.5rem 0.3rem 0.9rem;
+  font-size: 0.82rem;
+  margin-top: 0.75rem;
+}
+
+.active-filter button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.1rem 0.3rem;
+}
+
+.delete-button {
+  display: block;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--error-fg);
+  border-radius: 8px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.delete-button:hover {
+  border-color: var(--error-fg);
+}
+
+.delete-button:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .badge {
@@ -195,7 +416,7 @@ td.empty {
 }
 
 .error {
-  color: #991b1b;
+  color: var(--error-fg);
 }
 
 .loading {
@@ -208,6 +429,41 @@ td.empty {
   max-width: 1000px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.site-header .logo {
+  height: 26px;
+  width: auto;
+}
+
+.site-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sign-out {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.sign-out:hover {
+  color: var(--fg);
+  border-color: var(--muted);
 }
 
 .app .dashboard {
@@ -239,6 +495,28 @@ td.empty {
 }
 
 /* ─── Analytics ─── */
+
+.analytics-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.analytics-header h1 {
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+/* Mientras se recargan datos (cambio de filtro/rango) se mantiene lo anterior
+   visible y atenuado, sin desmontar la tabla ni parpadear a "Loading…". */
+.reloading {
+  opacity: 0.55;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
 
 .tiles {
   display: grid;
@@ -320,6 +598,29 @@ td.empty {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+a.rank-text:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+/* Pregunta sin responder clicable: se ve como texto, se comporta como enlace
+   (lleva a esas conversaciones). Botón por accesibilidad, sin estilo de botón. */
+button.rank-text {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.rank-text.drill:hover {
+  color: var(--primary);
+  text-decoration: underline;
 }
 
 .rank-count {
@@ -363,4 +664,217 @@ td.empty {
   font-size: 0.68rem;
   color: var(--muted);
   margin-top: 0.3rem;
+}
+
+/* ─── Switch claro/oscuro (mismo patrón que packages/web) ─── */
+
+.theme-toggle {
+  position: relative; display: inline-flex; align-items: center;
+  width: 52px; height: 26px; flex-shrink: 0;
+  border-radius: 999px; border: 1px solid var(--border);
+  background: var(--surface); cursor: pointer; padding: 0;
+  transition: border-color 0.2s;
+}
+.theme-toggle:hover { border-color: var(--muted); }
+.theme-toggle .icon {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  color: var(--muted); display: inline-flex; pointer-events: none;
+}
+.theme-toggle .icon.sun { left: 6px; }
+.theme-toggle .icon.moon { right: 6px; }
+.theme-toggle .knob {
+  position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
+  border-radius: 50%; background: var(--primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.theme-toggle[aria-checked="true"] .knob { transform: translateX(26px); }
+
+/* El logotype trae el texto dibujado (fill fijo): se alterna el SVG entero
+   por tema. Especificidad "img.clase" para ganarle a las reglas ".logo".
+   Por defecto el dashboard es CLARO (al revés que la landing): se oculta
+   la variante oscura por defecto, no la clara. */
+img.logo-dark { display: none; }
+:root[data-theme="dark"] img.logo-dark { display: block; }
+:root[data-theme="dark"] img.logo-light { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) img.logo-dark { display: block; }
+  :root:not([data-theme="light"]) img.logo-light { display: none; }
+}
+
+/* ─── Modal de conversación ─── */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 100;
+  animation: modal-fade 0.15s ease;
+}
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 640px;
+  max-height: calc(100vh - 3rem);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modal-rise 0.18s cubic-bezier(0.22, 0.9, 0.3, 1.05);
+}
+
+@keyframes modal-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modal-rise {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.modal-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.15rem 0.4rem;
+  border-radius: 6px;
+}
+
+.modal-close:hover {
+  color: var(--fg);
+  background: var(--th-bg);
+}
+
+.modal-body {
+  padding: 1.25rem 1.1rem;
+  overflow-y: auto;
+}
+
+.modal-question {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+}
+
+.modal-sources {
+  margin-top: 1.25rem;
+}
+
+.modal-footer {
+  padding: 0.8rem 1.1rem;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.modal-footer .delete-button {
+  margin: 0;
+}
+
+/* ─── Markdown de la respuesta (espejo del widget) ─── */
+
+.modal-answer.md {
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.modal-answer.md p {
+  margin: 0 0 0.6rem;
+}
+
+.modal-answer.md p:last-child,
+.modal-answer.md ul:last-child,
+.modal-answer.md .codeblock:last-child {
+  margin-bottom: 0;
+}
+
+.modal-answer.md ul {
+  margin: 0 0 0.6rem;
+  padding-left: 1.2rem;
+}
+
+.modal-answer.md li {
+  margin-bottom: 0.2rem;
+}
+
+.modal-answer.md p code,
+.modal-answer.md li code {
+  background: var(--th-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.05em 0.3em;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+}
+
+.modal-answer.md a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.codeblock {
+  position: relative;
+  margin: 0.6rem 0;
+}
+
+.codeblock pre {
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 8px;
+  padding: 0.7rem 0.85rem;
+  padding-right: 3.6rem;
+  overflow-x: auto;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.codeblock pre code {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+.codeblock .copy {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.45rem;
+  background: rgba(255, 255, 255, 0.14);
+  color: #cbd5e1;
+  border: none;
+  border-radius: 5px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.codeblock .copy:hover {
+  background: rgba(255, 255, 255, 0.22);
 }

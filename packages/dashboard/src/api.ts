@@ -1,3 +1,9 @@
+export interface ConversationSource {
+  url: string | null;
+  title: string;
+  anchor: string | null;
+}
+
 export interface Conversation {
   id: string;
   sessionId: string;
@@ -6,7 +12,7 @@ export interface Conversation {
   answered: boolean;
   feedback: number | null;
   createdAt: string;
-  sourceCount: number;
+  sources: ConversationSource[];
 }
 
 export interface ConversationsResponse {
@@ -42,8 +48,16 @@ export function clearToken(): void {
 
 export class UnauthorizedError extends Error {}
 
+export type SortBy = "date" | "feedback" | "sources";
+export type SortDir = "asc" | "desc";
+
 export interface FetchConversationsOptions {
   answered?: boolean;
+  search?: string;
+  sessionId?: string;
+  since?: string;
+  sortBy?: SortBy;
+  sortDir?: SortDir;
   limit: number;
   offset: number;
 }
@@ -54,6 +68,11 @@ export async function fetchConversations(
 ): Promise<ConversationsResponse> {
   const params = new URLSearchParams();
   if (options.answered !== undefined) params.set("answered", String(options.answered));
+  if (options.search) params.set("search", options.search);
+  if (options.sessionId) params.set("sessionId", options.sessionId);
+  if (options.since) params.set("since", options.since);
+  if (options.sortBy) params.set("sortBy", options.sortBy);
+  if (options.sortDir) params.set("sortDir", options.sortDir);
   params.set("limit", String(options.limit));
   params.set("offset", String(options.offset));
 
@@ -72,6 +91,21 @@ export async function fetchConversations(
   return (await response.json()) as ConversationsResponse;
 }
 
+export async function deleteConversation(token: string, id: string): Promise<void> {
+  const response = await fetch(`/admin/conversations/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (response.status === 401) {
+    throw new UnauthorizedError("Invalid token");
+  }
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+}
+
 export interface AdminStats {
   totals: {
     total: number;
@@ -83,10 +117,12 @@ export interface AdminStats {
   topUnanswered: { question: string; times: number }[];
   topSources: { title: string; url: string | null; anchor: string | null; times: number }[];
   daily: { day: string; total: number; unanswered: number }[];
+  chartDays: number;
 }
 
-export async function fetchStats(token: string): Promise<AdminStats> {
-  const response = await fetch("/admin/stats", {
+export async function fetchStats(token: string, days?: number): Promise<AdminStats> {
+  const query = days ? `?days=${days}` : "";
+  const response = await fetch(`/admin/stats${query}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 

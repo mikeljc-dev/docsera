@@ -2,18 +2,46 @@ import { useState } from "preact/hooks";
 import { AnalyticsView } from "./AnalyticsView.js";
 import { clearToken, getStoredToken, storeToken } from "./api.js";
 import { ConversationsView } from "./ConversationsView.js";
+import { ThemeToggle } from "./ThemeToggle.js";
 
 type Tab = "analytics" | "conversations";
+
+const BASE = import.meta.env.BASE_URL;
+
+function Logo({ width, height }: { width: number; height: number }) {
+  return (
+    <>
+      <img
+        class="logo logo-dark"
+        src={`${BASE}assets/docsera-logotype-dark.svg`}
+        width={width}
+        height={height}
+        alt="Docsera"
+      />
+      <img
+        class="logo logo-light"
+        src={`${BASE}assets/docsera-logotype-light.svg`}
+        width={width}
+        height={height}
+        alt="Docsera"
+      />
+    </>
+  );
+}
 
 export function App() {
   const [token, setToken] = useState<string | null>(getStoredToken());
   const [inputValue, setInputValue] = useState("");
   const [tab, setTab] = useState<Tab>("analytics");
+  // Búsqueda con la que arrancar la vista de conversaciones cuando se llega
+  // desde un clic en "Top unanswered". Al cambiar de pestaña a mano se limpia.
+  const [drillSearch, setDrillSearch] = useState("");
 
   if (!token) {
     return (
       <div class="login">
-        <h1>Docsera — Admin panel</h1>
+        <Logo width={140} height={35} />
+        <p class="login-subtitle">Admin panel</p>
         <form
           onSubmit={(event) => {
             event.preventDefault();
@@ -44,23 +72,54 @@ export function App() {
     setToken(null);
   };
 
+  const signOut = () => {
+    clearToken();
+    setToken(null);
+  };
+
   return (
     <div class="app">
+      <header class="site-header">
+        <Logo width={112} height={28} />
+        <div class="site-header-actions">
+          <ThemeToggle />
+          <button class="sign-out" onClick={signOut}>
+            Sign out
+          </button>
+        </div>
+      </header>
       <nav class="tabs">
-        <button class={tab === "analytics" ? "active" : ""} onClick={() => setTab("analytics")}>
+        <button
+          class={tab === "analytics" ? "active" : ""}
+          onClick={() => setTab("analytics")}
+        >
           Analytics
         </button>
         <button
           class={tab === "conversations" ? "active" : ""}
-          onClick={() => setTab("conversations")}
+          onClick={() => {
+            setDrillSearch("");
+            setTab("conversations");
+          }}
         >
           Conversations
         </button>
       </nav>
       {tab === "analytics" ? (
-        <AnalyticsView token={token} onUnauthorized={onUnauthorized} />
+        <AnalyticsView
+          token={token}
+          onUnauthorized={onUnauthorized}
+          onDrillDown={(question) => {
+            setDrillSearch(question);
+            setTab("conversations");
+          }}
+        />
       ) : (
-        <ConversationsView token={token} onUnauthorized={onUnauthorized} />
+        <ConversationsView
+          token={token}
+          onUnauthorized={onUnauthorized}
+          initialSearch={drillSearch}
+        />
       )}
     </div>
   );
