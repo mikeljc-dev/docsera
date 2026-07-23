@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 56" width="220" height="56">
+  <path d="M8 18a10 10 0 0 1 10-10h20a10 10 0 0 1 10 10v13a10 10 0 0 1-10 10H26l-8 6.5v-6.5h-1a10 10 0 0 1-9-8V18z" fill="#2563eb"></path>
+  <rect x="17" y="18" width="5" height="11" rx="1.6" fill="#ffffff"></rect>
+  <rect x="25" y="18" width="5" height="11" rx="1.6" fill="#ffffff"></rect>
+  <text x="58" y="37" font-family="-apple-system,BlinkMacSystemFont,&#39;Segoe UI&#39;,Roboto,Inter,sans-serif" font-size="28" font-weight="600" letter-spacing="-0.6" fill="#e6e9f2">Docsera<tspan fill="#2563eb">.</tspan></text>
+</svg>

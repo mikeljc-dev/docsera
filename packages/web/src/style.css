@@ -1,18 +1,7 @@
 :root {
-  --bg: #0b1020;
-  --bg-soft: #111832;
-  --fg: #e6e9f2;
-  --muted: #9aa3b8;
-  --primary: #2563eb;
-  --primary-soft: #3b82f6;
-  --border: #1f2a4a;
-  --radius: 14px;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  /* el bloque de código del hero es una "ventana de editor": oscuro siempre */
-  --snippet-bg: #111832;
-  --snippet-border: #1f2a4a;
-}
-:root[data-theme="light"] {
+  /* Claro por defecto: si el sistema del visitante no tiene preferencia
+     detectable, cae aquí. El oscuro se aplica solo si el sistema lo pide
+     explícitamente (media query de abajo) o vía el switch manual. */
   --bg: #ffffff;
   --bg-soft: #f6f8fc;
   --fg: #0f172a;
@@ -20,16 +9,30 @@
   --primary: #2563eb;
   --primary-soft: #2563eb;
   --border: #e2e8f0;
+  --radius: 14px;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  /* el bloque de código del hero es una "ventana de editor": oscuro siempre */
+  --snippet-bg: #111832;
+  --snippet-border: #1f2a4a;
 }
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    --bg: #ffffff;
-    --bg-soft: #f6f8fc;
-    --fg: #0f172a;
-    --muted: #5b6577;
+:root[data-theme="dark"] {
+  --bg: #0b1020;
+  --bg-soft: #111832;
+  --fg: #e6e9f2;
+  --muted: #9aa3b8;
+  --primary: #2563eb;
+  --primary-soft: #3b82f6;
+  --border: #1f2a4a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b1020;
+    --bg-soft: #111832;
+    --fg: #e6e9f2;
+    --muted: #9aa3b8;
     --primary: #2563eb;
-    --primary-soft: #2563eb;
-    --border: #e2e8f0;
+    --primary-soft: #3b82f6;
+    --border: #1f2a4a;
   }
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -57,14 +60,16 @@ nav.wrap {
 .logo img { height: 30px; width: auto; }
 /* El logotype ya trae el texto dibujado (fill fijo), así que se alterna el
    SVG entero por tema en vez de recolorear con CSS. Especificidad "img.clase"
-   a propósito: tiene que ganarle a ".logo img" de arriba. */
-.logo img.logo-dark { display: block; }
-.logo img.logo-light { display: none; }
-:root[data-theme="light"] .logo img.logo-dark { display: none; }
-:root[data-theme="light"] .logo img.logo-light { display: block; }
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) .logo img.logo-dark { display: none; }
-  :root:not([data-theme="dark"]) .logo img.logo-light { display: block; }
+   a propósito: tiene que ganarle a ".logo img" de arriba. Claro por defecto
+   (igual que los tokens de arriba): se oculta la variante oscura salvo que
+   el sistema pida oscuro de verdad o el switch lo fuerce. */
+.logo img.logo-dark { display: none; }
+.logo img.logo-light { display: block; }
+:root[data-theme="dark"] .logo img.logo-dark { display: block; }
+:root[data-theme="dark"] .logo img.logo-light { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .logo img.logo-dark { display: block; }
+  :root:not([data-theme="light"]) .logo img.logo-light { display: none; }
 }
 nav .links { display: flex; gap: 1.5rem; align-items: center; }
 nav .links a { color: var(--muted); font-size: 0.95rem; white-space: nowrap; }
