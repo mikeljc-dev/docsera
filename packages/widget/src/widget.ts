@@ -653,18 +653,24 @@ export class DocseraWidget extends LitElement {
     this.checkHealth();
   }
 
+  // Contador para descartar respuestas desordenadas si se abre/cierra el
+  // panel rapido y se solapan dos chequeos: solo aplica el resultado si
+  // sigue siendo la comprobacion mas reciente al terminar.
+  private healthCheckSeq = 0;
+
   // Chequeo real (no decorativo) contra /health: si el server no responde,
   // se bloquea la entrada en vez de dejar preguntar para nada. Se repite al
   // abrir el panel, por si cambio el estado desde que se cargo la pagina.
   private async checkHealth(): Promise<void> {
     if (!this.server) return;
+    const seq = ++this.healthCheckSeq;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 4000);
     try {
       const response = await fetch(`${this.server}/health`, { signal: controller.signal });
-      this.serverOnline = response.ok;
+      if (seq === this.healthCheckSeq) this.serverOnline = response.ok;
     } catch {
-      this.serverOnline = false;
+      if (seq === this.healthCheckSeq) this.serverOnline = false;
     } finally {
       clearTimeout(timeout);
     }
