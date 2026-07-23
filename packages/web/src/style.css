@@ -46,7 +46,7 @@ body {
 }
 a { color: var(--primary-soft); text-decoration: none; }
 a:hover { text-decoration: underline; }
-.wrap { max-width: 1040px; margin: 0 auto; padding: 0 1.5rem; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 1.5rem; overflow: hidden; }
 
 .nav-bar {
   position: sticky; top: 0; z-index: 50;
@@ -254,7 +254,9 @@ footer {
 }
 
 /* Glow suave detrás del hero, con deriva lenta */
-header.hero { position: relative; }
+header.hero {
+  position: relative;
+}
 .glow {
   position: absolute;
   top: -180px;

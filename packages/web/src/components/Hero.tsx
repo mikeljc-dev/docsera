@@ -2,7 +2,8 @@ import { GITHUB_URL } from "../links.js";
 
 export function Hero() {
   return (
-    <header class="hero"><div class="glow" aria-hidden="true"></div>
+    <header class="hero">
+      <div class="glow" aria-hidden="true"></div>
       <div class="badge hero-in" style="--d:0">
         <span class="dot" /> v{__DOCSERA_VERSION__} · open source · AGPL-3.0
       </div>
