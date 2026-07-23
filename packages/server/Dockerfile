@@ -9,7 +9,9 @@ FROM node:26-alpine@sha256:e88a35be04478413b7c71c455cd9865de9b9360e1f43456be5951
 
 WORKDIR /app
 
-RUN corepack enable
+# Desde node:26-alpine, corepack ya no viene preinstalado (lo quitaron del
+# runtime base); hay que traerlo de npm antes de poder habilitarlo.
+RUN npm install -g corepack@latest && corepack enable
 
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml tsconfig.base.json ./
 COPY packages/server/package.json packages/server/package.json
