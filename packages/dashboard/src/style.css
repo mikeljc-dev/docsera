@@ -216,6 +216,27 @@ th {
   color: var(--muted);
 }
 
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+th.sortable:hover {
+  color: var(--fg);
+}
+
+.sort-arrow {
+  margin-left: 0.3rem;
+  font-size: 0.7em;
+}
+
+mark {
+  background: rgba(37, 99, 235, 0.25);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 0.05em;
+}
+
 tr:last-child td {
   border-bottom: none;
 }
@@ -289,6 +310,64 @@ td.empty {
 .source-chips a:hover {
   border-color: var(--primary);
   color: var(--primary);
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 0.15rem;
+  border-radius: 6px;
+  opacity: 0.6;
+}
+
+.icon-button:hover {
+  opacity: 1;
+  background: var(--th-bg);
+}
+
+.active-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  border-radius: 999px;
+  padding: 0.3rem 0.5rem 0.3rem 0.9rem;
+  font-size: 0.82rem;
+  margin-top: 0.75rem;
+}
+
+.active-filter button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.1rem 0.3rem;
+}
+
+.delete-button {
+  display: block;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--error-fg);
+  border-radius: 8px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.delete-button:hover {
+  border-color: var(--error-fg);
+}
+
+.delete-button:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .badge {

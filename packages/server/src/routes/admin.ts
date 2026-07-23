@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { listConversations } from "../admin/conversations.js";
+import { deleteConversation, listConversations } from "../admin/conversations.js";
 import { getStats } from "../admin/stats.js";
 import { getPool } from "../lib/db.js";
 import { requireAdminToken } from "../lib/adminAuth.js";
@@ -11,9 +11,15 @@ const DEFAULT_LIMIT = 50;
 const querySchema = z.object({
   answered: z.enum(["true", "false"]).optional(),
   search: z.string().max(200).optional(),
+  sessionId: z.uuid().optional(),
+  since: z.iso.datetime({ offset: true }).optional(),
+  sortBy: z.enum(["date", "feedback", "sources"]).optional(),
+  sortDir: z.enum(["asc", "desc"]).optional(),
   limit: z.string().optional(),
   offset: z.string().optional(),
 });
+
+const idSchema = z.object({ id: z.uuid() });
 
 export const adminRoute = new Hono();
 
@@ -30,10 +36,27 @@ adminRoute.get("/admin/conversations", requireAdminToken, async (c) => {
   const result = await listConversations(getPool(), {
     answered,
     search: parsed.data.search,
+    sessionId: parsed.data.sessionId,
+    since: parsed.data.since,
+    sortBy: parsed.data.sortBy,
+    sortDir: parsed.data.sortDir,
     limit,
     offset,
   });
   return c.json(result);
+});
+
+adminRoute.delete("/admin/conversations/:id", requireAdminToken, async (c) => {
+  const parsed = idSchema.safeParse({ id: c.req.param("id") });
+  if (!parsed.success) {
+    return c.json({ error: "id inválido" }, 400);
+  }
+
+  const deleted = await deleteConversation(getPool(), parsed.data.id);
+  if (!deleted) {
+    return c.json({ error: "No encontrada" }, 404);
+  }
+  return c.json({ ok: true });
 });
 
 adminRoute.get("/admin/stats", requireAdminToken, async (c) => {

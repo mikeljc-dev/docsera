@@ -48,9 +48,16 @@ export function clearToken(): void {
 
 export class UnauthorizedError extends Error {}
 
+export type SortBy = "date" | "feedback" | "sources";
+export type SortDir = "asc" | "desc";
+
 export interface FetchConversationsOptions {
   answered?: boolean;
   search?: string;
+  sessionId?: string;
+  since?: string;
+  sortBy?: SortBy;
+  sortDir?: SortDir;
   limit: number;
   offset: number;
 }
@@ -62,6 +69,10 @@ export async function fetchConversations(
   const params = new URLSearchParams();
   if (options.answered !== undefined) params.set("answered", String(options.answered));
   if (options.search) params.set("search", options.search);
+  if (options.sessionId) params.set("sessionId", options.sessionId);
+  if (options.since) params.set("since", options.since);
+  if (options.sortBy) params.set("sortBy", options.sortBy);
+  if (options.sortDir) params.set("sortDir", options.sortDir);
   params.set("limit", String(options.limit));
   params.set("offset", String(options.offset));
 
@@ -78,6 +89,21 @@ export async function fetchConversations(
   }
 
   return (await response.json()) as ConversationsResponse;
+}
+
+export async function deleteConversation(token: string, id: string): Promise<void> {
+  const response = await fetch(`/admin/conversations/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (response.status === 401) {
+    throw new UnauthorizedError("Invalid token");
+  }
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
 }
 
 export interface AdminStats {

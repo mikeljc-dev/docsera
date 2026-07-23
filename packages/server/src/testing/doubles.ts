@@ -8,10 +8,15 @@ export interface FakeRow {
 // Pool falso: devuelve filas fijas según qué contiene el SQL. Basta para las
 // rutas, que solo necesitan que la consulta responda algo coherente; el SQL
 // de verdad se sigue verificando a mano contra Postgres (ver deuda-tecnica.md).
-export function fakePool(handlers: { match: RegExp; rows: FakeRow[] }[]): Pool {
-  const query = (text: string): Promise<{ rows: FakeRow[] }> => {
+// rowCount es opcional (para UPDATE/DELETE, donde no hay filas que devolver
+// pero sí importa cuántas se tocaron); por defecto, el número de filas.
+export function fakePool(handlers: { match: RegExp; rows: FakeRow[]; rowCount?: number }[]): Pool {
+  const query = (text: string): Promise<{ rows: FakeRow[]; rowCount: number }> => {
     const handler = handlers.find((h) => h.match.test(text));
-    return Promise.resolve({ rows: handler?.rows ?? [] });
+    return Promise.resolve({
+      rows: handler?.rows ?? [],
+      rowCount: handler?.rowCount ?? handler?.rows.length ?? 0,
+    });
   };
 
   return {
