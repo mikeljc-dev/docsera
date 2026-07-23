@@ -10,6 +10,7 @@ const DEFAULT_LIMIT = 50;
 
 const querySchema = z.object({
   answered: z.enum(["true", "false"]).optional(),
+  search: z.string().max(200).optional(),
   limit: z.string().optional(),
   offset: z.string().optional(),
 });
@@ -26,7 +27,12 @@ adminRoute.get("/admin/conversations", requireAdminToken, async (c) => {
   const offset = Math.max(Number(parsed.data.offset ?? 0), 0);
   const answered = parsed.data.answered === undefined ? undefined : parsed.data.answered === "true";
 
-  const result = await listConversations(getPool(), { answered, limit, offset });
+  const result = await listConversations(getPool(), {
+    answered,
+    search: parsed.data.search,
+    limit,
+    offset,
+  });
   return c.json(result);
 });
 

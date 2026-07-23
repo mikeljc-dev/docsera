@@ -1,7 +1,9 @@
+import { Fragment } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { type Conversation, fetchConversations, UnauthorizedError } from "./api.js";
 
 const PAGE_SIZE = 25;
+const SEARCH_DEBOUNCE_MS = 350;
 
 type Filter = "all" | "answered" | "unanswered";
 
@@ -16,13 +18,35 @@ interface Props {
   onUnauthorized: () => void;
 }
 
+function sourceLabel(source: Conversation["sources"][number]): string {
+  if (!source.anchor) return source.title;
+  return `${source.title} § ${source.anchor.replace(/-/g, " ")}`;
+}
+
+function sourceHref(source: Conversation["sources"][number]): string {
+  if (!source.url) return "";
+  return source.anchor ? `${source.url}#${source.anchor}` : source.url;
+}
+
 export function ConversationsView({ token, onUnauthorized }: Props) {
   const [filter, setFilter] = useState<Filter>("all");
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  // Debounce: no dispares una petición por cada tecla.
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setSearch(searchInput.trim());
+      setPage(0);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(id);
+  }, [searchInput]);
 
   useEffect(() => {
     let cancelled = false;
@@ -31,7 +55,7 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
 
     const answered = filter === "all" ? undefined : filter === "answered";
 
-    fetchConversations(token, { answered, limit: PAGE_SIZE, offset: page * PAGE_SIZE })
+    fetchConversations(token, { answered, search, limit: PAGE_SIZE, offset: page * PAGE_SIZE })
       .then((result) => {
         if (cancelled) return;
         setConversations(result.conversations);
@@ -52,7 +76,7 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [token, filter, page]);
+  }, [token, filter, search, page]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
@@ -76,6 +100,14 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
         </div>
       </header>
 
+      <input
+        class="search"
+        type="search"
+        placeholder="Search questions…"
+        value={searchInput}
+        onInput={(event) => setSearchInput((event.target as HTMLInputElement).value)}
+      />
+
       {error && <p class="error">{error}</p>}
       {loading && <p class="loading">Loading…</p>}
 
@@ -93,22 +125,53 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
               </tr>
             </thead>
             <tbody>
-              {conversations.map((conversation) => (
-                <tr key={conversation.id}>
-                  <td class="date">{new Date(conversation.createdAt).toLocaleString()}</td>
-                  <td>{conversation.question}</td>
-                  <td>{conversation.answer ?? "—"}</td>
-                  <td>
-                    <span class={conversation.answered ? "badge ok" : "badge warn"}>
-                      {conversation.answered ? "Answered" : "Unanswered"}
-                    </span>
-                  </td>
-                  <td class="center">{conversation.sourceCount}</td>
-                  <td class="center">
-                    {conversation.feedback === 1 ? "👍" : conversation.feedback === -1 ? "👎" : "—"}
-                  </td>
-                </tr>
-              ))}
+              {conversations.map((conversation) => {
+                const isExpanded = expanded === conversation.id;
+                return (
+                  <Fragment key={conversation.id}>
+                    <tr
+                      class={`row ${isExpanded ? "expanded" : ""}`}
+                      onClick={() => setExpanded(isExpanded ? null : conversation.id)}
+                    >
+                      <td class="date">{new Date(conversation.createdAt).toLocaleString()}</td>
+                      <td class={isExpanded ? "" : "clamp"}>{conversation.question}</td>
+                      <td class={isExpanded ? "" : "clamp"}>{conversation.answer ?? "—"}</td>
+                      <td>
+                        <span class={conversation.answered ? "badge ok" : "badge warn"}>
+                          {conversation.answered ? "Answered" : "Unanswered"}
+                        </span>
+                      </td>
+                      <td class="center">{conversation.sources.length}</td>
+                      <td class="center">
+                        {conversation.feedback === 1
+                          ? "👍"
+                          : conversation.feedback === -1
+                            ? "👎"
+                            : "—"}
+                      </td>
+                    </tr>
+                    {isExpanded && conversation.sources.length > 0 && (
+                      <tr class="row-detail">
+                        <td colSpan={6}>
+                          <div class="source-chips">
+                            {conversation.sources.map((source) => (
+                              <a
+                                key={sourceHref(source)}
+                                href={sourceHref(source)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(event) => event.stopPropagation()}
+                              >
+                                {sourceLabel(source)}
+                              </a>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                );
+              })}
               {conversations.length === 0 && (
                 <tr>
                   <td colSpan={6} class="empty">

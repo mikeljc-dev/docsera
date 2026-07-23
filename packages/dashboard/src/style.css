@@ -149,6 +149,23 @@ body {
   border-color: var(--primary);
 }
 
+.search {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  border-radius: 8px;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.search:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -192,6 +209,53 @@ td.empty {
   text-align: center;
   color: var(--muted);
   padding: 2rem;
+}
+
+.row {
+  cursor: pointer;
+}
+
+.row:hover td {
+  background: var(--bg);
+}
+
+.row.expanded td {
+  background: var(--bg);
+}
+
+td.clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 320px;
+}
+
+.row-detail td {
+  padding-top: 0;
+  background: var(--bg);
+}
+
+.source-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding-bottom: 0.4rem;
+}
+
+.source-chips a {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.78rem;
+  text-decoration: none;
+}
+
+.source-chips a:hover {
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .badge {

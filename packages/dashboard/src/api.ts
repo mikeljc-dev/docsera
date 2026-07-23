@@ -1,3 +1,9 @@
+export interface ConversationSource {
+  url: string | null;
+  title: string;
+  anchor: string | null;
+}
+
 export interface Conversation {
   id: string;
   sessionId: string;
@@ -6,7 +12,7 @@ export interface Conversation {
   answered: boolean;
   feedback: number | null;
   createdAt: string;
-  sourceCount: number;
+  sources: ConversationSource[];
 }
 
 export interface ConversationsResponse {
@@ -44,6 +50,7 @@ export class UnauthorizedError extends Error {}
 
 export interface FetchConversationsOptions {
   answered?: boolean;
+  search?: string;
   limit: number;
   offset: number;
 }
@@ -54,6 +61,7 @@ export async function fetchConversations(
 ): Promise<ConversationsResponse> {
   const params = new URLSearchParams();
   if (options.answered !== undefined) params.set("answered", String(options.answered));
+  if (options.search) params.set("search", options.search);
   params.set("limit", String(options.limit));
   params.set("offset", String(options.offset));
 
