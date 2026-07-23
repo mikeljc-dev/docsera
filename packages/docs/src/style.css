@@ -115,6 +115,14 @@ footer {
   aside { display: none; }
   main { padding: 1.5rem 1.25rem 5rem; }
 }
+/* En móvil el topbar se apelotona: se deja solo lo imprescindible (logo, que
+   ya es el enlace a la home de docs, y el switch de tema). El badge de versión
+   y los enlaces Home/GitHub del nav se ocultan — ambos siguen en el footer. */
+@media (max-width: 640px) {
+  .topbar { padding: 0.75rem 1.1rem; }
+  .topbar .badge { display: none; }
+  .topbar nav a { display: none; }
+}
 
 /* ─── Captura y stats en vivo de la sección del dashboard ─── */
 
