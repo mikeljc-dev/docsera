@@ -53,6 +53,22 @@ function sourceHref(source: Conversation["sources"][number]): string {
   return source.anchor ? `${source.url}#${source.anchor}` : source.url;
 }
 
+// toLocaleString() da fechas de longitud variable (con/sin AM-PM, día de 1 o
+// 2 dígitos...), así que la misma columna se salía o envolvía a 2 líneas
+// según la fila. Día/mes/hora/minuto siempre a 2 cifras + mes de 3 letras:
+// la misma longitud siempre, cabe en una línea sin excepción.
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  day: "2-digit",
+  month: "short",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
+
+function formatDate(iso: string): string {
+  return dateFormatter.format(new Date(iso));
+}
+
 function sinceFor(range: DateRange): string | undefined {
   if (range === "all") return undefined;
   const now = Date.now();
@@ -234,13 +250,12 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
         <>
           <table>
             <colgroup>
-              <col style="width: 16%" />
-              <col style="width: 24%" />
-              <col style="width: 24%" />
-              <col style="width: 11%" />
-              <col style="width: 9%" />
-              <col style="width: 9%" />
-              <col style="width: 7%" />
+              <col style="width: 17%" />
+              <col style="width: 26%" />
+              <col style="width: 26%" />
+              <col style="width: 12%" />
+              <col style="width: 9.5%" />
+              <col style="width: 9.5%" />
             </colgroup>
             <thead>
               <tr>
@@ -270,7 +285,25 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
                       class={`row ${isExpanded ? "expanded" : ""}`}
                       onClick={() => setExpanded(isExpanded ? null : conversation.id)}
                     >
-                      <td class="date">{new Date(conversation.createdAt).toLocaleString()}</td>
+                      <td class="date">
+                        <div class="date-row">
+                          {formatDate(conversation.createdAt)}
+                          <button
+                            class="session-link"
+                            title="Filter this session"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setSessionFilter(conversation.sessionId);
+                              setPage(0);
+                            }}
+                          >
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
                       <td>
                         <div class={isExpanded ? "" : "clamp"}>
                           {highlight(conversation.question, search)}
@@ -292,23 +325,10 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
                             ? "👎"
                             : "—"}
                       </td>
-                      <td class="center">
-                        <button
-                          class="icon-button"
-                          title="Filter this session"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setSessionFilter(conversation.sessionId);
-                            setPage(0);
-                          }}
-                        >
-                          🔗
-                        </button>
-                      </td>
                     </tr>
                     {isExpanded && (
                       <tr class="row-detail">
-                        <td colSpan={7}>
+                        <td colSpan={6}>
                           {conversation.sources.length > 0 && (
                             <>
                               <span class="source-chips-label">Sources</span>
@@ -345,7 +365,7 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
               })}
               {conversations.length === 0 && (
                 <tr>
-                  <td colSpan={7} class="empty">
+                  <td colSpan={6} class="empty">
                     No conversations match this filter.
                   </td>
                 </tr>
