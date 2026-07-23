@@ -1,6 +1,7 @@
 export interface WidgetStrings {
   heading: string;
   statusOnline: string;
+  statusOffline: string;
   placeholder: string;
   empty: string;
   typing: string;
@@ -24,6 +25,7 @@ export const LOCALES: Record<string, WidgetStrings> = {
   en: {
     heading: "Ask me about the docs",
     statusOnline: "Answers from this documentation",
+    statusOffline: "Currently unavailable — please try again later.",
     placeholder: "Type your question…",
     empty: "Ask a question about the documentation.",
     typing: "Typing…",
@@ -43,6 +45,7 @@ export const LOCALES: Record<string, WidgetStrings> = {
   es: {
     heading: "Pregúntame sobre la documentación",
     statusOnline: "Responde desde esta documentación",
+    statusOffline: "No disponible ahora mismo — inténtalo más tarde.",
     placeholder: "Escribe tu pregunta…",
     empty: "Escribe una pregunta sobre la documentación.",
     typing: "Escribiendo…",
@@ -62,6 +65,7 @@ export const LOCALES: Record<string, WidgetStrings> = {
   fr: {
     heading: "Posez-moi vos questions sur la doc",
     statusOnline: "Répond à partir de cette documentation",
+    statusOffline: "Indisponible pour le moment — réessayez plus tard.",
     placeholder: "Écrivez votre question…",
     empty: "Posez une question sur la documentation.",
     typing: "En train d'écrire…",
@@ -81,6 +85,7 @@ export const LOCALES: Record<string, WidgetStrings> = {
   de: {
     heading: "Frag mich zur Dokumentation",
     statusOnline: "Antwortet auf Basis dieser Dokumentation",
+    statusOffline: "Momentan nicht verfügbar — bitte versuche es später erneut.",
     placeholder: "Schreibe deine Frage…",
     empty: "Stelle eine Frage zur Dokumentation.",
     typing: "Schreibt…",
@@ -100,6 +105,7 @@ export const LOCALES: Record<string, WidgetStrings> = {
   pt: {
     heading: "Pergunte-me sobre a documentação",
     statusOnline: "Responde com base nesta documentação",
+    statusOffline: "Indisponível neste momento — tenta novamente mais tarde.",
     placeholder: "Escreva a sua pergunta…",
     empty: "Faça uma pergunta sobre a documentação.",
     typing: "A escrever…",

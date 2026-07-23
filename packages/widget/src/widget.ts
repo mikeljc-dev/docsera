@@ -48,6 +48,7 @@ export class DocseraWidget extends LitElement {
     messages: { state: true },
     pending: { state: true },
     inputValue: { state: true },
+    serverOnline: { state: true },
   };
 
   static styles = css`
@@ -152,6 +153,18 @@ export class DocseraWidget extends LitElement {
       border-radius: 50%;
       background: #22c55e;
       flex-shrink: 0;
+    }
+
+    header .status .dot.offline {
+      background: var(--docsera-muted);
+    }
+
+    .offline-notice {
+      color: var(--docsera-muted);
+      font-size: 0.85rem;
+      text-align: center;
+      margin-top: 2rem;
+      padding: 0 0.5rem;
     }
 
     header button {
@@ -600,6 +613,7 @@ export class DocseraWidget extends LitElement {
   declare messages: ChatMessage[];
   declare pending: boolean;
   declare inputValue: string;
+  declare serverOnline: boolean | null;
 
   private sessionId = "";
 
@@ -617,6 +631,9 @@ export class DocseraWidget extends LitElement {
     this.messages = [];
     this.pending = false;
     this.inputValue = "";
+    // null hasta que se resuelva la primera comprobacion: evita parpadear a
+    // "no disponible" mientras carga.
+    this.serverOnline = null;
   }
 
   // Los atributos heading/placeholder tienen prioridad sobre el idioma
@@ -633,6 +650,24 @@ export class DocseraWidget extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
     this.sessionId = loadSessionId();
+    this.checkHealth();
+  }
+
+  // Chequeo real (no decorativo) contra /health: si el server no responde,
+  // se bloquea la entrada en vez de dejar preguntar para nada. Se repite al
+  // abrir el panel, por si cambio el estado desde que se cargo la pagina.
+  private async checkHealth(): Promise<void> {
+    if (!this.server) return;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    try {
+      const response = await fetch(`${this.server}/health`, { signal: controller.signal });
+      this.serverOnline = response.ok;
+    } catch {
+      this.serverOnline = false;
+    } finally {
+      clearTimeout(timeout);
+    }
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -656,7 +691,10 @@ export class DocseraWidget extends LitElement {
 
   private toggleOpen(): void {
     this.open = !this.open;
-    if (this.open) this.setAttribute("opened", "");
+    if (this.open) {
+      this.setAttribute("opened", "");
+      this.checkHealth();
+    }
   }
 
   private onInput(event: Event): void {
@@ -669,7 +707,7 @@ export class DocseraWidget extends LitElement {
   }
 
   private async send(question: string): Promise<void> {
-    if (!question || this.pending || !this.server) return;
+    if (!question || this.pending || !this.server || this.serverOnline === false) return;
 
     this.messages = [...this.messages, { role: "user", content: question }];
     this.inputValue = "";
@@ -732,7 +770,11 @@ export class DocseraWidget extends LitElement {
       }
 
       if (!answer) throw new Error("Empty stream");
+      // Llego una respuesta real: el server esta disponible de verdad, mas
+      // fiable que el propio /health si este ultimo hubiera fallado antes.
+      this.serverOnline = true;
     } catch {
+      this.serverOnline = false;
       const failed: ChatMessage = { role: "assistant", content: this.strings.error, error: true };
       this.messages =
         index === -1
@@ -774,13 +816,18 @@ export class DocseraWidget extends LitElement {
 
   private renderPanel() {
     const strings = this.strings;
+    const offline = this.serverOnline === false;
     return html`
       <div class="panel">
         <header>
           ${markIcon()}
           <div class="titles">
             <div class="heading-text">${strings.heading}</div>
-            <div class="status"><span class="dot"></span>${strings.statusOnline}</div>
+            <div class="status">
+              <span class="dot ${offline ? "offline" : ""}"></span>${offline
+                ? strings.statusOffline
+                : strings.statusOnline}
+            </div>
           </div>
           <button @click=${this.toggleOpen} aria-label=${strings.close}>✕</button>
         </header>
@@ -788,9 +835,12 @@ export class DocseraWidget extends LitElement {
           ${this.messages.length === 0
             ? html`
                 <p class="empty">${strings.empty}</p>
-                ${this.renderSuggestions()}
+                ${offline ? null : this.renderSuggestions()}
               `
             : this.messages.map((message) => this.renderMessage(message))}
+          ${offline && this.messages.length > 0
+            ? html`<p class="offline-notice">${strings.statusOffline}</p>`
+            : null}
           ${this.pending
             ? html`<div class="message assistant pending"><div
                 class="bubble"
@@ -803,13 +853,13 @@ export class DocseraWidget extends LitElement {
           <input
             .value=${this.inputValue}
             @input=${this.onInput}
-            placeholder=${strings.placeholder}
-            ?disabled=${this.pending}
+            placeholder=${offline ? strings.statusOffline : strings.placeholder}
+            ?disabled=${this.pending || offline}
           />
           <button
             type="submit"
             aria-label=${strings.send}
-            ?disabled=${this.pending || !this.inputValue.trim()}
+            ?disabled=${this.pending || offline || !this.inputValue.trim()}
           >
             ${sendIcon()}
           </button>
