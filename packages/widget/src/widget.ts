@@ -60,6 +60,7 @@ export class DocseraWidget extends LitElement {
       --docsera-primary: #2563eb;
       --docsera-primary-fg: #ffffff;
       --docsera-bg: #ffffff;
+      --docsera-bg-soft: #f3f4f6;
       --docsera-fg: #1f2937;
       --docsera-muted: #6b7280;
       --docsera-border: #e5e7eb;
@@ -98,9 +99,9 @@ export class DocseraWidget extends LitElement {
       position: absolute;
       right: 0;
       bottom: 68px;
-      width: 360px;
+      width: 380px;
       max-width: calc(100vw - 2rem);
-      height: 520px;
+      height: 540px;
       max-height: calc(100vh - 6rem);
       background: var(--docsera-bg);
       color: var(--docsera-fg);
@@ -115,22 +116,57 @@ export class DocseraWidget extends LitElement {
     header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 0.6rem;
       padding: 0.85rem 1rem;
-      background: var(--docsera-primary);
-      color: var(--docsera-primary-fg);
-      font-weight: 600;
-      font-size: 0.95rem;
+      border-bottom: 1px solid var(--docsera-border);
+      flex-shrink: 0;
+    }
+
+    header .mark {
+      flex-shrink: 0;
+    }
+
+    header .titles {
+      flex: 1;
+      min-width: 0;
+    }
+
+    header .heading-text {
+      color: var(--docsera-fg);
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    header .status {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--docsera-muted);
+      font-size: 0.72rem;
+      margin-top: 0.1rem;
+    }
+
+    header .status .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+      flex-shrink: 0;
     }
 
     header button {
       background: none;
       border: none;
-      color: inherit;
+      color: var(--docsera-muted);
       font-size: 1.1rem;
       line-height: 1;
       cursor: pointer;
       padding: 0.1rem 0.3rem;
+      flex-shrink: 0;
+    }
+
+    header button:hover {
+      color: var(--docsera-fg);
     }
 
     .messages {
@@ -180,7 +216,7 @@ export class DocseraWidget extends LitElement {
     }
 
     .message.assistant .bubble {
-      background: #f3f4f6;
+      background: var(--docsera-bg-soft);
     }
 
     .message.assistant .bubble.error {
@@ -277,10 +313,10 @@ export class DocseraWidget extends LitElement {
     }
 
     .chip {
-      background: none;
+      background: var(--docsera-bg-soft);
       border: 1px solid var(--docsera-border);
       border-radius: 999px;
-      color: var(--docsera-primary);
+      color: var(--docsera-fg);
       padding: 0.4rem 0.85rem;
       font-size: 0.85rem;
       font-family: inherit;
@@ -290,7 +326,7 @@ export class DocseraWidget extends LitElement {
 
     .chip:hover {
       border-color: var(--docsera-primary);
-      background: rgba(37, 99, 235, 0.06);
+      background: var(--docsera-border);
     }
 
     .contact {
@@ -324,7 +360,7 @@ export class DocseraWidget extends LitElement {
 
     .feedback button:hover {
       color: var(--docsera-fg);
-      background: #f3f4f6;
+      background: var(--docsera-bg-soft);
     }
 
     .feedback button.down svg {
@@ -343,24 +379,38 @@ export class DocseraWidget extends LitElement {
 
     .sources {
       margin-top: 0.3rem;
-      font-size: 0.75rem;
-      color: var(--docsera-muted);
       display: flex;
       flex-direction: column;
-      gap: 0.15rem;
+      gap: 0.3rem;
+      align-items: flex-start;
     }
 
     .sources a {
-      color: var(--docsera-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      max-width: 100%;
+      color: var(--docsera-fg);
+      font-size: 0.72rem;
       text-decoration: none;
+      border: 1px solid var(--docsera-border);
+      border-radius: 8px;
+      padding: 0.3rem 0.55rem;
+    }
+
+    .sources a span:last-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .sources a:hover {
-      text-decoration: underline;
+      border-color: var(--docsera-primary);
     }
 
     .pending .bubble {
-      background: #f3f4f6;
+      background: var(--docsera-bg-soft);
       color: var(--docsera-muted);
       font-style: italic;
     }
@@ -370,6 +420,7 @@ export class DocseraWidget extends LitElement {
       gap: 0.5rem;
       padding: 0.75rem;
       border-top: 1px solid var(--docsera-border);
+      flex-shrink: 0;
     }
 
     input {
@@ -388,18 +439,30 @@ export class DocseraWidget extends LitElement {
     }
 
     form button {
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: var(--docsera-primary);
       color: var(--docsera-primary-fg);
       border: none;
       border-radius: 8px;
-      padding: 0 0.9rem;
-      font-size: 0.9rem;
       cursor: pointer;
     }
 
     form button:disabled {
       opacity: 0.6;
       cursor: default;
+    }
+
+    .powered-by {
+      text-align: center;
+      color: var(--docsera-muted);
+      font-size: 0.68rem;
+      padding: 0 0.75rem 0.65rem;
+      flex-shrink: 0;
     }
 
     /* ─── Animaciones ─── */
@@ -714,7 +777,11 @@ export class DocseraWidget extends LitElement {
     return html`
       <div class="panel">
         <header>
-          <span>${strings.heading}</span>
+          ${markIcon()}
+          <div class="titles">
+            <div class="heading-text">${strings.heading}</div>
+            <div class="status"><span class="dot"></span>${strings.statusOnline}</div>
+          </div>
           <button @click=${this.toggleOpen} aria-label=${strings.close}>✕</button>
         </header>
         <div class="messages">
@@ -739,10 +806,15 @@ export class DocseraWidget extends LitElement {
             placeholder=${strings.placeholder}
             ?disabled=${this.pending}
           />
-          <button type="submit" ?disabled=${this.pending || !this.inputValue.trim()}>
-            ${strings.send}
+          <button
+            type="submit"
+            aria-label=${strings.send}
+            ?disabled=${this.pending || !this.inputValue.trim()}
+          >
+            ${sendIcon()}
           </button>
         </form>
+        <div class="powered-by">${strings.poweredBy}</div>
       </div>
     `;
   }
@@ -779,7 +851,7 @@ export class DocseraWidget extends LitElement {
                 ${message.sources.map(
                   (source) =>
                     html`<a href=${sourceHref(source)} target="_blank" rel="noopener noreferrer"
-                      >${sourceLabel(source)}</a
+                      ><span aria-hidden="true">📄</span><span>${sourceLabel(source)}</span></a
                     >`,
                 )}
               </div>
@@ -824,13 +896,36 @@ function thumbIcon() {
   </svg>`;
 }
 
-function chatIcon() {
-  return html`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+// Icono de marca de Docsera (burbuja + dos barras), usado en el header con
+// sus dos tonos originales.
+function markIcon() {
+  return html`<svg class="mark" width="22" height="21" viewBox="0 0 48 45" fill="none" aria-hidden="true">
     <path
-      d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.35 0-2.62-.32-3.73-.9L3 21l1.9-5.77A8.5 8.5 0 1 1 21 11.5Z"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      d="M4 14a10 10 0 0 1 10-10h20a10 10 0 0 1 10 10v13a10 10 0 0 1-10 10H22l-8 6.5v-6.5h-1a10 10 0 0 1-9-8V14z"
+      fill="var(--docsera-primary)"
     />
+    <rect x="13" y="14" width="5" height="11" rx="1.6" fill="#ffffff" />
+    <rect x="21" y="14" width="5" height="11" rx="1.6" fill="#ffffff" />
+  </svg>`;
+}
+
+// Misma marca, invertida (burbuja blanca + barras del color de marca) para
+// el botón flotante cerrado, que ya lleva el fondo de color.
+function chatIcon() {
+  return html`<svg width="22" height="21" viewBox="0 0 48 45" fill="none">
+    <path
+      d="M4 14a10 10 0 0 1 10-10h20a10 10 0 0 1 10 10v13a10 10 0 0 1-10 10H22l-8 6.5v-6.5h-1a10 10 0 0 1-9-8V14z"
+      fill="#ffffff"
+    />
+    <rect x="13" y="14" width="5" height="11" rx="1.6" fill="var(--docsera-primary)" />
+    <rect x="21" y="14" width="5" height="11" rx="1.6" fill="var(--docsera-primary)" />
+  </svg>`;
+}
+
+function sendIcon() {
+  return html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M22 2 11 13" />
+    <path d="M22 2 15 22l-4-9-9-4Z" />
   </svg>`;
 }
 
