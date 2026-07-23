@@ -93,7 +93,63 @@ branch returns anything, the server answers the configured no-answer phrase
 **without calling the LLM** — irrelevant questions cost retrieval, not
 generation. FTS was chosen over a second embedding model or an external
 re-ranker because it adds one generated column and no new dependency or
-network call. Cross-encoder re-ranking is still on the roadmap.
+network call. Optional cross-encoder re-ranking (`RERANKER_ENABLED`) can
+reorder the fused candidates before the final cut — see below for why it
+runs on WASM instead of a native runtime.
+
+## Why does the re-ranker run on WASM instead of a native ONNX runtime?
+
+`RERANKER_ENABLED=true` reorders the RRF-fused candidates with a small
+cross-encoder (`Xenova/ms-marco-MiniLM-L-6-v2`, 6 layers, int8-quantized,
+~23 MB) before the final cut to `TOP_K`: unlike the bi-encoder embedding
+used for vector search, a cross-encoder scores the *actual pair*
+(question, chunk) jointly, so it can promote a chunk RRF ranked lower —
+at the cost of one inference call per candidate, which is why it's opt-in
+and only reorders a bounded pool (`RERANK_POOL`), not every chunk in the
+database.
+
+The obvious choice, `onnxruntime-node` (native bindings), doesn't work on
+the server's own base image: Alpine uses musl libc, and
+`onnxruntime-node`'s prebuilt binaries need glibc — a gap open in
+[microsoft/onnxruntime#9483](https://github.com/microsoft/onnxruntime/issues/9483)
+since 2021, confirmed directly (`docker run node:20-alpine` +
+`require("onnxruntime-node")` throws `ERR_DLOPEN_FAILED`, missing
+`ld-linux*.so`). Switching the base image to a glibc one (`node:20-slim`)
+would work, but measured concretely it very nearly doubles the image
+(+121 MB base image, +259 MB for the native package, vs. the current
+~470 MB total) — a lot to pay across *every* deployment for a feature
+most won't enable, and a change to the one image the whole project ships
+from. `onnxruntime-web`'s WASM backend has no native bindings, so it
+loads fine on the existing Alpine image, at a fixed ~132 MB dependency
+cost regardless of whether `RERANKER_ENABLED` is ever turned on, and some
+inference latency vs. native (WASM, no GPU, no SIMD guarantees) — a trade
+made deliberately for a feature whose value is still unproven with real
+traffic (see the roadmap). Measured directly, reranking a pool of 12
+candidates adds roughly 600-700ms on top of a ~3s baseline request
+(local Ollama on CPU, so the LLM call itself dominates) — noticeable but
+not prohibitive; a hosted LLM provider would make the relative overhead
+smaller still.
+
+The model and tokenizer files themselves are **not** baked into the
+image: they're downloaded once, lazily, on first use, into the OS temp
+directory — the same "pull a model file once" pattern as `ollama pull`,
+which keeps the image size unchanged for the majority who never enable
+this. A download failure (offline build environment, Hugging Face
+unreachable) doesn't fail the request: retrieval falls back to the plain
+RRF order and logs the error, exactly like a condense-question LLM call
+failing falls back to the original question.
+
+`@huggingface/tokenizers`'s `Tokenizer` class builds its normalizer,
+pre-tokenizer, post-processor and decoder internally from the `type`
+field of each section — so the model's `tokenizer.json` is passed through
+close to as-is, rather than needing every piece
+(`WordPiece`/`BertNormalizer`/`BertPreTokenizer`/...) instantiated by
+hand. `@huggingface/tokenizers` was picked over rolling WordPiece
+tokenization by hand specifically because it *doesn't* pull in
+`onnxruntime-node` transitively (unlike the higher-level
+`@huggingface/transformers`, which does, and crashes for the same reason
+on Alpine even if you only intend to use its WASM backend — confirmed the
+same way, by actually running it in a container).
 
 ## How do follow-up questions work?
 

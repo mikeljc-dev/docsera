@@ -1,4 +1,4 @@
-# Roadmap de producto — Fase 3
+# Roadmap de producto (self-hosted)
 
 Nació como análisis de la competencia (Intercom Fin, Mintlify, DocsBot,
 kapa.ai) el 2026-07-17: qué tienen ellos que Docsera podía implementar,
@@ -9,6 +9,12 @@ diseño vive en `ARCHITECTURE.md`, las notas de sesión en `CLAUDE.md`, y el
 porqué de cada decisión en los mensajes de commit), y lo que sigue abierto
 queda arriba, no enterrado entre párrafos.
 
+**No confundir con la Fase 3 del plan por fases** (`CLAUDE.md` —
+"Tracción": versión cloud, multi-tenant, billing). Este documento se
+llamaba "fase-3-ideas.md" porque nació cronológicamente durante esa fase,
+pero su contenido es mejoras del producto self-hosted, no el pivote a
+SaaS — de ahí el renombrado (2026-07-22).
+
 ## Próximos candidatos
 
 Nada aquí está priorizado sobre lo demás; son las puertas abiertas que se
@@ -17,20 +23,9 @@ identificaron trabajando en otras cosas, no una cola.
 - **Conectores Notion/Confluence** *(DocsBot, kapa)* — necesitan OAuth, más
   esfuerzo de integración que PDF/GitHub. Aparcados hasta que alguien los
   pida explícitamente.
-- **Branch protection en `main`** *(Scorecard, 0/10)* — exigir PRs con
-  revisión chocaría con la forma de trabajar actual (directo en `main`,
-  preguntar antes de cada push). Necesita que Mikel decida el trade-off,
-  no es una config que se activa sola.
 - **CII Best Practices badge** *(Scorecard, 0/10)* — cuestionario de
   autoevaluación en bestpractices.dev, no una config de repo. Más esfuerzo
   que los otros checks de Scorecard, aparcado por ahora.
-- **CodeQL / SAST** *(Scorecard, 0/10)* — no se llegó a añadir el
-  2026-07-22 junto al resto de hardening; añadir un workflow estándar de
-  GitHub es barato, pero puede sacar hallazgos propios que haya que
-  triar, a diferencia de los cambios de config de esa sesión.
-- **Re-ranking con cross-encoder** — la búsqueda híbrida (RRF) fusiona vector
-  + full-text pero no re-ordena el top-k con un modelo dedicado. Anotado
-  como pendiente desde que se implementó la búsqueda híbrida (2026-07-18).
 - **Mitigar respuestas desviadas con `answered=true`** — el historial ya
   descarta los turnos sin respuesta, pero una respuesta *mal enfocada* que
   cuenta como respondida sigue contaminando la reescritura del siguiente
@@ -91,9 +86,9 @@ conversación, no una entrada más en esta lista.
 
     **Primer informe real (2026-07-22): 3.3/10.** La mayoría de lo bajo es
     estructural (proyecto <90 días, sin PRs externos, un solo mantenedor —
-    no arreglable hoy) o pide una decisión aparte (Branch-Protection choca
-    con trabajar directo en `main`; CII-Best-Practices es un cuestionario
-    de autoevaluación, no una config). Lo accionable, hecho el mismo día:
+    no arreglable hoy) o pide una decisión aparte (CII-Best-Practices es un
+    cuestionario de autoevaluación, no una config). Lo accionable, hecho el
+    mismo día:
     - Dos vulnerabilidades transitivas reales de la fecha (`fast-uri`
       confusión de host, `@hono/node-server` path traversal en
       serve-static), ambas via `@modelcontextprotocol/sdk`. Investigadas a
@@ -113,6 +108,43 @@ conversación, no una entrada más en esta lista.
     - Los tres workflows y el `FROM` del Dockerfile pineados por SHA/digest
       en vez de por tag flotante — viable sin perder actualizaciones porque
       Dependabot ya sabe mantener pines al día.
+
+    **Branch protection en `main`, decidida después de plantear el
+    trade-off** (2026-07-22): PR obligatoria, 0 aprobaciones exigidas (para
+    no autobloquear al mantenedor único — GitHub no deja aprobar tu propia
+    PR), check `ci` requerido, sin force-push ni borrado,
+    `enforce_admins: false` como válvula de escape. Cambia el flujo de
+    trabajo real (ya no hay push directo a `main`); probado de punta a
+    punta con el primer PR real del repo (#12), incluida la v0.7.1 —
+    patch de seguridad cortada porque la imagen `0.7.0` en GHCR se había
+    remutado en silencio (reconstruida dos veces el mismo día sin subir
+    versión).
+
+16. ✅ **CodeQL / SAST** *(2026-07-22)* — `.github/workflows/codeql.yml`,
+    un solo lenguaje (`javascript-typescript` cubre todo el monorepo, sin
+    paso de build manual), en cada push/PR a `main` y semanalmente. Badge
+    en el README. Pineado por SHA como el resto de workflows de seguridad.
+    No bloquea el merge de PRs (branch protection solo exige el check
+    `ci`): los hallazgos que saque se triarán aparte, no junto al resto
+    del hardening.
+17. ✅ **Re-ranking con cross-encoder** *(2026-07-22)* — `RERANKER_ENABLED`,
+    opt-in. `Xenova/ms-marco-MiniLM-L-6-v2` (int8, ~23 MB) reordena el pool
+    ya fusionado por RRF antes del corte a `TOP_K`. Alcance mayor de lo
+    esperado al empezar: `onnxruntime-node` (nativo) no carga en Alpine
+    (falta el loader glibc, confirmado en un contenedor real — issue
+    abierto en microsoft/onnxruntime desde 2021) y cambiar a una imagen
+    base con glibc casi duplicaba el tamaño de la imagen (medido:
+    +121 MB de base + 259 MB del paquete, contra 470 MB actuales). Se optó
+    por `onnxruntime-web` (WASM): +132 MB fijos, se queda en Alpine, algo
+    más lento sin GPU. El modelo no se hornea en la imagen — se descarga
+    una vez al primer uso (como `ollama pull`), así que no afecta a quien
+    no activa la feature. `@huggingface/tokenizers` en vez de tokenizar
+    WordPiece a mano; construye sus piezas internas directamente desde
+    `tokenizer.json` sin instanciarlas una a una. Verificado con un
+    prototipo aislado antes de integrarlo: discrimina de verdad (pasaje
+    relevante +7.25, relacionado pero no relevante -8.87, ajeno -11.23).
+    Racional completo, con los números reales de cada alternativa, en
+    `ARCHITECTURE.md`.
 
 ## Lectura estratégica
 

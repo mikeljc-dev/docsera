@@ -1,7 +1,7 @@
 # Deuda técnica y mejoras pendientes (2026-07-19)
 
 Lista salida de revisar el repo tras publicar la v0.3.0. A diferencia de
-`fase-3-ideas.md` —que es producto y análisis de competencia— esto es lo que
+`roadmap-producto.md` —que es producto y análisis de competencia— esto es lo que
 hay que arreglar dentro. Ordenado por lo que conviene hacer antes.
 
 ## 1. Ningún test toca HTTP — ✅ en marcha (2026-07-19)
@@ -269,7 +269,7 @@ Un verde local con otro shell no dice nada.
 
 ## Lo que NO está en esta lista
 
-- **Señal de confianza (punto 8 de `fase-3-ideas.md`)**: implementada y
+- **Señal de confianza (punto 8 de `roadmap-producto.md`)**: implementada y
   revertida con datos. No es deuda, es una idea descartada por ahora.
 - **Conectores PDF / bot de Discord**: producto, no deuda. Están en
-  `fase-3-ideas.md`.
+  `roadmap-producto.md`.

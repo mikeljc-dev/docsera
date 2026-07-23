@@ -1,8 +1,13 @@
 import type { Pool } from "pg";
+import { isRerankerEnabled, rerank } from "./rerank.js";
 
 export const TOP_K = 6;
 // Candidatos por cada rama (vector y texto) antes de fusionar.
 const CANDIDATES = 12;
+// Cuántos candidatos ya fusionados por RRF le llegan al re-ranker antes de
+// cortar a TOP_K. Darle solo los TOP_K finales no serviría de nada: el punto
+// del cross-encoder es poder promocionar algo que RRF dejó más abajo.
+const RERANK_POOL = 12;
 // Constante clásica de Reciprocal Rank Fusion: amortigua la diferencia
 // entre las primeras posiciones sin dejar que una sola rama domine.
 const RRF_K = 60;
@@ -85,6 +90,21 @@ export async function retrieveRelevantChunks(
     vectorResult.rows.map((row) => row.id),
     textResult.rows.map((row) => row.id),
   ]);
+
+  if (isRerankerEnabled() && fused.length > 0) {
+    try {
+      const pool = fused.slice(0, RERANK_POOL).map((id) => byId.get(id) as RetrievedChunk);
+      const rerankedIds = await rerank(
+        query,
+        pool.map((chunk) => ({ id: chunk.id, content: chunk.content })),
+      );
+      return rerankedIds.slice(0, limit).map((id) => byId.get(id) as RetrievedChunk);
+    } catch (error) {
+      // Un fallo del re-ranker (sin red la primera vez, WASM roto...) no
+      // debe tirar la pregunta entera: se cae al orden de RRF de siempre.
+      console.error("Re-ranking falló, usando el orden de RRF sin reordenar:", error);
+    }
+  }
 
   return fused.slice(0, limit).map((id) => byId.get(id) as RetrievedChunk);
 }

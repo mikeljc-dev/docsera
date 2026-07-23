@@ -1,6 +1,6 @@
 {
   "name": "docsera",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "One-command setup for Docsera: self-hosted AI chat for your docs",
   "license": "AGPL-3.0-only",
   "type": "module",
@@ -46,7 +46,7 @@
     "test": "tsx --test $(find src -name '*.test.ts')"
   },
   "devDependencies": {
-    "@types/node": "^20.14.0",
+    "@types/node": "^26.1.1",
     "tsx": "^4.23.1"
   }
 }

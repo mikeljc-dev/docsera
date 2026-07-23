@@ -5,8 +5,9 @@
 [![CI](https://github.com/mikeljc-dev/docsera/actions/workflows/ci.yml/badge.svg)](https://github.com/mikeljc-dev/docsera/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/mikeljc-dev/docsera)](./LICENSE)
 [![Release](https://img.shields.io/github/v/release/mikeljc-dev/docsera)](https://github.com/mikeljc-dev/docsera/releases)
-[![Tests](https://img.shields.io/badge/tests-172%20passing-brightgreen)](https://github.com/mikeljc-dev/docsera/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-175%20passing-brightgreen)](https://github.com/mikeljc-dev/docsera/actions/workflows/ci.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/mikeljc-dev/docsera/badge)](https://scorecard.dev/viewer/?uri=github.com/mikeljc-dev/docsera)
+[![CodeQL](https://github.com/mikeljc-dev/docsera/actions/workflows/codeql.yml/badge.svg)](https://github.com/mikeljc-dev/docsera/actions/workflows/codeql.yml)
 
 **AI chat for your docs. Open source, self-hosted, one line of code.**
 
@@ -19,7 +20,7 @@ Your data never leaves your server. Works with Anthropic, OpenAI or local models
 
 </div>
 
-> **Status: v0.7.0.** Server, ingestion, RAG chat with citations, widget,
+> **Status: v0.8.0.** Server, ingestion, RAG chat with citations, widget,
 > dashboard and Docker all work end to end. Young project — feedback and
 > issues are very welcome (see [Roadmap](#roadmap)).
 
@@ -111,7 +112,7 @@ This starts Postgres+pgvector, applies migrations automatically and runs the ser
 
 ```bash
 curl http://localhost:3000/health
-# {"status":"ok","version":"0.7.0"}
+# {"status":"ok","version":"0.8.0"}
 ```
 
 ## Usage
@@ -198,7 +199,9 @@ All variables live in `.env` (template in `.env.example`).
 | `CHAT_DAILY_LIMIT` | Optional questions-per-IP-per-day cap (`0` disables) — for public demos | `0` |
 | `CHAT_GLOBAL_DAILY_LIMIT` | Optional instance-wide daily budget of questions (`0` disables) | `0` |
 | `PUBLIC_STATS` | Expose `GET /stats/public` with aggregates only (never visitor questions) — for public demos | `false` |
+| `LLMS_TXT_TITLE` | Title used as the H1 of `GET /llms.txt` | `Documentation` |
 | `CHAT_MAX_DISTANCE` | Max cosine distance for a chunk to count as relevant; if none pass, the no-answer phrase is returned without calling the LLM. `2` disables the filter | `0.8` |
+| `RERANKER_ENABLED` | Re-rank retrieved chunks with a cross-encoder before they reach the LLM, for better precision on the top results. Downloads a small (~24 MB) model on first use, cached locally — doesn't grow the Docker image for instances that don't enable it. Adds latency (runs on WASM, no GPU) | `false` |
 | `CHAT_NO_ANSWER_TEXT` | Exact phrase when the docs don't have the answer (set it in your users' language, e.g. `No lo sé.`) | `I don't know.` |
 | `DISCORD_PUBLIC_KEY` / `DISCORD_APPLICATION_ID` / `DISCORD_BOT_TOKEN` | Optional [Discord bot](https://docs.docsera.dev/#discord-bot): a `/ask` slash command answering from your docs, with citations. Without them the endpoint doesn't exist | — |
 | `SLACK_SIGNING_SECRET` | Optional [Slack bot](https://docs.docsera.dev/#slack-bot): same idea, no bot token needed. Without it the endpoint doesn't exist | — |

@@ -1,6 +1,6 @@
 {
   "name": "@docsera/docs",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "description": "Documentacion de docs.docsera.dev (Vite, estatica, con el propio widget embebido)",
   "license": "AGPL-3.0-only",
@@ -16,6 +16,6 @@
     "vite": "^8.1.5"
   },
   "dependencies": {
-    "driver.js": "^1.7.0"
+    "driver.js": "^1.8.0"
   }
 }
