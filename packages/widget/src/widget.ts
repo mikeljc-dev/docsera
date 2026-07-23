@@ -2,7 +2,7 @@ import { LitElement, html, css, type PropertyValues } from "lit";
 import { resolveStrings, type WidgetStrings } from "./locales.js";
 import { renderMarkdown } from "./markdown.js";
 import { readSse, smooth } from "./sse.js";
-import type { ChatDone, ChatMessage, Source } from "./types.js";
+import type { ChatDone, ChatMessage, HistoryTurn, Source } from "./types.js";
 
 const SESSION_STORAGE_KEY = "docsera-session-id";
 
@@ -651,6 +651,39 @@ export class DocseraWidget extends LitElement {
     super.connectedCallback();
     this.sessionId = loadSessionId();
     this.checkHealth();
+    this.loadHistory();
+  }
+
+  // Recupera la conversación visible tras un refresco o al navegar a otra
+  // página del mismo sitio: mismo sessionId, misma ventana que usa el LLM
+  // para recordar (ver chat/history.ts en el server) — si no coincidieran,
+  // se vería en pantalla un turno que el modelo ya no recuerda de verdad.
+  // Best-effort: un fallo aquí no es un error para el usuario, solo empieza
+  // con la conversación vacía como hasta ahora.
+  private async loadHistory(): Promise<void> {
+    if (!this.server || !this.sessionId) return;
+    try {
+      const response = await fetch(
+        `${this.server}/chat/history?sessionId=${this.sessionId}`,
+      );
+      if (!response.ok) return;
+      const { turns } = (await response.json()) as { turns: HistoryTurn[] };
+      if (turns.length === 0 || this.messages.length > 0) return;
+
+      this.messages = turns.flatMap((turn) => [
+        { role: "user" as const, content: turn.question },
+        {
+          role: "assistant" as const,
+          content: turn.answer ?? "",
+          answered: turn.answered,
+          conversationId: turn.conversationId,
+          sources: turn.sources.length > 0 ? turn.sources : undefined,
+          feedback: turn.feedback ?? undefined,
+        },
+      ]);
+    } catch {
+      // sin conexión, CORS, etc.: se queda como si no hubiera historial
+    }
   }
 
   // Contador para descartar respuestas desordenadas si se abre/cierra el

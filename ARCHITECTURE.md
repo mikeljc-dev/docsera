@@ -168,6 +168,30 @@ And history expires after **30 minutes**: the widget keeps its session id in
 `localStorage` forever, so without a window a question today would be rewritten
 against a visit from last week.
 
+### Why does the widget restore the conversation after a reload?
+
+The widget is a web component that gets re-mounted from scratch on every page
+load, so refreshing — or clicking a link to another page of the same site —
+used to wipe the visible conversation even though the server still remembered
+it (the same 30-minute window above). That mismatch was confusing: the
+assistant would clearly reference earlier context on a follow-up, but the
+transcript on screen showed nothing before it.
+
+`GET /chat/history?sessionId=` fixes this by hydrating `messages` from the
+server on mount, using the **exact same window and turn limit** as the
+rewrite above (`HISTORY_TURNS`/`HISTORY_MAX_AGE_MINUTES`, exported from
+`chat/history.ts` for this reason) — what's shown and what the model actually
+remembers can't drift apart. Deliberately server-side rather than duplicating
+the transcript in `localStorage`: the conversation is already persisted in
+Postgres for the operator's dashboard, so this reads it back instead of
+keeping a second copy that could disagree with it (and that two open tabs of
+the same site could clobber). It also means a feedback vote already cast
+comes back correctly reflected, at no extra cost. The session id itself is
+an unguessable random UUID, so the endpoint only ever returns your own
+conversation, not anyone else's; malformed and empty/unknown session ids get
+the same shaped response, so the endpoint can't be used to probe which ids
+are real.
+
 ## How does streaming work?
 
 The widget talks to `POST /chat/stream`, which answers Server-Sent Events:
