@@ -1,9 +1,19 @@
 import { useEffect, useState } from "preact/hooks";
 import { type AdminStats, fetchStats, UnauthorizedError } from "./api.js";
 
+type Range = "7" | "30" | "all";
+
+const RANGES: { value: Range; label: string; days?: number }[] = [
+  { value: "7", label: "7 days", days: 7 },
+  { value: "30", label: "30 days", days: 30 },
+  { value: "all", label: "All time" },
+];
+
 interface Props {
   token: string;
   onUnauthorized: () => void;
+  // Salta a la pestaña de conversaciones con esta pregunta ya en el buscador.
+  onDrillDown: (question: string) => void;
 }
 
 function percent(part: number, whole: number): string {
@@ -23,13 +33,20 @@ function sourceHref(source: AdminStats["topSources"][number]): string | null {
   return source.anchor ? `${source.url}#${source.anchor}` : source.url;
 }
 
-export function AnalyticsView({ token, onUnauthorized }: Props) {
+export function AnalyticsView({ token, onUnauthorized, onDrillDown }: Props) {
+  const [range, setRange] = useState<Range>("all");
   const [stats, setStats] = useState<AdminStats | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    fetchStats(token)
+    setLoading(true);
+    const days = RANGES.find((r) => r.value === range)?.days;
+
+    // No se resetea stats a null: se mantiene lo anterior visible mientras
+    // llega lo nuevo (stale-while-revalidate), sin parpadeo a "Loading…".
+    fetchStats(token, days)
       .then((result) => {
         if (!cancelled) setStats(result);
       })
@@ -40,11 +57,14 @@ export function AnalyticsView({ token, onUnauthorized }: Props) {
           return;
         }
         setError(err instanceof Error ? err.message : "Unknown error");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
       });
     return () => {
       cancelled = true;
     };
-  }, [token]);
+  }, [token, range]);
 
   if (error) return <p class="error">{error}</p>;
   if (!stats) return <p class="loading">Loading…</p>;
@@ -56,7 +76,18 @@ export function AnalyticsView({ token, onUnauthorized }: Props) {
   const maxDaily = Math.max(1, ...stats.daily.map((d) => d.total));
 
   return (
-    <div class="analytics">
+    <div class={`analytics ${loading ? "reloading" : ""}`}>
+      <div class="analytics-header">
+        <h1>Analytics</h1>
+        <div class="filters">
+          {RANGES.map(({ value, label }) => (
+            <button key={value} class={range === value ? "active" : ""} onClick={() => setRange(value)}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div class="tiles">
         <div class="tile">
           <span class="value">{totals.total}</span>
@@ -83,8 +114,10 @@ export function AnalyticsView({ token, onUnauthorized }: Props) {
       </div>
 
       <section class="panel">
-        <h2>Questions per day <span class="hint">(last 14 days)</span></h2>
-        {stats.daily.length === 0 ? (
+        <h2>
+          Questions per day <span class="hint">(last {stats.chartDays} days)</span>
+        </h2>
+        {stats.daily.every((d) => d.total === 0) ? (
           <p class="empty-note">No activity yet.</p>
         ) : (
           <div class="days">
@@ -112,7 +145,13 @@ export function AnalyticsView({ token, onUnauthorized }: Props) {
               {stats.topUnanswered.map((item) => (
                 <li key={item.question}>
                   <div class="rank-row">
-                    <span class="rank-text">{item.question}</span>
+                    <button
+                      class="rank-text drill"
+                      title="See these conversations"
+                      onClick={() => onDrillDown(item.question)}
+                    >
+                      {item.question}
+                    </button>
                     <span class="rank-count">{item.times}</span>
                   </div>
                   <div class="rank-bar" style={{ width: `${(item.times / maxUnanswered) * 100}%` }} />

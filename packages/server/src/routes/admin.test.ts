@@ -142,3 +142,29 @@ test("DELETE de una conversación existente responde ok", async () => {
   const body = (await response.json()) as { ok: boolean };
   assert.equal(body.ok, true);
 });
+
+test("stats acepta un rango de días válido", async () => {
+  process.env.ADMIN_TOKEN = TOKEN;
+  setPool(
+    fakePool([
+      { match: /count\(\*\) FILTER \(WHERE answered\)/, rows: [{ total: 0, answered: 0, up: 0, down: 0 }] },
+    ]),
+  );
+
+  const response = await get("/admin/stats?days=7", `Bearer ${TOKEN}`);
+  assert.equal(response.status, 200);
+});
+
+test("stats rechaza un rango de días no numérico", async () => {
+  process.env.ADMIN_TOKEN = TOKEN;
+
+  const response = await get("/admin/stats?days=abc", `Bearer ${TOKEN}`);
+  assert.equal(response.status, 400);
+});
+
+test("stats rechaza un rango de días fuera de límite", async () => {
+  process.env.ADMIN_TOKEN = TOKEN;
+
+  const response = await get("/admin/stats?days=999", `Bearer ${TOKEN}`);
+  assert.equal(response.status, 400);
+});

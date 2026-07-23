@@ -38,6 +38,8 @@ const SORTABLE_COLUMNS: { key: SortBy; label: string }[] = [
 interface Props {
   token: string;
   onUnauthorized: () => void;
+  // Búsqueda con la que arrancar (llega de un drill-down desde Analytics).
+  initialSearch?: string;
 }
 
 // Sin el título del documento delante: casi todas las citas de una misma
@@ -81,6 +83,21 @@ function sinceFor(range: DateRange): string | undefined {
   return new Date(now - days * DAY_MS).toISOString();
 }
 
+// La tabla es para leer, no para renderizar Markdown: quita la sintaxis más
+// ruidosa (fences ```, backticks, #, énfasis, sintaxis de enlace) dejando el
+// texto legible. No es un parser completo — solo lo justo para que un
+// operador no vea "```bash npx docsera```" literal en cada fila.
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/```[a-z]*\n?/gi, "") // apertura de fence (con lenguaje opcional)
+    .replace(/```/g, "") // cierre de fence
+    .replace(/`([^`]+)`/g, "$1") // código inline
+    .replace(/^#{1,6}\s+/gm, "") // encabezados
+    .replace(/\*\*([^*]+)\*\*/g, "$1") // negrita
+    .replace(/\*([^*]+)\*/g, "$1") // cursiva
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1"); // enlaces → solo el texto
+}
+
 // Trocea el texto en partes, envolviendo cada aparición del término buscado
 // en <mark>. Sin librería de resaltado: es solo un split por regex.
 function highlight(text: string, term: string) {
@@ -92,11 +109,13 @@ function highlight(text: string, term: string) {
   );
 }
 
-export function ConversationsView({ token, onUnauthorized }: Props) {
+export function ConversationsView({ token, onUnauthorized, initialSearch = "" }: Props) {
   const [filter, setFilter] = useState<Filter>("all");
   const [dateRange, setDateRange] = useState<DateRange>("all");
-  const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
+  // Sembrados desde initialSearch: la vista se remonta al cambiar de pestaña,
+  // así que el valor inicial del state basta (no hace falta un efecto).
+  const [searchInput, setSearchInput] = useState(initialSearch);
+  const [search, setSearch] = useState(initialSearch);
   const [sessionFilter, setSessionFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortBy>("date");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
@@ -104,6 +123,10 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  // Solo se muestra el placeholder "Loading…" en la primera carga; en las
+  // recargas por filtro se mantiene la tabla anterior visible (atenuada),
+  // sin parpadeo.
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -139,6 +162,7 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
         if (cancelled) return;
         setConversations(result.conversations);
         setTotal(result.total);
+        setHasLoaded(true);
       })
       .catch((err: unknown) => {
         if (cancelled) return;
@@ -244,10 +268,10 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
       </header>
 
       {error && <p class="error">{error}</p>}
-      {loading && <p class="loading">Loading…</p>}
+      {!error && !hasLoaded && <p class="loading">Loading…</p>}
 
-      {!loading && !error && (
-        <>
+      {!error && hasLoaded && (
+        <div class={loading ? "reloading" : ""}>
           <table>
             <colgroup>
               <col style="width: 17%" />
@@ -310,7 +334,18 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
                         </div>
                       </td>
                       <td>
-                        <div class={isExpanded ? "" : "clamp"}>{conversation.answer ?? "—"}</div>
+                        {conversation.answer == null ? (
+                          "—"
+                        ) : isExpanded ? (
+                          // Al expandir: Markdown limpiado pero con los saltos
+                          // de línea intactos (pre-wrap), para que un bloque de
+                          // código o una lista se lean como tal.
+                          <div class="answer-full">{stripMarkdown(conversation.answer)}</div>
+                        ) : (
+                          <div class="clamp">
+                            {stripMarkdown(conversation.answer).replace(/\s+/g, " ").trim()}
+                          </div>
+                        )}
                       </td>
                       <td>
                         <span class={conversation.answered ? "badge ok" : "badge warn"}>
@@ -384,7 +419,7 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
               Next
             </button>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

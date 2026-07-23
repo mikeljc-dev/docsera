@@ -117,10 +117,12 @@ export interface AdminStats {
   topUnanswered: { question: string; times: number }[];
   topSources: { title: string; url: string | null; anchor: string | null; times: number }[];
   daily: { day: string; total: number; unanswered: number }[];
+  chartDays: number;
 }
 
-export async function fetchStats(token: string): Promise<AdminStats> {
-  const response = await fetch("/admin/stats", {
+export async function fetchStats(token: string, days?: number): Promise<AdminStats> {
+  const query = days ? `?days=${days}` : "";
+  const response = await fetch(`/admin/stats${query}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 

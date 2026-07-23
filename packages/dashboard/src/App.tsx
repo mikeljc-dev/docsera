@@ -33,6 +33,9 @@ export function App() {
   const [token, setToken] = useState<string | null>(getStoredToken());
   const [inputValue, setInputValue] = useState("");
   const [tab, setTab] = useState<Tab>("analytics");
+  // Búsqueda con la que arrancar la vista de conversaciones cuando se llega
+  // desde un clic en "Top unanswered". Al cambiar de pestaña a mano se limpia.
+  const [drillSearch, setDrillSearch] = useState("");
 
   if (!token) {
     return (
@@ -86,20 +89,37 @@ export function App() {
         </div>
       </header>
       <nav class="tabs">
-        <button class={tab === "analytics" ? "active" : ""} onClick={() => setTab("analytics")}>
+        <button
+          class={tab === "analytics" ? "active" : ""}
+          onClick={() => setTab("analytics")}
+        >
           Analytics
         </button>
         <button
           class={tab === "conversations" ? "active" : ""}
-          onClick={() => setTab("conversations")}
+          onClick={() => {
+            setDrillSearch("");
+            setTab("conversations");
+          }}
         >
           Conversations
         </button>
       </nav>
       {tab === "analytics" ? (
-        <AnalyticsView token={token} onUnauthorized={onUnauthorized} />
+        <AnalyticsView
+          token={token}
+          onUnauthorized={onUnauthorized}
+          onDrillDown={(question) => {
+            setDrillSearch(question);
+            setTab("conversations");
+          }}
+        />
       ) : (
-        <ConversationsView token={token} onUnauthorized={onUnauthorized} />
+        <ConversationsView
+          token={token}
+          onUnauthorized={onUnauthorized}
+          initialSearch={drillSearch}
+        />
       )}
     </div>
   );

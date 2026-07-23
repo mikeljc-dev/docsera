@@ -21,6 +21,12 @@ const querySchema = z.object({
 
 const idSchema = z.object({ id: z.uuid() });
 
+// Rango en días para las analíticas; ausente = todo el histórico. Acotado a
+// 365 para que la ventana de la gráfica no se dispare.
+const statsQuerySchema = z.object({
+  days: z.coerce.number().int().positive().max(365).optional(),
+});
+
 export const adminRoute = new Hono();
 
 adminRoute.get("/admin/conversations", requireAdminToken, async (c) => {
@@ -60,6 +66,11 @@ adminRoute.delete("/admin/conversations/:id", requireAdminToken, async (c) => {
 });
 
 adminRoute.get("/admin/stats", requireAdminToken, async (c) => {
-  const stats = await getStats(getPool());
+  const parsed = statsQuerySchema.safeParse(c.req.query());
+  if (!parsed.success) {
+    return c.json({ error: "Parámetros inválidos", details: parsed.error.flatten() }, 400);
+  }
+
+  const stats = await getStats(getPool(), parsed.data.days ?? null);
   return c.json(stats);
 });
