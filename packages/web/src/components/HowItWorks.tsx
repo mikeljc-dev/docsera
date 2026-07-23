@@ -1,38 +1,32 @@
-import type { ComponentChildren } from "preact";
-
 interface Step {
   title: string;
-  body: ComponentChildren;
+  body: string;
 }
 
 const STEPS: Step[] = [
   {
-    title: "Ingest",
-    body: "Docsera crawls your sitemap or takes your Markdown, splits it into sections, and stores embeddings in Postgres with pgvector — one service for data and vectors.",
+    title: "npx docsera",
+    body: "A wizard detects your LLM (local Ollama included), indexes your docs, and generates the config with secrets already in place.",
   },
   {
-    title: "Retrieve",
-    body: 'Each question is embedded and matched against your docs by cosine similarity. If nothing relevant passes the threshold, it answers "I don\'t know" without even calling the LLM.',
+    title: "Paste the snippet",
+    body: "One line of code with your brand's data-attributes: color, language, position, suggested questions.",
   },
   {
-    title: "Answer with citations",
-    body: (
-      <>
-        The LLM answers strictly from the retrieved context, and the widget shows the sources —
-        deep links to the exact sections, like <code>/docs/install#requirements</code>.
-      </>
-    ),
+    title: "Check the dashboard",
+    body: "Answer rate, uncovered questions, and user feedback to improve your docs.",
   },
 ];
 
 export function HowItWorks() {
   return (
     <section id="how">
-      <h2 class="reveal">How it works</h2>
-      <p class="lead reveal">Classic RAG, engineered to be boring and reliable.</p>
+      <h2 class="reveal">Zero to widget in three steps</h2>
+      <p class="lead reveal">One command spins up Postgres, ingests your docs, and hands you the ready snippet.</p>
       <div class="steps">
-        {STEPS.map((step) => (
+        {STEPS.map((step, i) => (
           <div class="step reveal" key={step.title}>
+            <div class="step-badge">{i + 1}</div>
             <div>
               <h3>{step.title}</h3>
               <p>{step.body}</p>

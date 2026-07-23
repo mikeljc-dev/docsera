@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 45" width="48" height="45">
+  <g id="docsera-mark">
+    <path id="bubble" d="M4 14a10 10 0 0 1 10-10h20a10 10 0 0 1 10 10v13a10 10 0 0 1-10 10H22l-8 6.5v-6.5h-1a10 10 0 0 1-9-8V14z" fill="#2563eb"></path>
+    <rect id="quote-1" x="13" y="14" width="5" height="11" rx="1.6" fill="#ffffff"></rect>
+    <rect id="quote-2" x="21" y="14" width="5" height="11" rx="1.6" fill="#ffffff"></rect>
+  </g>
+</svg>
