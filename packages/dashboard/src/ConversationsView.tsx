@@ -18,9 +18,12 @@ interface Props {
   onUnauthorized: () => void;
 }
 
+// Sin el título del documento delante: casi todas las citas de una misma
+// instancia vienen del mismo documento, así que repetirlo en cada chip
+// solo añade ruido. Sin anchor no queda otra que caer al título.
 function sourceLabel(source: Conversation["sources"][number]): string {
   if (!source.anchor) return source.title;
-  return `${source.title} § ${source.anchor.replace(/-/g, " ")}`;
+  return source.anchor.replace(/-/g, " ");
 }
 
 function sourceHref(source: Conversation["sources"][number]): string {
@@ -116,12 +119,12 @@ export function ConversationsView({ token, onUnauthorized }: Props) {
         <>
           <table>
             <colgroup>
-              <col style="width: 14%" />
-              <col style="width: 27%" />
-              <col style="width: 27%" />
+              <col style="width: 17%" />
+              <col style="width: 26%" />
+              <col style="width: 26%" />
               <col style="width: 12%" />
-              <col style="width: 10%" />
-              <col style="width: 10%" />
+              <col style="width: 9.5%" />
+              <col style="width: 9.5%" />
             </colgroup>
             <thead>
               <tr>

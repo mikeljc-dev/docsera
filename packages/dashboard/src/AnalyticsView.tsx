@@ -11,9 +11,11 @@ function percent(part: number, whole: number): string {
   return `${Math.round((part / whole) * 100)}%`;
 }
 
+// Sin el título del documento delante, igual que en ConversationsView: casi
+// todas las citas de una misma instancia vienen del mismo documento.
 function sourceLabel(source: AdminStats["topSources"][number]): string {
   if (!source.anchor) return source.title;
-  return `${source.title} § ${source.anchor.replace(/-/g, " ")}`;
+  return source.anchor.replace(/-/g, " ");
 }
 
 function sourceHref(source: AdminStats["topSources"][number]): string | null {

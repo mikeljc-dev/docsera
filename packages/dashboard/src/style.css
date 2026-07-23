@@ -133,6 +133,7 @@ header h1 {
 }
 
 .toolbar {
+  margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -220,7 +221,6 @@ tr:last-child td {
 }
 
 td.date {
-  white-space: nowrap;
   color: var(--muted);
 }
 
