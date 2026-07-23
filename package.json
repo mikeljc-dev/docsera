@@ -1,6 +1,6 @@
 {
   "name": "docsera",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "private": true,
   "description": "Widget open source de chat con IA sobre tu documentacion. Self-hosted, privacy-first, agnostico de LLM.",
   "license": "AGPL-3.0-only",
