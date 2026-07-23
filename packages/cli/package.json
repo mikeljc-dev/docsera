@@ -46,7 +46,7 @@
     "test": "tsx --test $(find src -name '*.test.ts')"
   },
   "devDependencies": {
-    "@types/node": "^20.14.0",
+    "@types/node": "^26.1.1",
     "tsx": "^4.23.1"
   }
 }
