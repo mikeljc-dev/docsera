@@ -7,12 +7,16 @@ export interface Turn {
 
 // Cuántos turnos previos se arrastran. Suficiente para resolver referencias
 // ("¿y eso cómo se configura?") sin inflar el prompt ni el coste.
-const HISTORY_TURNS = 3;
+// Exportadas: chat/publicHistory.ts las reutiliza para que la ventana que ve
+// el widget al recargar sea EXACTAMENTE la misma que la que usa el LLM para
+// reescribir preguntas — si no coincidieran, el widget mostraría un turno
+// que el modelo ya no recuerda (o viceversa).
+export const HISTORY_TURNS = 3;
 
 // El widget guarda el sessionId en localStorage y no caduca nunca: sin esta
 // ventana, una pregunta de hoy se reescribiría con el contexto de una visita
 // de la semana pasada. Un hueco largo se trata como conversación nueva.
-const HISTORY_MAX_AGE_MINUTES = 30;
+export const HISTORY_MAX_AGE_MINUTES = 30;
 
 export async function loadRecentTurns(pool: Pool, sessionId: string): Promise<Turn[]> {
   // Los turnos sin respuesta se saltan (no cortan la conversación): un "no lo

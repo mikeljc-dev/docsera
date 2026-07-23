@@ -22,3 +22,13 @@ export interface ChatDone {
   conversationId: string;
   answered: boolean;
 }
+
+// Respuesta de GET /chat/history: un turno ya guardado en el server.
+export interface HistoryTurn {
+  conversationId: string;
+  question: string;
+  answer: string | null;
+  answered: boolean;
+  feedback: "up" | "down" | null;
+  sources: Source[];
+}
