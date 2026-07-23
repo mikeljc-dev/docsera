@@ -1,6 +1,6 @@
 {
   "name": "@docsera/dashboard",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "private": true,
   "description": "Panel de administracion de Docsera: conversaciones y preguntas sin respuesta",
   "license": "AGPL-3.0-only",
