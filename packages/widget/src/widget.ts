@@ -2,7 +2,7 @@ import { LitElement, html, css, type PropertyValues } from "lit";
 import { resolveStrings, type WidgetStrings } from "./locales.js";
 import { renderMarkdown } from "./markdown.js";
 import { readSse, smooth } from "./sse.js";
-import type { ChatDone, ChatMessage, Source } from "./types.js";
+import type { ChatDone, ChatMessage, HistoryTurn, Source } from "./types.js";
 
 const SESSION_STORAGE_KEY = "docsera-session-id";
 
@@ -48,6 +48,7 @@ export class DocseraWidget extends LitElement {
     messages: { state: true },
     pending: { state: true },
     inputValue: { state: true },
+    serverOnline: { state: true },
   };
 
   static styles = css`
@@ -60,6 +61,7 @@ export class DocseraWidget extends LitElement {
       --docsera-primary: #2563eb;
       --docsera-primary-fg: #ffffff;
       --docsera-bg: #ffffff;
+      --docsera-bg-soft: #f3f4f6;
       --docsera-fg: #1f2937;
       --docsera-muted: #6b7280;
       --docsera-border: #e5e7eb;
@@ -98,9 +100,9 @@ export class DocseraWidget extends LitElement {
       position: absolute;
       right: 0;
       bottom: 68px;
-      width: 360px;
+      width: 380px;
       max-width: calc(100vw - 2rem);
-      height: 520px;
+      height: 540px;
       max-height: calc(100vh - 6rem);
       background: var(--docsera-bg);
       color: var(--docsera-fg);
@@ -115,22 +117,69 @@ export class DocseraWidget extends LitElement {
     header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 0.6rem;
       padding: 0.85rem 1rem;
-      background: var(--docsera-primary);
-      color: var(--docsera-primary-fg);
-      font-weight: 600;
-      font-size: 0.95rem;
+      border-bottom: 1px solid var(--docsera-border);
+      flex-shrink: 0;
+    }
+
+    header .mark {
+      flex-shrink: 0;
+    }
+
+    header .titles {
+      flex: 1;
+      min-width: 0;
+    }
+
+    header .heading-text {
+      color: var(--docsera-fg);
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    header .status {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--docsera-muted);
+      font-size: 0.72rem;
+      margin-top: 0.1rem;
+    }
+
+    header .status .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+      flex-shrink: 0;
+    }
+
+    header .status .dot.offline {
+      background: var(--docsera-muted);
+    }
+
+    .offline-notice {
+      color: var(--docsera-muted);
+      font-size: 0.85rem;
+      text-align: center;
+      margin-top: 2rem;
+      padding: 0 0.5rem;
     }
 
     header button {
       background: none;
       border: none;
-      color: inherit;
+      color: var(--docsera-muted);
       font-size: 1.1rem;
       line-height: 1;
       cursor: pointer;
       padding: 0.1rem 0.3rem;
+      flex-shrink: 0;
+    }
+
+    header button:hover {
+      color: var(--docsera-fg);
     }
 
     .messages {
@@ -180,7 +229,7 @@ export class DocseraWidget extends LitElement {
     }
 
     .message.assistant .bubble {
-      background: #f3f4f6;
+      background: var(--docsera-bg-soft);
     }
 
     .message.assistant .bubble.error {
@@ -277,10 +326,10 @@ export class DocseraWidget extends LitElement {
     }
 
     .chip {
-      background: none;
+      background: var(--docsera-bg-soft);
       border: 1px solid var(--docsera-border);
       border-radius: 999px;
-      color: var(--docsera-primary);
+      color: var(--docsera-fg);
       padding: 0.4rem 0.85rem;
       font-size: 0.85rem;
       font-family: inherit;
@@ -290,7 +339,7 @@ export class DocseraWidget extends LitElement {
 
     .chip:hover {
       border-color: var(--docsera-primary);
-      background: rgba(37, 99, 235, 0.06);
+      background: var(--docsera-border);
     }
 
     .contact {
@@ -324,7 +373,7 @@ export class DocseraWidget extends LitElement {
 
     .feedback button:hover {
       color: var(--docsera-fg);
-      background: #f3f4f6;
+      background: var(--docsera-bg-soft);
     }
 
     .feedback button.down svg {
@@ -343,24 +392,38 @@ export class DocseraWidget extends LitElement {
 
     .sources {
       margin-top: 0.3rem;
-      font-size: 0.75rem;
-      color: var(--docsera-muted);
       display: flex;
       flex-direction: column;
-      gap: 0.15rem;
+      gap: 0.3rem;
+      align-items: flex-start;
     }
 
     .sources a {
-      color: var(--docsera-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      max-width: 100%;
+      color: var(--docsera-fg);
+      font-size: 0.72rem;
       text-decoration: none;
+      border: 1px solid var(--docsera-border);
+      border-radius: 8px;
+      padding: 0.3rem 0.55rem;
+    }
+
+    .sources a span:last-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .sources a:hover {
-      text-decoration: underline;
+      border-color: var(--docsera-primary);
     }
 
     .pending .bubble {
-      background: #f3f4f6;
+      background: var(--docsera-bg-soft);
       color: var(--docsera-muted);
       font-style: italic;
     }
@@ -370,6 +433,7 @@ export class DocseraWidget extends LitElement {
       gap: 0.5rem;
       padding: 0.75rem;
       border-top: 1px solid var(--docsera-border);
+      flex-shrink: 0;
     }
 
     input {
@@ -388,18 +452,30 @@ export class DocseraWidget extends LitElement {
     }
 
     form button {
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: var(--docsera-primary);
       color: var(--docsera-primary-fg);
       border: none;
       border-radius: 8px;
-      padding: 0 0.9rem;
-      font-size: 0.9rem;
       cursor: pointer;
     }
 
     form button:disabled {
       opacity: 0.6;
       cursor: default;
+    }
+
+    .powered-by {
+      text-align: center;
+      color: var(--docsera-muted);
+      font-size: 0.68rem;
+      padding: 0 0.75rem 0.65rem;
+      flex-shrink: 0;
     }
 
     /* ─── Animaciones ─── */
@@ -537,6 +613,7 @@ export class DocseraWidget extends LitElement {
   declare messages: ChatMessage[];
   declare pending: boolean;
   declare inputValue: string;
+  declare serverOnline: boolean | null;
 
   private sessionId = "";
 
@@ -554,6 +631,9 @@ export class DocseraWidget extends LitElement {
     this.messages = [];
     this.pending = false;
     this.inputValue = "";
+    // null hasta que se resuelva la primera comprobacion: evita parpadear a
+    // "no disponible" mientras carga.
+    this.serverOnline = null;
   }
 
   // Los atributos heading/placeholder tienen prioridad sobre el idioma
@@ -570,6 +650,63 @@ export class DocseraWidget extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
     this.sessionId = loadSessionId();
+    this.checkHealth();
+    this.loadHistory();
+  }
+
+  // Recupera la conversación visible tras un refresco o al navegar a otra
+  // página del mismo sitio: mismo sessionId, misma ventana que usa el LLM
+  // para recordar (ver chat/history.ts en el server) — si no coincidieran,
+  // se vería en pantalla un turno que el modelo ya no recuerda de verdad.
+  // Best-effort: un fallo aquí no es un error para el usuario, solo empieza
+  // con la conversación vacía como hasta ahora.
+  private async loadHistory(): Promise<void> {
+    if (!this.server || !this.sessionId) return;
+    try {
+      const response = await fetch(
+        `${this.server}/chat/history?sessionId=${this.sessionId}`,
+      );
+      if (!response.ok) return;
+      const { turns } = (await response.json()) as { turns: HistoryTurn[] };
+      if (turns.length === 0 || this.messages.length > 0) return;
+
+      this.messages = turns.flatMap((turn) => [
+        { role: "user" as const, content: turn.question },
+        {
+          role: "assistant" as const,
+          content: turn.answer ?? "",
+          answered: turn.answered,
+          conversationId: turn.conversationId,
+          sources: turn.sources.length > 0 ? turn.sources : undefined,
+          feedback: turn.feedback ?? undefined,
+        },
+      ]);
+    } catch {
+      // sin conexión, CORS, etc.: se queda como si no hubiera historial
+    }
+  }
+
+  // Contador para descartar respuestas desordenadas si se abre/cierra el
+  // panel rapido y se solapan dos chequeos: solo aplica el resultado si
+  // sigue siendo la comprobacion mas reciente al terminar.
+  private healthCheckSeq = 0;
+
+  // Chequeo real (no decorativo) contra /health: si el server no responde,
+  // se bloquea la entrada en vez de dejar preguntar para nada. Se repite al
+  // abrir el panel, por si cambio el estado desde que se cargo la pagina.
+  private async checkHealth(): Promise<void> {
+    if (!this.server) return;
+    const seq = ++this.healthCheckSeq;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    try {
+      const response = await fetch(`${this.server}/health`, { signal: controller.signal });
+      if (seq === this.healthCheckSeq) this.serverOnline = response.ok;
+    } catch {
+      if (seq === this.healthCheckSeq) this.serverOnline = false;
+    } finally {
+      clearTimeout(timeout);
+    }
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -593,7 +730,10 @@ export class DocseraWidget extends LitElement {
 
   private toggleOpen(): void {
     this.open = !this.open;
-    if (this.open) this.setAttribute("opened", "");
+    if (this.open) {
+      this.setAttribute("opened", "");
+      this.checkHealth();
+    }
   }
 
   private onInput(event: Event): void {
@@ -606,7 +746,7 @@ export class DocseraWidget extends LitElement {
   }
 
   private async send(question: string): Promise<void> {
-    if (!question || this.pending || !this.server) return;
+    if (!question || this.pending || !this.server || this.serverOnline === false) return;
 
     this.messages = [...this.messages, { role: "user", content: question }];
     this.inputValue = "";
@@ -669,7 +809,11 @@ export class DocseraWidget extends LitElement {
       }
 
       if (!answer) throw new Error("Empty stream");
+      // Llego una respuesta real: el server esta disponible de verdad, mas
+      // fiable que el propio /health si este ultimo hubiera fallado antes.
+      this.serverOnline = true;
     } catch {
+      this.serverOnline = false;
       const failed: ChatMessage = { role: "assistant", content: this.strings.error, error: true };
       this.messages =
         index === -1
@@ -711,19 +855,31 @@ export class DocseraWidget extends LitElement {
 
   private renderPanel() {
     const strings = this.strings;
+    const offline = this.serverOnline === false;
     return html`
       <div class="panel">
         <header>
-          <span>${strings.heading}</span>
+          ${markIcon()}
+          <div class="titles">
+            <div class="heading-text">${strings.heading}</div>
+            <div class="status">
+              <span class="dot ${offline ? "offline" : ""}"></span>${offline
+                ? strings.statusOffline
+                : strings.statusOnline}
+            </div>
+          </div>
           <button @click=${this.toggleOpen} aria-label=${strings.close}>✕</button>
         </header>
         <div class="messages">
           ${this.messages.length === 0
             ? html`
                 <p class="empty">${strings.empty}</p>
-                ${this.renderSuggestions()}
+                ${offline ? null : this.renderSuggestions()}
               `
             : this.messages.map((message) => this.renderMessage(message))}
+          ${offline && this.messages.length > 0
+            ? html`<p class="offline-notice">${strings.statusOffline}</p>`
+            : null}
           ${this.pending
             ? html`<div class="message assistant pending"><div
                 class="bubble"
@@ -736,13 +892,18 @@ export class DocseraWidget extends LitElement {
           <input
             .value=${this.inputValue}
             @input=${this.onInput}
-            placeholder=${strings.placeholder}
-            ?disabled=${this.pending}
+            placeholder=${offline ? strings.statusOffline : strings.placeholder}
+            ?disabled=${this.pending || offline}
           />
-          <button type="submit" ?disabled=${this.pending || !this.inputValue.trim()}>
-            ${strings.send}
+          <button
+            type="submit"
+            aria-label=${strings.send}
+            ?disabled=${this.pending || offline || !this.inputValue.trim()}
+          >
+            ${sendIcon()}
           </button>
         </form>
+        <div class="powered-by">${strings.poweredBy}</div>
       </div>
     `;
   }
@@ -779,7 +940,7 @@ export class DocseraWidget extends LitElement {
                 ${message.sources.map(
                   (source) =>
                     html`<a href=${sourceHref(source)} target="_blank" rel="noopener noreferrer"
-                      >${sourceLabel(source)}</a
+                      ><span aria-hidden="true">📄</span><span>${sourceLabel(source)}</span></a
                     >`,
                 )}
               </div>
@@ -824,13 +985,36 @@ function thumbIcon() {
   </svg>`;
 }
 
-function chatIcon() {
-  return html`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+// Icono de marca de Docsera (burbuja + dos barras), usado en el header con
+// sus dos tonos originales.
+function markIcon() {
+  return html`<svg class="mark" width="22" height="21" viewBox="0 0 48 45" fill="none" aria-hidden="true">
     <path
-      d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.35 0-2.62-.32-3.73-.9L3 21l1.9-5.77A8.5 8.5 0 1 1 21 11.5Z"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      d="M4 14a10 10 0 0 1 10-10h20a10 10 0 0 1 10 10v13a10 10 0 0 1-10 10H22l-8 6.5v-6.5h-1a10 10 0 0 1-9-8V14z"
+      fill="var(--docsera-primary)"
     />
+    <rect x="13" y="14" width="5" height="11" rx="1.6" fill="#ffffff" />
+    <rect x="21" y="14" width="5" height="11" rx="1.6" fill="#ffffff" />
+  </svg>`;
+}
+
+// Misma marca, invertida (burbuja blanca + barras del color de marca) para
+// el botón flotante cerrado, que ya lleva el fondo de color.
+function chatIcon() {
+  return html`<svg width="22" height="21" viewBox="0 0 48 45" fill="none">
+    <path
+      d="M4 14a10 10 0 0 1 10-10h20a10 10 0 0 1 10 10v13a10 10 0 0 1-10 10H22l-8 6.5v-6.5h-1a10 10 0 0 1-9-8V14z"
+      fill="#ffffff"
+    />
+    <rect x="13" y="14" width="5" height="11" rx="1.6" fill="var(--docsera-primary)" />
+    <rect x="21" y="14" width="5" height="11" rx="1.6" fill="var(--docsera-primary)" />
+  </svg>`;
+}
+
+function sendIcon() {
+  return html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M22 2 11 13" />
+    <path d="M22 2 15 22l-4-9-9-4Z" />
   </svg>`;
 }
 

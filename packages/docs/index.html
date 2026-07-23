@@ -231,6 +231,7 @@ jobs:
             <tr><td><code>GET /health</code></td><td>—</td><td>Status and version</td></tr>
             <tr><td><code>POST /chat</code></td><td>rate-limited</td><td><code>{question, sessionId?}</code> → <code>{answer, sources[], sessionId, conversationId, answered}</code></td></tr>
             <tr><td><code>POST /chat/stream</code></td><td>rate-limited</td><td>Same body, streamed as SSE: <code>delta</code> events with text, then a <code>done</code> event with <code>{sources[], sessionId, conversationId, answered}</code>. This is what the widget uses.</td></tr>
+            <tr><td><code>GET /chat/history</code></td><td>rate-limited</td><td><code>?sessionId=</code> → <code>{turns[]}</code>, the last turns of that session still inside the multi-turn window (see <a href="#configuration">Configuration</a>). Lets the widget restore the visible conversation after a reload or navigating to another page of the same site.</td></tr>
             <tr><td><code>POST /feedback</code></td><td>rate-limited</td><td><code>{conversationId, rating: "up"|"down"}</code> — 👍/👎 on an answer</td></tr>
             <tr><td><code>GET /stats/public</code></td><td>opt-in (<code>PUBLIC_STATS</code>)</td><td>Aggregates only: totals, daily activity, most cited sections</td></tr>
             <tr><td><code>GET /llms.txt</code></td><td>public</td><td><a href="https://llmstxt.org/">llms.txt</a> for your docs, generated from what's actually indexed: how to query them plus the list of pages.</td></tr>
