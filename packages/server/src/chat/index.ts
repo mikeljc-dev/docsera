@@ -4,7 +4,7 @@ import type { ChatMessage } from "../llm/types.js";
 import { condenseQuestion } from "./condense.js";
 import { loadRecentTurns } from "./history.js";
 import { buildChatMessages, isNoAnswer, noAnswerText } from "./prompt.js";
-import { retrieveRelevantChunks, type RetrievedChunk } from "./retrieve.js";
+import { retrieveFromTerms, type RetrievedChunk, type SearchTerm } from "./retrieve.js";
 import { saveConversation } from "./store.js";
 
 export interface ChatInput {
@@ -54,12 +54,24 @@ export async function prepareChat(input: ChatInput): Promise<PreparedChat> {
   const turns = await loadRecentTurns(pool, input.sessionId);
   const searchQuery = await condenseQuestion(input.question, turns);
 
-  const [questionEmbedding] = await getEmbeddingsAdapter().embed([searchQuery]);
-  if (!questionEmbedding) {
-    throw new Error("No se pudo generar el embedding de la pregunta");
-  }
+  // Retrieval dual (deuda #5): en un seguimiento la reescritura puede
+  // desviarse y arrastrar el retrieval a otro tema. Añadir la pregunta literal
+  // como segundo término y fusionar por RRF hace que una reescritura envenenada
+  // deje de secuestrar sola la recuperación. Cuando la reescritura coincide con
+  // la original (primer turno o pregunta ya autocontenida) hay un solo término
+  // y el comportamiento es el de siempre. Coste: solo BD —el embed batchea los
+  // dos textos en una llamada—, sin llamada extra al LLM.
+  const queries = searchQuery === input.question ? [searchQuery] : [searchQuery, input.question];
+  const embeddings = await getEmbeddingsAdapter().embed(queries);
+  const terms: SearchTerm[] = queries.map((query, i) => {
+    const embedding = embeddings[i];
+    if (!embedding) throw new Error("No se pudo generar el embedding de la pregunta");
+    return { embedding, query };
+  });
 
-  const chunks = await retrieveRelevantChunks(pool, questionEmbedding, searchQuery);
+  // El cross-encoder reordena con la reescritura, que es la de más señal de
+  // intención en un seguimiento; el segundo término solo amplía el pool.
+  const chunks = await retrieveFromTerms(pool, terms, searchQuery);
   if (chunks.length === 0) {
     return { chunks, messages: [] };
   }

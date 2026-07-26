@@ -26,12 +26,13 @@ identificaron trabajando en otras cosas, no una cola.
 - **CII Best Practices badge** *(Scorecard, 0/10)* — cuestionario de
   autoevaluación en bestpractices.dev, no una config de repo. Más esfuerzo
   que los otros checks de Scorecard, aparcado por ahora.
-- **Mitigar respuestas desviadas con `answered=true`** — el historial ya
-  descarta los turnos sin respuesta, pero una respuesta *mal enfocada* que
-  cuenta como respondida sigue contaminando la reescritura del siguiente
-  turno. Sin arreglo barato encontrado (ver `docs/deuda-tecnica.md` punto
-  5); necesita preguntas reales de usuarios para calibrar algo mejor, no
-  cuatro ejemplos de prueba.
+- **Mitigar respuestas desviadas con `answered=true`** — mitigado con
+  retrieval dual RRF (2026-07-26): en un seguimiento se fusiona la reescritura
+  con la pregunta literal, así una reescritura envenenada deja de secuestrar
+  sola el retrieval (ver `docs/deuda-tecnica.md` punto 5, enfoque C). No es
+  arreglo total: falta medir con tráfico real si diluye seguimientos legítimos,
+  y una calibración mejor (enfoque B, atado a la señal de confianza #8) sigue
+  necesitando preguntas reales de usuarios.
 - **Retomar la señal de confianza vía marcador del LLM** — la vía por
   distancia coseno está descartada con datos (ver más abajo); la
   alternativa (pedirle un marcador `PARTIAL`/`NO_ANSWER` al propio LLM,

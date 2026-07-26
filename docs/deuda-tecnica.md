@@ -253,6 +253,22 @@ reaprovecha el RRF), **B cuando haya datos reales** (resuelve #5 y #8 juntos),
 **A como alternativa** si C diluye demasiado los seguimientos legítimos. Todos
 hay que medirlos con casos reales antes de darlos por buenos.
 
+**Enfoque C implementado (2026-07-26).** `retrieve.ts` pasa de una firma de
+un solo término a `retrieveFromTerms(pool, terms, rerankQuery, limit)`: cada
+`SearchTerm` (embedding + texto) aporta sus dos ramas y todas se fusionan por
+RRF. `retrieveRelevantChunks` queda como wrapper de un término para el MCP y
+los tests de integración. En `prepareChat`, cuando la reescritura difiere de
+la pregunta original (solo en seguimientos), se añade la pregunta literal como
+segundo término; los dos textos se embeben en una sola llamada, así que el
+coste es solo de BD, sin llamada extra al LLM. El cross-encoder reordena con
+la reescritura (la de más señal de intención); el segundo término solo amplía
+el pool. Verificado con Postgres real (`retrieve.integration.test.ts`): con el
+umbral puesto, una reescritura desviada a "precios" no alcanza el chunk de
+"ollama", pero al fusionar la pregunta literal el chunk correcto vuelve a
+aparecer. **Contra conocido, sin medir aún con tráfico real:** en un
+seguimiento legítimo donde la literal ("¿cómo lo configuro?") no aporta señal,
+sus ramas diluyen algo la reescritura buena. Convivir hasta tener datos.
+
 ## 6. Streaming a trompicones según el proveedor — ✅ hecho (2026-07-19)
 
 Gemini (lo que corre en la demo pública) manda fragmentos enormes: una
