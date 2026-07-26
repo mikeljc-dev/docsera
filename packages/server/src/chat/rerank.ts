@@ -44,10 +44,19 @@ async function downloadIfMissing(url: string, path: string): Promise<void> {
   await writeFile(path, Buffer.from(await response.arrayBuffer()));
 }
 
+// El modelo (~23 MB) se cachea en disco entre cargas. Por defecto en
+// `tmpdir()`, que en muchos contenedores es efímero: cada reinicio forzaría
+// una re-descarga desde HuggingFace en la primera consulta. `RERANKER_CACHE_DIR`
+// permite apuntarlo a un volumen persistente para descargarlo una sola vez.
+export function resolveRerankerCacheDir(env: NodeJS.ProcessEnv = process.env): string {
+  const configured = env.RERANKER_CACHE_DIR?.trim();
+  return configured ? configured : join(tmpdir(), "docsera-reranker");
+}
+
 let rerankerPromise: Promise<Reranker> | null = null;
 
 async function loadReranker(): Promise<Reranker> {
-  const dir = join(tmpdir(), "docsera-reranker");
+  const dir = resolveRerankerCacheDir();
   await mkdir(dir, { recursive: true });
   const modelPath = join(dir, "model_quantized.onnx");
   const tokenizerPath = join(dir, "tokenizer.json");
