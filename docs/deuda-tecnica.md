@@ -126,9 +126,20 @@ local: migraciones aplicadas desde `dist`, `/health`, `/chat` con citas,
 `/llms.txt` y `widget.js` respondiendo, y **cero procesos `tsx`** dentro del
 contenedor.
 
-**Queda pendiente:** la imagen sigue instalando devDependencies (470 MB). Un
-`pnpm install --prod` en una segunda etapa, o un multi-stage, la bajaría
-bastante. No es urgente.
+**Multi-stage — ✅ hecho (2026-07-26).** El `Dockerfile` pasa a dos etapas:
+un `builder` que instala todo y compila widget/dashboard/server, y un
+`runtime` que solo copia el paquete podado con `pnpm --filter @docsera/server
+deploy --prod /prod` (node_modules de solo producción, sin devDeps ni
+fuentes). Medido de verdad construyendo ambas imágenes: **713 MB → 471 MB
+(−242 MB, −34%)**. Verificado E2E arrancando la imagen nueva contra un
+pgvector real: migraciones 0001-0005 aplicadas, `/health` 200,
+`onnxruntime-web` presente (el reranker sigue disponible) y `tsx` ausente
+(devDeps efectivamente fuera).
+
+Lo que queda del peso es sobre todo `onnxruntime-web` (~132 MB, dependencia
+de producción del reranker, siempre instalada aunque no se active). Bajarlo
+más exige hacer el reranker una dependencia opcional con `import()` dinámico
+— cambio con implicaciones de runtime, aparcado hasta que el peso moleste.
 
 ## 3. Enlaces Markdown sin renderizar en el widget — ✅ hecho (2026-07-19)
 

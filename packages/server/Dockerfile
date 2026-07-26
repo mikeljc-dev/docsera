@@ -5,7 +5,12 @@
 # Pineada por digest (no por tag flotante): Dependabot abre PR solo cuando
 # hay uno nuevo para node:20-alpine, así que se sigue actualizando sin
 # perder reproducibilidad entre builds.
-FROM node:26-alpine@sha256:e88a35be04478413b7c71c455cd9865de9b9360e1f43456be5951032d7ac1a66
+
+# ─── Stage 1: builder ────────────────────────────────────────────
+# Instala TODO (dev incluido), compila el widget, el dashboard y el server,
+# y poda a un directorio autocontenido con solo dependencias de produccion.
+# Nada de esto (devDeps, fuentes, tooling) llega a la imagen final.
+FROM node:26-alpine@sha256:e88a35be04478413b7c71c455cd9865de9b9360e1f43456be5951032d7ac1a66 AS builder
 
 WORKDIR /app
 
@@ -32,7 +37,24 @@ RUN pnpm --filter @docsera/dashboard build \
 
 RUN pnpm --filter @docsera/server build
 
+# `deploy --prod` clona el paquete con un node_modules autocontenido (solo
+# dependencias de produccion, sin las dev). El server no depende de otros
+# paquetes del workspace (widget/dashboard se compilan a assets estaticos y
+# se copian aparte), asi que queda un directorio listo para ejecutar.
+RUN pnpm --filter @docsera/server deploy --prod /prod
+
+# ─── Stage 2: runtime ────────────────────────────────────────────
+# Solo Node + el paquete podado. Sin pnpm/corepack, sin devDeps, sin fuentes.
+FROM node:26-alpine@sha256:e88a35be04478413b7c71c455cd9865de9b9360e1f43456be5951032d7ac1a66 AS runtime
+
 WORKDIR /app/packages/server
+ENV NODE_ENV=production
+
+COPY --from=builder /prod/node_modules ./node_modules
+COPY --from=builder /app/packages/server/dist ./dist
+COPY --from=builder /app/packages/server/public ./public
+COPY --from=builder /app/packages/server/package.json ./package.json
+
 EXPOSE 3000
 
 # Compilado, no transpilado en caliente: hasta la v0.3.0 esto arrancaba con
