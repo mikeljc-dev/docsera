@@ -8,13 +8,12 @@ import {
   UnauthorizedError,
 } from "./api.js";
 import { ConversationModal } from "./ConversationModal.js";
+import { type DateRange, sinceFor, stripMarkdown } from "./conversations.js";
 
 const PAGE_SIZE = 25;
 const SEARCH_DEBOUNCE_MS = 350;
-const DAY_MS = 86_400_000;
 
 type Filter = "all" | "answered" | "unanswered";
-type DateRange = "all" | "today" | "7d" | "30d";
 
 const FILTERS: { value: Filter; label: string }[] = [
   { value: "all", label: "All" },
@@ -56,33 +55,6 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 
 function formatDate(iso: string): string {
   return dateFormatter.format(new Date(iso));
-}
-
-function sinceFor(range: DateRange): string | undefined {
-  if (range === "all") return undefined;
-  const now = Date.now();
-  if (range === "today") {
-    const midnight = new Date();
-    midnight.setHours(0, 0, 0, 0);
-    return midnight.toISOString();
-  }
-  const days = range === "7d" ? 7 : 30;
-  return new Date(now - days * DAY_MS).toISOString();
-}
-
-// La tabla es para leer, no para renderizar Markdown: quita la sintaxis más
-// ruidosa (fences ```, backticks, #, énfasis, sintaxis de enlace) dejando el
-// texto legible. No es un parser completo — solo lo justo para que un
-// operador no vea "```bash npx docsera```" literal en cada fila.
-function stripMarkdown(text: string): string {
-  return text
-    .replace(/```[a-z]*\n?/gi, "") // apertura de fence (con lenguaje opcional)
-    .replace(/```/g, "") // cierre de fence
-    .replace(/`([^`]+)`/g, "$1") // código inline
-    .replace(/^#{1,6}\s+/gm, "") // encabezados
-    .replace(/\*\*([^*]+)\*\*/g, "$1") // negrita
-    .replace(/\*([^*]+)\*/g, "$1") // cursiva
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1"); // enlaces → solo el texto
 }
 
 // Trocea el texto en partes, envolviendo cada aparición del término buscado

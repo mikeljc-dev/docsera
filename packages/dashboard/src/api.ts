@@ -62,10 +62,11 @@ export interface FetchConversationsOptions {
   offset: number;
 }
 
-export async function fetchConversations(
-  token: string,
-  options: FetchConversationsOptions,
-): Promise<ConversationsResponse> {
+// Solo los filtros presentes viajan en la query. Ojo con `answered`: es un
+// booleano, así que se comprueba `!== undefined` (un `false` es un filtro
+// válido); el resto se omiten cuando están vacíos. Pura para poder testear
+// esa inclusión condicional sin montar el fetch.
+export function buildConversationsQuery(options: FetchConversationsOptions): string {
   const params = new URLSearchParams();
   if (options.answered !== undefined) params.set("answered", String(options.answered));
   if (options.search) params.set("search", options.search);
@@ -75,8 +76,14 @@ export async function fetchConversations(
   if (options.sortDir) params.set("sortDir", options.sortDir);
   params.set("limit", String(options.limit));
   params.set("offset", String(options.offset));
+  return params.toString();
+}
 
-  const response = await fetch(`/admin/conversations?${params.toString()}`, {
+export async function fetchConversations(
+  token: string,
+  options: FetchConversationsOptions,
+): Promise<ConversationsResponse> {
+  const response = await fetch(`/admin/conversations?${buildConversationsQuery(options)}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
