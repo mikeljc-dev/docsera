@@ -52,6 +52,66 @@ jobs:
 
       - run: pnpm lint
 
-      - run: pnpm test
+      # Contamos "tests N" de la salida de cada paquete (reporter "spec" de
+      # node:test) para alimentar el badge dinamico: si el job falla, este
+      # paso no se ejecuta y el badge no se toca.
+      - name: Test
+        run: |
+          set -o pipefail
+          pnpm test | tee test-output.log
+
+      - name: Contar tests para el badge
+        run: |
+          grep -oE 'ℹ tests [0-9]+' test-output.log \
+            | awk '{sum += $3} END {print sum}' > test-count.txt
+          cat test-count.txt
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: test-count
+          path: test-count.txt
 
       - run: pnpm build
+
+  update-tests-badge:
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    # Unico job del workflow que escribe: solo para publicar el badge en la
+    # rama huerfana `badges` (sin proteccion, no toca `main`).
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: test-count
+
+      - name: Publicar badge en la rama badges
+        run: |
+          count=$(cat test-count.txt)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git ls-remote --exit-code --heads origin badges >/dev/null 2>&1; then
+            git fetch origin badges
+            git worktree add /tmp/badges-wt origin/badges
+            (cd /tmp/badges-wt && git checkout -B badges)
+          else
+            git worktree add --orphan -b badges /tmp/badges-wt
+          fi
+
+          printf '{"schemaVersion":1,"label":"tests","message":"%s passing","color":"brightgreen"}\n' \
+            "$count" > /tmp/badges-wt/tests.json
+
+          cd /tmp/badges-wt
+          git add tests.json
+          if git diff --cached --quiet; then
+            echo "Badge sin cambios, no hace falta commit"
+          else
+            git commit -q -m "chore: actualiza el badge de tests ($count passing)"
+            git push origin badges
+          fi
