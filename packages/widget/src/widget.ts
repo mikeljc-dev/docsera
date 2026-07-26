@@ -1,38 +1,11 @@
 import { LitElement, html, css, type PropertyValues } from "lit";
+import { mapHistoryToMessages } from "./history.js";
 import { resolveStrings, type WidgetStrings } from "./locales.js";
 import { renderMarkdown } from "./markdown.js";
+import { loadSessionId } from "./session.js";
 import { readSse, smooth } from "./sse.js";
-import type { ChatDone, ChatMessage, HistoryTurn, Source } from "./types.js";
-
-const SESSION_STORAGE_KEY = "docsera-session-id";
-
-function loadSessionId(): string {
-  try {
-    const existing = window.localStorage.getItem(SESSION_STORAGE_KEY);
-    if (existing) return existing;
-  } catch {
-    // localStorage no disponible (modo privado, storage bloqueado, etc.)
-  }
-  const id = crypto.randomUUID();
-  try {
-    window.localStorage.setItem(SESSION_STORAGE_KEY, id);
-  } catch {
-    // ignorar: la sesion simplemente no persistira entre recargas
-  }
-  return id;
-}
-
-function sourceHref(source: Source): string {
-  if (!source.url) return "";
-  return source.anchor ? `${source.url}#${source.anchor}` : source.url;
-}
-
-// Varias fuentes suelen compartir documento (mismo título): el anchor
-// humanizado ("add-the-widget" → "add the widget") las hace distinguibles.
-function sourceLabel(source: Source): string {
-  if (!source.anchor) return source.title;
-  return `${source.title} § ${source.anchor.replace(/-/g, " ")}`;
-}
+import { sourceHref, sourceLabel } from "./sources.js";
+import type { ChatDone, ChatMessage, HistoryTurn } from "./types.js";
 
 export class DocseraWidget extends LitElement {
   static properties = {
@@ -670,17 +643,7 @@ export class DocseraWidget extends LitElement {
       const { turns } = (await response.json()) as { turns: HistoryTurn[] };
       if (turns.length === 0 || this.messages.length > 0) return;
 
-      this.messages = turns.flatMap((turn) => [
-        { role: "user" as const, content: turn.question },
-        {
-          role: "assistant" as const,
-          content: turn.answer ?? "",
-          answered: turn.answered,
-          conversationId: turn.conversationId,
-          sources: turn.sources.length > 0 ? turn.sources : undefined,
-          feedback: turn.feedback ?? undefined,
-        },
-      ]);
+      this.messages = mapHistoryToMessages(turns);
     } catch {
       // sin conexión, CORS, etc.: se queda como si no hubiera historial
     }
