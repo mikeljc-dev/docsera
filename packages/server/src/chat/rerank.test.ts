@@ -1,6 +1,20 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { truncateEncodedPair } from "./rerank.js";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { resolveRerankerCacheDir, truncateEncodedPair } from "./rerank.js";
+
+test("la ruta de cache cae en tmpdir cuando no hay override", () => {
+  assert.equal(resolveRerankerCacheDir({}), join(tmpdir(), "docsera-reranker"));
+});
+
+test("RERANKER_CACHE_DIR apunta la cache a un directorio persistente", () => {
+  assert.equal(resolveRerankerCacheDir({ RERANKER_CACHE_DIR: "/data/reranker" }), "/data/reranker");
+});
+
+test("un RERANKER_CACHE_DIR en blanco cae al default en vez de a una ruta vacia", () => {
+  assert.equal(resolveRerankerCacheDir({ RERANKER_CACHE_DIR: "  " }), join(tmpdir(), "docsera-reranker"));
+});
 
 test("una secuencia dentro del límite no se toca", () => {
   const pair = { ids: [101, 1, 2, 102], attentionMask: [1, 1, 1, 1], tokenTypeIds: [0, 0, 0, 0] };

@@ -134,7 +134,10 @@ The model and tokenizer files themselves are **not** baked into the
 image: they're downloaded once, lazily, on first use, into the OS temp
 directory — the same "pull a model file once" pattern as `ollama pull`,
 which keeps the image size unchanged for the majority who never enable
-this. A download failure (offline build environment, Hugging Face
+this. The temp directory is often ephemeral in a container, so a restart
+re-downloads on the next query; set `RERANKER_CACHE_DIR` to a persistent
+volume to download the model just once for good. A download failure
+(offline build environment, Hugging Face
 unreachable) doesn't fail the request: retrieval falls back to the plain
 RRF order and logs the error, exactly like a condense-question LLM call
 failing falls back to the original question.
