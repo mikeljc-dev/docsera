@@ -218,6 +218,41 @@ solo las preguntas) y **empeora**: pierde el referente. Con
 ellas lo pierde. Descartado. No hay arreglo barato para el caso general;
 convivir con ello hasta tener datos reales.
 
+**Análisis de enfoques (2026-07-26), sin implementar.** Revisado el código
+(`chat/condense.ts` + `chat/history.ts`) para no re-derivarlo cada vez. La
+raíz: para saber si una respuesta sirve como contexto hay que saber si fue
+*buena*, y eso es justo la deuda de la señal de confianza (roadmap #8, también
+aparcada). Tres vías:
+
+- **A. Condensar con las fuentes citadas, no con la prosa de la respuesta.**
+  Meter en el prompt de reescritura los anchors de las secciones que citó cada
+  turno en vez del texto de la respuesta. Las citas están ancladas a la doc
+  real, así que resisten mejor una respuesta con prosa desviada. Contra: si la
+  respuesta se desvió *porque el retrieval falló*, las fuentes también son
+  malas; y un anchor da menos señal que la prosa para resolver pronombres.
+  Esfuerzo medio. Las fuentes ya se guardan por turno.
+
+- **B. Señal de confianza por respuesta → excluir del historial las de baja
+  confianza (ata #5 con #8).** Igual que hoy se excluye `answered=false`, una
+  condición más en el `WHERE` de `loadRecentTurns`. Es el arreglo general y
+  limpio, pero **hereda el bloqueo de #8**: la señal por distancia coseno no
+  funcionó (revertida) y el marcador `PARTIAL` pedido al LLM necesita
+  calibrarse con preguntas reales. Sin tráfico real, no hay umbral fiable.
+
+- **C. Retrieval dual con RRF: fusionar la reescritura y la pregunta literal.**
+  ⭐ No arregla `condense`, lo hace irrelevante cuando falla: lanzar el
+  retrieval con la pregunta condensada **y** con la literal y fusionar por RRF
+  (la infraestructura `fuseRankings` ya existe de la búsqueda híbrida). Una
+  reescritura envenenada deja de secuestrar el retrieval sola. Sin llamada
+  extra al LLM (coste solo de BD) y **sin calibración**. Contra: diluye también
+  una reescritura buena (un "¿cómo lo configuro?" donde la literal no sirve).
+  Esfuerzo bajo-medio.
+
+Recomendación: **C a corto plazo** (único sin calibración ni coste de LLM,
+reaprovecha el RRF), **B cuando haya datos reales** (resuelve #5 y #8 juntos),
+**A como alternativa** si C diluye demasiado los seguimientos legítimos. Todos
+hay que medirlos con casos reales antes de darlos por buenos.
+
 ## 6. Streaming a trompicones según el proveedor — ✅ hecho (2026-07-19)
 
 Gemini (lo que corre en la demo pública) manda fragmentos enormes: una
