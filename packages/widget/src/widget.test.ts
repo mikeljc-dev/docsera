@@ -29,6 +29,12 @@ g.Event = window.Event;
 g.CustomEvent = window.CustomEvent;
 g.getComputedStyle = window.getComputedStyle.bind(window);
 g.localStorage = window.localStorage;
+// Node <21 no trae `navigator` global (CI usa Node 20; un Node 21+ ya lo
+// expone como accessor de solo lectura que no hay que pisar). Lit lo lee al
+// renderizar, así que se aporta desde jsdom solo si falta.
+if (!("navigator" in globalThis)) {
+  Object.defineProperty(globalThis, "navigator", { value: window.navigator, configurable: true });
+}
 // smooth() usa requestAnimationFrame; un setTimeout(0) lo hace determinista
 // sin depender del reloj de repintado de jsdom.
 g.requestAnimationFrame = (cb: (t: number) => void) => setTimeout(() => cb(Date.now()), 0);
