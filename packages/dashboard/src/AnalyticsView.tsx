@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { type AdminStats, fetchStats, UnauthorizedError } from "./api.js";
+import { percent, sourceHref, sourceLabel } from "./analytics.js";
 
 type Range = "7" | "30" | "all";
 
@@ -14,23 +15,6 @@ interface Props {
   onUnauthorized: () => void;
   // Salta a la pestaña de conversaciones con esta pregunta ya en el buscador.
   onDrillDown: (question: string) => void;
-}
-
-function percent(part: number, whole: number): string {
-  if (whole === 0) return "—";
-  return `${Math.round((part / whole) * 100)}%`;
-}
-
-// Sin el título del documento delante, igual que en ConversationsView: casi
-// todas las citas de una misma instancia vienen del mismo documento.
-function sourceLabel(source: AdminStats["topSources"][number]): string {
-  if (!source.anchor) return source.title;
-  return source.anchor.replace(/-/g, " ");
-}
-
-function sourceHref(source: AdminStats["topSources"][number]): string | null {
-  if (!source.url) return null;
-  return source.anchor ? `${source.url}#${source.anchor}` : source.url;
 }
 
 export function AnalyticsView({ token, onUnauthorized, onDrillDown }: Props) {
