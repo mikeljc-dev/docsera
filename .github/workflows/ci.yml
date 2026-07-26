@@ -52,9 +52,11 @@ jobs:
 
       - run: pnpm lint
 
-      # Contamos "tests N" de la salida de cada paquete (reporter "spec" de
-      # node:test) para alimentar el badge dinamico: si el job falla, este
-      # paso no se ejecuta y el badge no se toca.
+      # Contamos "tests N" de la salida de cada paquete para alimentar el
+      # badge dinamico: si el job falla, este paso no se ejecuta y el badge
+      # no se toca. node:test cambia de reporter segun haya TTY o no: en un
+      # terminal normal usa "spec" ("ℹ tests N"), en el runner de Actions
+      # (sin TTY) cae a TAP ("# tests N") -- contemplamos los dos formatos.
       - name: Test
         run: |
           set -o pipefail
@@ -62,7 +64,7 @@ jobs:
 
       - name: Contar tests para el badge
         run: |
-          grep -oE 'ℹ tests [0-9]+' test-output.log \
+          grep -oE '(ℹ|#) tests [0-9]+' test-output.log \
             | awk '{sum += $3} END {print sum}' > test-count.txt
           cat test-count.txt
 
