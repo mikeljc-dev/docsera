@@ -1,7 +1,7 @@
 import { test, before, after, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import type { Pool } from "pg";
-import { retrieveRelevantChunks } from "./retrieve.js";
+import { retrieveFromTerms, retrieveRelevantChunks } from "./retrieve.js";
 import { seedDocument, setupTestDb, testDatabaseUrl, truncateAll } from "../testing/db.js";
 
 // Estos tests ejercen el SQL real (pgvector + full-text + RRF), que es
@@ -106,6 +106,38 @@ test("respeta el límite y no repite un chunk hallado por las dos ramas", { skip
 
   assert.equal(chunks.length, 2);
   assert.equal(new Set(chunks.map((c) => c.id)).size, 2, "no debería repetir chunks");
+});
+
+test("el retrieval dual rescata el chunk que solo halla la pregunta literal", { skip }, async () => {
+  // La reescritura se desvió a "precios"; la pregunta literal apuntaba a
+  // "ollama". Con el umbral puesto, la rama de la reescritura no alcanza el
+  // chunk de ollama, así que si aparece es porque el segundo término lo trajo.
+  process.env.CHAT_MAX_DISTANCE = "0.5";
+  await seedDocument(pool, {
+    url: "https://docs.example.com/a",
+    title: "Doc A",
+    chunks: [
+      { content: "Configura Ollama como proveedor local.", embedding: [1, 0, 0], anchor: "ollama" },
+      { content: "Detalles de la suscripción y el precio.", embedding: [0, 1, 0], anchor: "precios" },
+    ],
+  });
+
+  const rewrite = { embedding: [0, 1, 0], query: "suscripción precio" };
+  const literal = { embedding: [1, 0, 0], query: "Ollama" };
+
+  // Solo con la reescritura envenenada: el chunk de ollama queda fuera.
+  const soloRewrite = await retrieveFromTerms(pool, [rewrite], "suscripción precio");
+  assert.ok(
+    !soloRewrite.some((chunk) => chunk.anchor === "ollama"),
+    "la reescritura sola no debería alcanzar el chunk de ollama",
+  );
+
+  // Añadiendo la pregunta literal: el chunk correcto vuelve a aparecer.
+  const dual = await retrieveFromTerms(pool, [rewrite, literal], "suscripción precio");
+  assert.ok(
+    dual.some((chunk) => chunk.anchor === "ollama"),
+    "el retrieval dual debería rescatar el chunk que halla la pregunta literal",
+  );
 });
 
 test("la columna tsv se genera sola al insertar", { skip }, async () => {
