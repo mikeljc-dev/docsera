@@ -33,11 +33,6 @@ identificaron trabajando en otras cosas, no una cola.
   arreglo total: falta medir con tráfico real si diluye seguimientos legítimos,
   y una calibración mejor (enfoque B, atado a la señal de confianza #8) sigue
   necesitando preguntas reales de usuarios.
-- **Retomar la señal de confianza vía marcador del LLM** — la vía por
-  distancia coseno está descartada con datos (ver más abajo); la
-  alternativa (pedirle un marcador `PARTIAL`/`NO_ANSWER` al propio LLM,
-  coste cero en la misma llamada) apuntaba bien pero necesita el mismo tipo
-  de calibración con tráfico real que el punto anterior.
 - **Infra:** decidir plan de Railway cuando se agote el crédito del trial
   (Hobby ~5 $/mes, o migrar a Cloud Run + Neon con la misma imagen).
 
@@ -50,13 +45,28 @@ conversación, no una entrada más en esta lista.
 
 ## Aparcado a propósito (no reabrir sin una razón nueva)
 
-- **#8 — Señal de confianza por distancia coseno.** Implementada y
-  revertida el 2026-07-19: medida contra la doc real, la distancia no
-  separa "respondible" de "no respondible" ("Kubernetes ingress
-  controller", no documentado, daba mejor distancia que una pregunta sí
-  documentada). Con el umbral puesto, una respuesta inventada salía
-  marcada como confianza *alta* — peor que no tener señal. La vía
-  alternativa está en "Próximos candidatos".
+- **#8 — Señal de confianza.** Las dos vías están descartadas con datos:
+  - *Distancia coseno* (implementada y revertida el 2026-07-19): medida
+    contra la doc real, la distancia no separa "respondible" de "no
+    respondible" ("Kubernetes ingress controller", no documentado, daba
+    mejor distancia que una pregunta sí documentada). Con el umbral puesto,
+    una respuesta inventada salía marcada como confianza *alta* — peor que
+    no tener señal.
+  - *Marcador `PARTIAL` pedido al propio LLM* (prototipada y revertida el
+    2026-08-02, sin llegar a commit): la idea era darle al modelo una
+    tercera salida además de responder / `NO_ANSWER`. **Resultó peor que la
+    coseno**: darle la opción intermedia erosiona la disciplina binaria y
+    el modelo la usa como licencia para *alucinar*. Medido con `llama3.2`
+    (A/B, prompt original vs. con `PARTIAL`, estable en varias tiradas):
+    una pregunta sin cobertura ("Kubernetes ingress") que el prompt
+    original rechaza con `NO_ANSWER`, con `PARTIAL` disponible pasa a
+    devolver un manifiesto de Ingress **inventado** etiquetado como
+    "parcial"; y una pregunta parcial se convierte en un "no hay
+    información" mal etiquetado. Rompe la garantía núcleo ("antes de
+    alucinar, di 'no lo sé'") justo en la ruta por defecto self-hosted
+    (Ollama). No reintentar por esta vía; si algún día hubiera tráfico
+    real, la única variante no descartada sería una señal *post-hoc* que no
+    le dé al modelo una nueva salida generativa.
 - **#14 — Targeting por audiencia y acciones multi-paso** *(Fin
   "Procedures")* — para muy tarde; ahí Intercom lleva años de ventaja.
 
