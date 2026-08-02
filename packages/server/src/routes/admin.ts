@@ -32,7 +32,7 @@ export const adminRoute = new Hono();
 adminRoute.get("/admin/conversations", requireAdminToken, async (c) => {
   const parsed = querySchema.safeParse(c.req.query());
   if (!parsed.success) {
-    return c.json({ error: "Parámetros inválidos", details: parsed.error.flatten() }, 400);
+    return c.json({ error: "Invalid parameters", details: parsed.error.flatten() }, 400);
   }
 
   const limit = Math.min(Math.max(Number(parsed.data.limit ?? DEFAULT_LIMIT), 1), MAX_LIMIT);
@@ -55,12 +55,12 @@ adminRoute.get("/admin/conversations", requireAdminToken, async (c) => {
 adminRoute.delete("/admin/conversations/:id", requireAdminToken, async (c) => {
   const parsed = idSchema.safeParse({ id: c.req.param("id") });
   if (!parsed.success) {
-    return c.json({ error: "id inválido" }, 400);
+    return c.json({ error: "Invalid id" }, 400);
   }
 
   const deleted = await deleteConversation(getPool(), parsed.data.id);
   if (!deleted) {
-    return c.json({ error: "No encontrada" }, 404);
+    return c.json({ error: "Not found" }, 404);
   }
   return c.json({ ok: true });
 });
@@ -68,7 +68,7 @@ adminRoute.delete("/admin/conversations/:id", requireAdminToken, async (c) => {
 adminRoute.get("/admin/stats", requireAdminToken, async (c) => {
   const parsed = statsQuerySchema.safeParse(c.req.query());
   if (!parsed.success) {
-    return c.json({ error: "Parámetros inválidos", details: parsed.error.flatten() }, 400);
+    return c.json({ error: "Invalid parameters", details: parsed.error.flatten() }, 400);
   }
 
   const stats = await getStats(getPool(), parsed.data.days ?? null);

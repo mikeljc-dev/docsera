@@ -163,7 +163,7 @@ test("un body inválido es 400 JSON, no un stream", async () => {
     assert.equal(response.status, 400);
     assert.match(response.headers.get("content-type") ?? "", /application\/json/);
     const json = (await response.json()) as { error: string };
-    assert.match(json.error, /inválido/i);
+    assert.match(json.error, /invalid/i);
   }
 });
 

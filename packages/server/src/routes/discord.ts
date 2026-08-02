@@ -94,7 +94,7 @@ discordRoute.post("/discord/interactions", async (c) => {
   }
   const parsed = interactionSchema.safeParse(json);
   if (!parsed.success) {
-    return c.json({ error: "Body inválido" }, 400);
+    return c.json({ error: "Invalid body" }, 400);
   }
   const interaction = parsed.data;
 
@@ -106,7 +106,7 @@ discordRoute.post("/discord/interactions", async (c) => {
     const rawQuestion = interaction.data.options?.find((o) => o.name === "question")?.value;
     const question = questionSchema.safeParse(rawQuestion);
     if (!question.success || !interaction.application_id || !interaction.token) {
-      return c.json({ error: "Body inválido" }, 400);
+      return c.json({ error: "Invalid body" }, 400);
     }
 
     // Todas las interacciones llegan desde IPs de Discord: la clave del rate

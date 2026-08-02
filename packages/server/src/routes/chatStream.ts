@@ -31,7 +31,7 @@ chatStreamRoute.post("/chat/stream", chatRateLimit, async (c) => {
   const parsed = chatSchema.safeParse(body);
 
   if (!parsed.success) {
-    return c.json({ error: "Body inválido", details: parsed.error.flatten() }, 400);
+    return c.json({ error: "Invalid body", details: parsed.error.flatten() }, 400);
   }
 
   const question = parsed.data.question;
