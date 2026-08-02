@@ -120,11 +120,23 @@ would work, but measured concretely it very nearly doubles the image
 ~470 MB total) — a lot to pay across *every* deployment for a feature
 most won't enable, and a change to the one image the whole project ships
 from. `onnxruntime-web`'s WASM backend has no native bindings, so it
-loads fine on the existing Alpine image, at a fixed ~132 MB dependency
-cost regardless of whether `RERANKER_ENABLED` is ever turned on, and some
-inference latency vs. native (WASM, no GPU, no SIMD guarantees) — a trade
-made deliberately for a feature whose value is still unproven with real
-traffic (see the roadmap). Measured directly, reranking a pool of 12
+loads fine on the existing Alpine image, at a ~132 MB dependency cost and
+some inference latency vs. native (WASM, no GPU, no SIMD guarantees) — a
+trade made deliberately for a feature whose value is still unproven with
+real traffic (see the roadmap).
+
+That ~132 MB is why `onnxruntime-web` and `@huggingface/tokenizers` are
+**optional dependencies**, loaded via dynamic `import()` in
+`chat/rerank.ts` and left out of the default image (`pnpm deploy --prod
+--no-optional` in the Dockerfile). The default image stays ~28% smaller;
+enabling `RERANKER_ENABLED` without the libraries present falls back to
+RRF and logs an actionable message, exactly like a failed model download.
+To actually rerank, rebuild the image with `--build-arg
+INSTALL_RERANKER=true` (which keeps the optional deps). This keeps a
+single Dockerfile and ships the light image by default, since most
+self-hosters never turn reranking on.
+
+Measured directly, reranking a pool of 12
 candidates adds roughly 600-700ms on top of a ~3s baseline request
 (local Ollama on CPU, so the LLM call itself dominates) — noticeable but
 not prohibitive; a hosted LLM provider would make the relative overhead

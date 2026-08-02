@@ -1,8 +1,17 @@
 import { mkdir, readFile, writeFile, access } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { Tokenizer } from "@huggingface/tokenizers";
-import * as ort from "onnxruntime-web";
+import type * as OrtTypes from "onnxruntime-web";
+import type { Tokenizer as TokenizerInstance } from "@huggingface/tokenizers";
+
+// Solo tipos (se borran al compilar): los valores se cargan con import()
+// dinámico en loadRerankDeps para que estos dos paquetes puedan ser
+// dependencias OPCIONALES. La imagen Docker por defecto no los instala (pesan
+// ~132 MB y solo sirven al reranker, que es opt-in) — ver docs/deuda-tecnica.md
+// #2. Si faltan, loadRerankDeps lanza un error accionable y el llamador
+// (chat/retrieve.ts) cae al orden de RRF sin reordenar.
+type OrtModule = typeof import("onnxruntime-web");
+type TokenizersModule = typeof import("@huggingface/tokenizers");
 
 // Cross-encoder ligero (6 capas, cuantizado a int8, ~23 MB) especializado en
 // reordenar pares pregunta-pasaje. Corre sobre onnxruntime-web (WASM) en vez
@@ -22,8 +31,31 @@ export interface RerankCandidate {
 }
 
 interface Reranker {
-  session: ort.InferenceSession;
-  tokenizer: Tokenizer;
+  ort: OrtModule;
+  session: OrtTypes.InferenceSession;
+  tokenizer: TokenizerInstance;
+}
+
+// Carga onnxruntime-web y @huggingface/tokenizers con import() dinámico. Los
+// importadores se inyectan para poder probar la degradación sin desinstalar
+// nada. Un fallo (dep opcional ausente en la imagen delgada) se traduce a un
+// error accionable; el llamador ya lo captura y sigue con RRF.
+export async function loadRerankDeps(
+  importOrt: () => Promise<OrtModule> = () => import("onnxruntime-web"),
+  importTokenizers: () => Promise<TokenizersModule> = () => import("@huggingface/tokenizers"),
+): Promise<{ ort: OrtModule; Tokenizer: TokenizersModule["Tokenizer"] }> {
+  try {
+    const [ort, tokenizers] = await Promise.all([importOrt(), importTokenizers()]);
+    return { ort, Tokenizer: tokenizers.Tokenizer };
+  } catch (error) {
+    throw new Error(
+      "RERANKER_ENABLED pero onnxruntime-web/@huggingface/tokenizers no están instalados. " +
+        "La imagen por defecto los excluye para ir ligera; reconstruye con " +
+        "--build-arg INSTALL_RERANKER=true (o instala las deps opcionales) para reordenar. " +
+        "Se sigue con RRF sin reordenar.",
+      { cause: error },
+    );
+  }
 }
 
 // No se hornea en la imagen Docker a propósito: así el tamaño de la imagen
@@ -56,6 +88,7 @@ export function resolveRerankerCacheDir(env: NodeJS.ProcessEnv = process.env): s
 let rerankerPromise: Promise<Reranker> | null = null;
 
 async function loadReranker(): Promise<Reranker> {
+  const { ort, Tokenizer } = await loadRerankDeps();
   const dir = resolveRerankerCacheDir();
   await mkdir(dir, { recursive: true });
   const modelPath = join(dir, "model_quantized.onnx");
@@ -83,7 +116,7 @@ async function loadReranker(): Promise<Reranker> {
   );
 
   const session = await ort.InferenceSession.create(modelPath);
-  return { session, tokenizer };
+  return { ort, session, tokenizer };
 }
 
 interface EncodedPair {
@@ -123,6 +156,7 @@ async function scorePair(reranker: Reranker, query: string, passage: string): Pr
   });
 
   const n = ids.length;
+  const { ort } = reranker;
   const feeds = {
     input_ids: new ort.Tensor("int64", BigInt64Array.from(ids.map(BigInt)), [1, n]),
     attention_mask: new ort.Tensor("int64", BigInt64Array.from(attentionMask.map(BigInt)), [1, n]),

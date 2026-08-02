@@ -15,15 +15,17 @@
   },
   "dependencies": {
     "@hono/node-server": "^2.0.12",
-    "@huggingface/tokenizers": "^0.1.3",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "cheerio": "^1.2.0",
     "dotenv": "^17.4.2",
     "hono": "^4.12.32",
-    "onnxruntime-web": "^1.27.0",
     "pg": "^8.22.0",
     "unpdf": "1.6.2",
     "zod": "^4.4.3"
+  },
+  "optionalDependencies": {
+    "@huggingface/tokenizers": "^0.1.3",
+    "onnxruntime-web": "^1.27.0"
   },
   "devDependencies": {
     "@types/node": "^26.1.2",
