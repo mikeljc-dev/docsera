@@ -328,3 +328,61 @@ test("con el server offline la entrada queda deshabilitada", async () => {
   const input = el.renderRoot.querySelector("input") as HTMLInputElement;
   assert.equal(input.disabled, true);
 });
+
+// ─── accesibilidad ───
+
+test("el panel se anuncia como diálogo con nombre accesible", async () => {
+  const el = await mount({ server: "https://api.example", heading: "Ask the docs" });
+  el.open = true;
+  await el.updateComplete;
+
+  const panel = el.renderRoot.querySelector(".panel") as HTMLElement;
+  assert.equal(panel.getAttribute("role"), "dialog");
+  assert.equal(panel.getAttribute("aria-label"), "Ask the docs");
+});
+
+test("la lista de mensajes es una live region para anunciar las respuestas", async () => {
+  const el = await mount({ server: "https://api.example" });
+  el.open = true;
+  await el.updateComplete;
+
+  const messages = el.renderRoot.querySelector(".messages") as HTMLElement;
+  assert.equal(messages.getAttribute("role"), "log");
+  assert.equal(messages.getAttribute("aria-live"), "polite");
+});
+
+test("el FAB refleja su estado: nombre accesible y aria-expanded cambian al abrir", async () => {
+  const el = await mount({ server: "https://api.example" });
+  const fab = () => el.renderRoot.querySelector(".fab") as HTMLButtonElement;
+  assert.equal(fab().getAttribute("aria-expanded"), "false");
+  const closedLabel = fab().getAttribute("aria-label");
+
+  el.open = true;
+  await el.updateComplete;
+  assert.equal(fab().getAttribute("aria-expanded"), "true");
+  // El nombre accesible pasa de "abrir" a "cerrar": coincide con su función.
+  assert.notEqual(fab().getAttribute("aria-label"), closedLabel);
+});
+
+test("al abrir, el foco entra directo en el campo de texto", async () => {
+  const el = await mount({ server: "https://api.example" });
+  el.open = true;
+  await el.updateComplete;
+
+  // renderRoot es el ShadowRoot en runtime (Lit lo tipa más ancho).
+  assert.equal((el.renderRoot as ShadowRoot).activeElement, el.renderRoot.querySelector("input"));
+});
+
+test("Escape cierra el panel y devuelve el foco al FAB", async () => {
+  const el = await mount({ server: "https://api.example" });
+  el.open = true;
+  await el.updateComplete;
+
+  const panel = el.renderRoot.querySelector(".panel") as HTMLElement;
+  panel.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+  await el.updateComplete;
+
+  assert.equal(el.open, false);
+  assert.equal(el.renderRoot.querySelector(".panel"), null);
+  assert.equal((el.renderRoot as ShadowRoot).activeElement, el.renderRoot.querySelector(".fab"));
+});
