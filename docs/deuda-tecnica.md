@@ -141,6 +141,41 @@ de producción del reranker, siempre instalada aunque no se active). Bajarlo
 más exige hacer el reranker una dependencia opcional con `import()` dinámico
 — cambio con implicaciones de runtime, aparcado hasta que el peso moleste.
 
+#### Adelgazar más: decisión pendiente (brief, 2026-08-02)
+
+Los ~132 MB de `onnxruntime-web` son ~28 % de la imagen de 471 MB, y solo
+sirven al reranker, que es **opt-in** (`RERANKER_ENABLED`, por defecto
+`false`), añade ~600-700 ms/consulta y cuyo modelo ya se descarga en runtime
+de HuggingFace (no viaja en la imagen). La mayoría de quien autohospeda no lo
+activa. Tres caminos:
+
+- **A. Status quo** — 471 MB, el reranker funciona nada más poner el flag.
+  Coste/riesgo cero. Contra: la imagen por defecto carga 132 MB que casi
+  nadie usa.
+- **B. Imagen por defecto delgada (~339 MB, −28 %)** — mover
+  `onnxruntime-web` (+ `@huggingface/tokenizers`) a `optionalDependencies` y
+  cargarlo con `import()` dinámico en `chat/rerank.ts`; no instalarlo en la
+  imagen de producción. Si alguien pone `RERANKER_ENABLED=true` sin la
+  dependencia, ya existe la degradación a RRF: el `import()` falla → se captura
+  → se sigue sin reordenar, ahora con un log accionable ("reranker pedido pero
+  onnxruntime no instalado; usa la imagen `-reranker` o instala la dep").
+  Contra: es un **cambio de comportamiento** para quien hoy activa el reranker
+  en la imagen por defecto (dejaría de reordenar en el próximo `pull` hasta
+  seguir el paso extra). Esfuerzo: medio (import dinámico, degradación con
+  mensaje, docs, y decidir cómo se ofrece la variante con reranker).
+- **C. Dos variantes de imagen** (`latest` delgada + `docsera:reranker`) —
+  lo mejor de ambas, pero duplica la matriz de release (tiempo de build,
+  tags, docs) y el mantenimiento de `release-image.yml`.
+
+**Recomendación: B.** El reranker está apagado por defecto, cuesta latencia y
+casi nadie lo usa; una imagen 28 % más pequeña sirve directamente al
+principio "instalar en <10 min" (pulls más rápidos) en el caso común, y la
+degradación a RRF con mensaje hace el cambio de comportamiento tolerable.
+La decisión de producto que hay que confirmar antes de implementar: **¿es
+aceptable que `RERANKER_ENABLED` en la imagen por defecto degrade a RRF (con
+log) salvo que se dé un paso extra?** Si sí, B es limpio; si el reranker debe
+funcionar out-of-the-box en la imagen por defecto, la única vía es C.
+
 ## 3. Enlaces Markdown sin renderizar en el widget — ✅ hecho (2026-07-19)
 
 El system prompt le prohíbe enlaces al modelo, pero los emite igual: en la
