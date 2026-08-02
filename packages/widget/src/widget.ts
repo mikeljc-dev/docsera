@@ -684,6 +684,11 @@ export class DocseraWidget extends LitElement {
     if (changed.has("messages") || changed.has("pending")) {
       this.scrollToBottom();
     }
+    if (changed.has("open") && this.open) {
+      // Al abrir por acción del usuario, el foco entra directo al campo de
+      // texto: teclado y lectores de pantalla empiezan a escribir sin tabular.
+      this.renderRoot.querySelector<HTMLInputElement>("input")?.focus();
+    }
   }
 
   private scrollToBottom(): void {
@@ -696,6 +701,16 @@ export class DocseraWidget extends LitElement {
     if (this.open) {
       this.setAttribute("opened", "");
       this.checkHealth();
+    }
+  }
+
+  // Escape cierra el panel y devuelve el foco al FAB, como cualquier popover.
+  // El handler vive en .panel, así que solo actúa cuando el foco está dentro
+  // del widget: no secuestra el Escape de la página anfitriona.
+  private onKeydown(event: KeyboardEvent): void {
+    if (event.key === "Escape" && this.open) {
+      this.toggleOpen();
+      this.renderRoot.querySelector<HTMLButtonElement>(".fab")?.focus();
     }
   }
 
@@ -809,7 +824,12 @@ export class DocseraWidget extends LitElement {
 
   protected override render() {
     return html`
-      <button class="fab" @click=${this.toggleOpen} aria-label=${this.strings.openChat}>
+      <button
+        class="fab"
+        @click=${this.toggleOpen}
+        aria-label=${this.open ? this.strings.close : this.strings.openChat}
+        aria-expanded=${this.open ? "true" : "false"}
+      >
         ${this.open ? closeIcon() : chatIcon()}
       </button>
       ${this.open ? this.renderPanel() : null}
@@ -820,7 +840,13 @@ export class DocseraWidget extends LitElement {
     const strings = this.strings;
     const offline = this.serverOnline === false;
     return html`
-      <div class="panel">
+      <div
+        class="panel"
+        role="dialog"
+        aria-label=${strings.heading}
+        aria-modal="false"
+        @keydown=${this.onKeydown}
+      >
         <header>
           ${markIcon()}
           <div class="titles">
@@ -833,7 +859,7 @@ export class DocseraWidget extends LitElement {
           </div>
           <button @click=${this.toggleOpen} aria-label=${strings.close}>✕</button>
         </header>
-        <div class="messages">
+        <div class="messages" role="log" aria-live="polite">
           ${this.messages.length === 0
             ? html`
                 <p class="empty">${strings.empty}</p>
