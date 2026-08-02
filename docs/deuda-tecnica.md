@@ -106,6 +106,22 @@ los adaptadores de LLM, que hoy se obtienen con `getPool()` y
 
 **Esfuerzo:** medio. **Es el mayor agujero del proyecto ahora mismo.**
 
+**Actualización (2026-08-02): cerrado el hueco de integración con Postgres
+real.** Nuevos `routes/{ingest,chat,mcp}.integration.test.ts` que ejercen las
+tres rutas contra un pgvector de verdad (esquema aislado vía `setupTestDb`,
+misma infra que `retrieve`/`history`), no contra el pool falso:
+- `/ingest`: ingesta de markdown → persiste documento + chunks con vector,
+  dedup por hash (`unchanged` al reingerir), y 401 sin token sin tocar la BD.
+- `/chat`: recuperación real (pgvector + full-text + RRF) e **INSERT de la
+  conversación y sus fuentes** en `conversation_sources`; el caso sin
+  cobertura persiste la no-respuesta sin fuentes ni llamada al LLM.
+- `/mcp`: `search_docs` (retrieval puro) y `ask_docs` (RAG + INSERT) por el
+  transporte del SDK sobre un servidor HTTP real.
+7 tests que se saltan sin `TEST_DATABASE_URL` y corren en CI (que ya levanta
+Postgres). Verificado en local contra el pgvector de `docker compose`: 208/208
+con la BD, 0 fail. Quedan como no-cubiertos los detalles menores de la lista de
+arriba (429 real, `/llms.txt` content-type), de mucho menor riesgo.
+
 ## 2. `packages/server` no se construye — ✅ hecho (2026-07-19)
 
 `"build": "echo \"TODO: build del server\""` en su `package.json`. CI corre
