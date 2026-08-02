@@ -19,7 +19,7 @@ chatHistoryRoute.get("/chat/history", chatRateLimit, async (c) => {
   const parsed = querySchema.safeParse({ sessionId: c.req.query("sessionId") });
 
   if (!parsed.success) {
-    return c.json({ error: "sessionId inválido" }, 400);
+    return c.json({ error: "Invalid sessionId" }, 400);
   }
 
   try {
