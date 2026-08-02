@@ -41,7 +41,17 @@ RUN pnpm --filter @docsera/server build
 # dependencias de produccion, sin las dev). El server no depende de otros
 # paquetes del workspace (widget/dashboard se compilan a assets estaticos y
 # se copian aparte), asi que queda un directorio listo para ejecutar.
-RUN pnpm --filter @docsera/server deploy --prod /prod
+#
+# --no-optional deja fuera onnxruntime-web/@huggingface/tokenizers (~132 MB,
+# solo para el reranker opt-in): la imagen por defecto va ligera. Quien quiera
+# reordenar reconstruye con --build-arg INSTALL_RERANKER=true; si se activa
+# RERANKER_ENABLED sin ellas, el server cae a RRF con un log accionable.
+ARG INSTALL_RERANKER=false
+RUN if [ "$INSTALL_RERANKER" = "true" ]; then \
+      pnpm --filter @docsera/server deploy --prod /prod; \
+    else \
+      pnpm --filter @docsera/server deploy --prod --no-optional /prod; \
+    fi
 
 # ─── Stage 2: runtime ────────────────────────────────────────────
 # Solo Node + el paquete podado. Sin pnpm/corepack, sin devDeps, sin fuentes.

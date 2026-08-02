@@ -171,10 +171,16 @@ activa. Tres caminos:
 casi nadie lo usa; una imagen 28 % más pequeña sirve directamente al
 principio "instalar en <10 min" (pulls más rápidos) en el caso común, y la
 degradación a RRF con mensaje hace el cambio de comportamiento tolerable.
-La decisión de producto que hay que confirmar antes de implementar: **¿es
-aceptable que `RERANKER_ENABLED` en la imagen por defecto degrade a RRF (con
-log) salvo que se dé un paso extra?** Si sí, B es limpio; si el reranker debe
-funcionar out-of-the-box en la imagen por defecto, la única vía es C.
+
+**✅ Implementado (2026-08-02, opción B elegida).** `onnxruntime-web` y
+`@huggingface/tokenizers` pasan a `optionalDependencies` y se cargan con
+`import()` dinámico en `chat/rerank.ts` (extraído a `loadRerankDeps`,
+inyectable y testeado). El Dockerfile poda con `pnpm deploy --prod
+--no-optional` por defecto; un `ARG INSTALL_RERANKER=true` reconstruye la
+imagen completa cuando se quiere reordenar de verdad. Si se activa
+`RERANKER_ENABLED` sin las deps, el error accionable de `loadRerankDeps` sale
+por el `console.error` que ya tenía `chat/retrieve.ts` y se sigue con RRF.
+Documentado en `.env.example`, ARCHITECTURE.md y el Dockerfile.
 
 ## 3. Enlaces Markdown sin renderizar en el widget — ✅ hecho (2026-07-19)
 

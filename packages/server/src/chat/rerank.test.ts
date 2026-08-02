@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { resolveRerankerCacheDir, truncateEncodedPair } from "./rerank.js";
+import { loadRerankDeps, resolveRerankerCacheDir, truncateEncodedPair } from "./rerank.js";
 
 test("la ruta de cache cae en tmpdir cuando no hay override", () => {
   assert.equal(resolveRerankerCacheDir({}), join(tmpdir(), "docsera-reranker"));
@@ -45,4 +45,29 @@ test("el límite exacto no dispara truncado", () => {
   const pair = { ids, attentionMask: ids.map(() => 1), tokenTypeIds: [0, 0, 0, 0] };
   const result = truncateEncodedPair(pair, 4);
   assert.deepEqual(result, pair);
+});
+
+type OrtImporter = () => Promise<typeof import("onnxruntime-web")>;
+type TokenizersImporter = () => Promise<typeof import("@huggingface/tokenizers")>;
+
+test("loadRerankDeps entrega ort y el constructor Tokenizer de los importadores", async () => {
+  const fakeOrt = { tag: "ort" };
+  const FakeTokenizer = function FakeTokenizer() {};
+  const deps = await loadRerankDeps(
+    (async () => fakeOrt) as unknown as OrtImporter,
+    (async () => ({ Tokenizer: FakeTokenizer })) as unknown as TokenizersImporter,
+  );
+  assert.equal(deps.ort, fakeOrt);
+  assert.equal(deps.Tokenizer, FakeTokenizer);
+});
+
+test("loadRerankDeps traduce una dep opcional ausente en un error accionable", async () => {
+  // Simula la imagen delgada: onnxruntime-web no está instalado.
+  await assert.rejects(
+    loadRerankDeps(
+      () => Promise.reject(new Error("Cannot find module 'onnxruntime-web'")),
+      (async () => ({ Tokenizer: function () {} })) as unknown as TokenizersImporter,
+    ),
+    /no están instalados|INSTALL_RERANKER/,
+  );
 });
