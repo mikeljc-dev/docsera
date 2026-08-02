@@ -75,6 +75,49 @@ jobs:
 
       - run: pnpm build
 
+  # El job `ci` corre en Node 20 (el suelo soportado: package.json pide
+  # >=20). Pero produccion usa node:26-alpine (Dockerfile), y a este repo ya
+  # le mordio una vez un fallo especifico de version de Node (navigator/jsdom,
+  # salia solo en el runner). Este job repite SOLO la suite de tests en la
+  # version de prod para cazar esa clase de bug. No toca el badge ni es el
+  # check requerido (eso sigue siendo `ci`): typecheck/lint/build ya se cubren
+  # alli y no dependen de la version de Node.
+  tests-node-prod:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: docsera
+          POSTGRES_PASSWORD: docsera
+          POSTGRES_DB: docsera_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      TEST_DATABASE_URL: postgresql://docsera:docsera@localhost:5432/docsera_test
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+
+      # La version de node:26-alpine con la que se construye la imagen de prod.
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm test
+
   update-tests-badge:
     needs: ci
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
