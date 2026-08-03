@@ -4,7 +4,7 @@ Lista salida de revisar el repo tras publicar la v0.3.0. A diferencia de
 `roadmap-producto.md` —que es producto y análisis de competencia— esto es lo que
 hay que arreglar dentro. Ordenado por lo que conviene hacer antes.
 
-## 1. Ningún test toca HTTP — ✅ en marcha (2026-07-19)
+## 1. Ningún test toca HTTP — ✅ cerrada (2026-08-03)
 
 **Hecho.** Costuras `setPool()` (`lib/db.ts`) y `setChatAdapter()` /
 `setEmbeddingsAdapter()` (`llm/index.ts`), más dobles compartidos en

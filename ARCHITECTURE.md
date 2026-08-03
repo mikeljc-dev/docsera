@@ -268,6 +268,33 @@ Chat and embeddings are configured independently because they're different
 markets: Anthropic has no embeddings API, and embedding models are where
 local (Ollama) is most practical.
 
+## What is checked at startup? (fail fast, not on the first question)
+
+Three common misconfigurations used to surface as a cryptic error on the
+first question (a generic 500 the operator only sees by digging through logs)
+rather than at boot. They're now caught up front:
+
+- **Embedding dimension mismatch.** The `chunks.embedding` column is fixed at
+  `vector(N)` by the first migration and can't change without recreating the
+  table. If `EMBEDDING_DIMENSIONS` later diverges (a different embedding model,
+  or migrating in one env and running in another), `assertEmbeddingDimensions`
+  reads the column's real dimension after migrations run and **aborts** with an
+  actionable message. Since `migrate` runs before `index` in the Dockerfile
+  `CMD`, the container never starts serving with vectors that won't match.
+- **Missing provider key.** `validateProviderConfig` runs right after
+  `loadEnv`: `anthropic` needs `ANTHROPIC_API_KEY`, `openai` needs
+  `OPENAI_API_KEY` (compat mode included), `ollama` needs none; an unknown
+  provider is rejected too. On a problem it prints the missing variable and
+  exits, instead of booting into a server that 500s every question.
+- **Empty `ALLOWED_ORIGINS`.** This one only **warns** (it doesn't abort):
+  using just the MCP server, the HTTP API or the bots is a legitimate
+  CORS-less setup. But an empty value silently blocks the embedded widget on
+  every site (the failure happens in the visitor's browser, not the server),
+  so it's called out at boot.
+
+The theme is the same as "I don't know" over hallucinating: fail loudly and
+early with a message the operator can act on, rather than degrade silently.
+
 ## How are the public endpoints protected?
 
 The public surface is `/chat`, `/feedback`, `/mcp` and (opt-in, aggregates
@@ -341,13 +368,16 @@ can't do (local `pnpm dev` needs the port).
 
 ## What's deliberately left out (for now)?
 
-Answer streaming, cross-encoder re-ranking, multi-turn conversations,
-multi-project instances and connectors beyond sitemap/URL/Markdown/GitHub.
-See the [roadmap](./README.md#roadmap) — each is planned; the project
-optimizes for a complete, verifiable end-to-end product over feature
-breadth. (Answer feedback, coverage analytics, GitHub repo ingestion,
-hybrid retrieval and the MCP server started on that list and have since
-shipped.)
+Connectors beyond sitemap/URL/Markdown/GitHub/PDF (Notion/Confluence need
+OAuth), a per-answer confidence signal (built twice and dropped both times —
+measured, see the [roadmap](./docs/roadmap-producto.md)), and the multi-tenant
+cloud version. See the [roadmap](./README.md#roadmap); for the cloud version
+specifically, the trade-offs and a recommended starting point are in
+[docs/fase-3-cloud-brief.md](./docs/fase-3-cloud-brief.md). The project
+optimizes for a complete, verifiable end-to-end product over feature breadth.
+(Answer streaming, cross-encoder re-ranking, multi-turn conversations, PDF
+ingestion, Discord/Slack bots, coverage analytics, hybrid retrieval and the
+MCP server all started on this list and have since shipped.)
 
 ## Why an MCP server?
 
