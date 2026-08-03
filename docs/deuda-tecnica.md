@@ -119,8 +119,14 @@ misma infra que `retrieve`/`history`), no contra el pool falso:
   transporte del SDK sobre un servidor HTTP real.
 7 tests que se saltan sin `TEST_DATABASE_URL` y corren en CI (que ya levanta
 Postgres). Verificado en local contra el pgvector de `docker compose`: 208/208
-con la BD, 0 fail. Quedan como no-cubiertos los detalles menores de la lista de
-arriba (429 real, `/llms.txt` content-type), de mucho menor riesgo.
+con la BD, 0 fail.
+
+**Corrección (2026-08-03): la lista "Qué falta cubrir" de arriba ya está
+entera hecha** (se comprobó fichero a fichero). El 429 real lo cubre
+`chatStreamRateLimit.test.ts` (429 end-to-end + el LLM no se llama), y
+`/llms.txt` (content-type, H1, esquema `https` vía `x-forwarded-proto`) lo
+cubre `llms.test.ts`. Con eso, y los tests de integración de arriba, la
+deuda #1 queda **cerrada**.
 
 ## 2. `packages/server` no se construye — ✅ hecho (2026-07-19)
 
