@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { loadEnv } from "./env.js";
 import { validateProviderConfig } from "./llm/index.js";
+import { allowedOriginsWarning, parseAllowedOrigins } from "./lib/cors.js";
 import { adminRoute } from "./routes/admin.js";
 import { chatRoute } from "./routes/chat.js";
 import { chatHistoryRoute } from "./routes/chatHistory.js";
@@ -32,10 +33,12 @@ try {
 }
 
 const PORT = Number(process.env.PORT ?? 3000);
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? "")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+const ALLOWED_ORIGINS = parseAllowedOrigins(process.env.ALLOWED_ORIGINS);
+
+// Aviso (no fatal) si nadie podrá embeber el widget: el fallo de CORS ocurre
+// en el navegador del visitante, no aquí, así que sin esto pasa desapercibido.
+const originsWarning = allowedOriginsWarning(ALLOWED_ORIGINS);
+if (originsWarning) console.warn(originsWarning);
 
 const app = new Hono();
 
