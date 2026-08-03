@@ -18,6 +18,36 @@ export function setEmbeddingsAdapter(replacement: EmbeddingsAdapter | undefined)
   embeddingsOverride = replacement;
 }
 
+// Valida la config de proveedor al arrancar en vez de descubrir el problema
+// en la primera pregunta (donde sale como un 500 genérico y hay que bucear en
+// los logs). Cubre el provider desconocido y la API key que falta para el
+// provider elegido; Ollama no necesita key. En inglés como el resto de lo que
+// ve quien autohospeda (.env.example, README). Igual espíritu que
+// assertEmbeddingDimensions: fallar rápido y claro.
+export function validateProviderConfig(env: NodeJS.ProcessEnv = process.env): void {
+  const problems: string[] = [];
+
+  const llm = env.LLM_PROVIDER ?? "anthropic";
+  if (llm === "anthropic") {
+    if (!env.ANTHROPIC_API_KEY) problems.push("LLM_PROVIDER=anthropic requires ANTHROPIC_API_KEY.");
+  } else if (llm === "openai") {
+    if (!env.OPENAI_API_KEY) problems.push("LLM_PROVIDER=openai requires OPENAI_API_KEY.");
+  } else if (llm !== "ollama") {
+    problems.push(`Unknown LLM_PROVIDER "${llm}". Use anthropic | openai | ollama.`);
+  }
+
+  const embeddings = env.EMBEDDING_PROVIDER ?? "openai";
+  if (embeddings === "openai") {
+    if (!env.OPENAI_API_KEY) problems.push("EMBEDDING_PROVIDER=openai requires OPENAI_API_KEY.");
+  } else if (embeddings !== "ollama") {
+    problems.push(`Unknown EMBEDDING_PROVIDER "${embeddings}". Use openai | ollama.`);
+  }
+
+  if (problems.length > 0) {
+    throw new Error(`Invalid LLM configuration:\n- ${problems.join("\n- ")}`);
+  }
+}
+
 export function getChatAdapter(): ChatAdapter {
   if (chatOverride) return chatOverride;
   const provider = process.env.LLM_PROVIDER ?? "anthropic";

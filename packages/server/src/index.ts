@@ -2,6 +2,7 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { loadEnv } from "./env.js";
+import { validateProviderConfig } from "./llm/index.js";
 import { adminRoute } from "./routes/admin.js";
 import { chatRoute } from "./routes/chat.js";
 import { chatHistoryRoute } from "./routes/chatHistory.js";
@@ -19,6 +20,16 @@ import { widgetRoute } from "./routes/widget.js";
 import { VERSION } from "./version.js";
 
 loadEnv();
+
+// Falla rápido si el proveedor de LLM/embeddings está mal configurado (key
+// ausente, provider desconocido): mejor no arrancar que servir y devolver un
+// 500 genérico en la primera pregunta. Solo el mensaje, sin stack.
+try {
+  validateProviderConfig();
+} catch (error) {
+  console.error(error instanceof Error ? error.message : error);
+  process.exit(1);
+}
 
 const PORT = Number(process.env.PORT ?? 3000);
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? "")
