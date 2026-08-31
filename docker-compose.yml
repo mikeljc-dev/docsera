@@ -1,6 +1,9 @@
 # db + server levantan el backend completo con un solo comando (`pnpm
 # compose:up` o `docker compose up -d --build`). El server sirve tambien
 # el widget y el dashboard como estaticos.
+#
+# Esto es para desarrollo LOCAL. En producción, la BD está en Supabase
+# (Postgres+pgvector hosted) y el server en Render (vía Dockerfile).
 
 services:
   db:

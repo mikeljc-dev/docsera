@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: docsera-server
+    runtime: node
+    plan: standard
+    
+    # Detectar cambios: como railway.json, watch de los cambios que disparan rebuild.
+    # El server compila el widget y el dashboard a assets estáticos, así que un
+    # cambio en cualquiera de los tres tiene que desplegar.
+    rootDir: .
+    buildCommand: pnpm install --frozen-lockfile && pnpm build
+    startCommand: node dist/server/index.js
+    
+    # Dockerfile (alternativo si prefieres usarlo en vez de buildCommand)
+    # dockerfilePath: packages/server/Dockerfile
+    
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      # Las demás variables (LLM_PROVIDER, ADMIN_TOKEN, etc.) se ponen en Render
+      # como "Environment Variables" en el dashboard o vía `render.yaml` en repo
+      # privado.
+      # Las variables sensibles (API keys, DB password) se gestionan como "Secrets".
